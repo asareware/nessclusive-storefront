@@ -1,0 +1,65 @@
+/* Nessclusive — design system CSS extracted from the Figma file.
+   The storefront itself is inline-styled; these variables exist for the
+   Shopify theme build so the same values live in one place. */
+
+@import './components/fig-tokens.css';
+@import './components/fig-typography.css';
+
+:root {
+  /* Colours — Nessclusive Style Guide */
+  --ness-body-text:      #15001A;
+  --ness-primary:        #621E69;
+  --ness-primary-deep:   #6B0D83;
+  --ness-secondary:      #FEF1D5;
+  --ness-card-1:         #F7E8F1;
+  --ness-card-cta:       #ECD6E3;
+  --ness-card-2:         #F4E8E8;
+  --ness-card-3:         #FDF9F0;
+  --ness-background:     #FFFDF8;
+  --ness-border:         #E3D2E6;
+  --ness-muted:          #5F5462;
+  --ness-muted-2:        #828282;
+  --ness-placeholder:    #9B9B9B;
+  --ness-gold:           #D8C08E;
+  --ness-on-primary:     #FEF1D5;
+  --ness-hero-body:      #FFE6D1;
+
+  /* Type */
+  --ness-font-display: "Bricolage Grotesque", sans-serif;
+  --ness-font-text:    "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+
+  /* Radii from the file */
+  --ness-radius-card:   20px;
+  --ness-radius-media:  10px;
+  --ness-radius-cta:    10px;
+  --ness-radius-pill:   41px;
+  --ness-radius-input:  6px;
+  --ness-radius-band:   8px;
+  --ness-radius-panel:  14px;
+}
+
+/* Text styles — transcribed from the Style Guide frame */
+.ness-h1 { font: 600 120px/100% var(--ness-font-display); letter-spacing: -0.04em; }
+.ness-h2 { font: 600 64px/100%  var(--ness-font-display); letter-spacing: -0.04em; }
+.ness-h3 { font: 600 48px/100%  var(--ness-font-display); letter-spacing: -0.04em; }
+.ness-h4 { font: 600 36px/100%  var(--ness-font-display); letter-spacing: -0.04em; }
+.ness-h5 { font: 600 32px/100%  var(--ness-font-text); }
+.ness-h6 { font: 600 20px/100%  var(--ness-font-text); text-transform: uppercase; }
+
+.ness-body-1        { font: 400 24px/100% var(--ness-font-text); }
+.ness-body-1-medium { font: 500 24px/100% var(--ness-font-text); }
+.ness-body-2        { font: 500 20px/60px var(--ness-font-text); letter-spacing: -0.02em; }
+.ness-body-2-medium { font: 500 20px/100% var(--ness-font-text); letter-spacing: -0.01em; }
+.ness-body-3        { font: 400 18px/28px var(--ness-font-text); }
+.ness-body-4        { font: 400 16px/100% var(--ness-font-text); }
+.ness-body-4-medium { font: 500 16px/100% var(--ness-font-text); }
+.ness-body-5        { font: 400 15px/22px var(--ness-font-text); }
+.ness-body-6        { font: 400 10px/100% var(--ness-font-text); }
+
+.ness-card-cta   { font: 500 24px/100% var(--ness-font-text); letter-spacing: -0.01em; }
+.ness-card-title-2 { font: 600 22px/100% var(--ness-font-text); }
+.ness-card-title-1 { font: 400 20px/100% var(--ness-font-text); text-transform: uppercase; }
+.ness-price-1    { font: 600 20px/100% var(--ness-font-text); letter-spacing: -0.04em; }
+.ness-price-2    { font: 600 18px/100% var(--ness-font-text); letter-spacing: -0.04em; }
+.ness-price-3    { font: 600 15px/100% var(--ness-font-text); letter-spacing: -0.04em; }
+.ness-cta-mobile { font: 500 15px/100% var(--ness-font-text); letter-spacing: -0.01em; }

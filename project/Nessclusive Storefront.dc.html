@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Inter+Tight:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #FFFDF8; }
+  body { font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif; color: #15001A; -webkit-font-smoothing: antialiased; }
+  * { box-sizing: border-box; }
+  a { color: #621E69; text-decoration: none; }
+  a:hover { color: #6B0D83; text-decoration: underline; }
+  input, textarea, select, button { font-family: inherit; }
+  input:focus, textarea:focus { outline: 2px solid #621E69; outline-offset: 1px; }
+  @keyframes ness-marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+  @keyframes ness-rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes ness-slide-in { from { transform: translateX(100%); } to { transform: none; } }
+  @keyframes ness-fade { from { opacity: 0; } to { opacity: 1; } }
+</style>
+</helmet>
+
+<div style="width: 100%; overflow-x: hidden; background: #FFFDF8;">
+
+  <div style="background: #6B0D83; height: 40px; display: flex; align-items: center; overflow: hidden;">
+    <div style="display: flex; width: max-content; animation: ness-marquee 38s linear infinite;">
+      <div style="display: flex; align-items: center; gap: 64px; padding-right: 64px;">
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Unique Solution For Everyone</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Ships Globally</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Fast Delivery Options</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">24/7 Customer Support</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Cost Effective</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 64px; padding-right: 64px;" aria-hidden="true">
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Unique Solution For Everyone</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Ships Globally</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Fast Delivery Options</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">24/7 Customer Support</span>
+        <span style="font-size: 15px; line-height: 22px; color: #FEF1D5; white-space: nowrap;">Cost Effective</span>
+      </div>
+    </div>
+  </div>
+
+  <header style="position: sticky; top: 0; z-index: 60; background: #FFFDF8; border-bottom: 1px solid #E3D2E6;">
+    <div style="max-width: 1770px; margin: 0 auto; padding: 8px clamp(20px, 4vw, 150px); min-height: 81px; display: flex; align-items: center; gap: clamp(16px, 2.2vw, 40px);">
+      <a href="#" onClick="{{ goHome }}" style="display: flex; flex-shrink: 0;" aria-label="Nessclusive home">
+        <img src="assets/logo.png" alt="Nessclusive" style="width: 102px; height: 65px; object-fit: contain; display: block;" />
+      </a>
+
+      <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
+      <nav style="display: flex; align-items: center; gap: clamp(14px, 1.8vw, 34px); flex: 1 1 auto; flex-wrap: wrap; justify-content: flex-end;">
+        <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="6">
+          <a href="#" onClick="{{ link.go }}" style="font-size: 16px; line-height: 100%; color: #15001A; white-space: nowrap; padding: 6px 0; border-bottom: 1px solid transparent;" style-hover="border-bottom: 1px solid #621E69; color: #621E69; text-decoration: none;">{{ link.label }}</a>
+        </sc-for>
+      </nav>
+      </sc-if>
+
+      <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0; margin-left: auto;">
+        <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ cycleCurrency }}" style="height: 46px; border-radius: 42px; border: 1px solid #E3D2E6; background: transparent; padding: 0 17px; display: flex; align-items: center; gap: 10px; cursor: pointer;" style-hover="border-color: #621E69;">
+          <span style="font-size: 16px; color: #15001A;">{{ currencyCode }}</span>
+          <svg width="12" height="9" viewBox="0 0 12.126 8.907" fill="#15001A"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
+        </button>
+        </sc-if>
+
+        <button onClick="{{ openSearch }}" style="height: 50px; border-radius: 41px; border: 1px solid #E3D2E6; background: transparent; padding: 0 15px; display: flex; align-items: center; gap: 8px; cursor: pointer;" style-hover="border-color: #621E69;" aria-label="Search">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#322F2C" stroke-width="1.5"><circle cx="6.8" cy="6.8" r="6.05" /><path d="M11.4 11.4 L15.2 15.2" stroke-linecap="round" /></svg>
+          <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}"><span style="font-size: 16px; color: #15001A;">Search</span></sc-if>
+        </button>
+
+        <sc-if value="{{ isWide }}" hint-placeholder-val="{{ true }}">
+        <button onClick="{{ openAccount }}" style="height: 50px; border-radius: 41px; border: 1px solid #E3D2E6; background: transparent; padding: 0 15px; display: flex; align-items: center; gap: 8px; cursor: pointer;" style-hover="border-color: #621E69;">
+          <svg width="15" height="16" viewBox="0 0 15 16" fill="none" stroke="#322F2C" stroke-width="1.5"><circle cx="7.5" cy="4.6" r="3.85" /><path d="M0.9 15.2 C1.6 12.1 4.3 10.4 7.5 10.4 C10.7 10.4 13.4 12.1 14.1 15.2" stroke-linecap="round" /></svg>
+          <span style="font-size: 16px; color: #15001A;">Sign in</span>
+        </button>
+        </sc-if>
+
+        <button onClick="{{ openCart }}" style="height: 50px; border-radius: 100px; border: none; background: #E3D2E6; padding: 0 15px; display: flex; align-items: center; gap: 8px; cursor: pointer;" style-hover="background: #ECD6E3;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#322F2C" stroke-width="1.4"><path d="M1.2 2.1 H3.3 L5.2 10.6 H13.1 L14.8 4.6 H4.1" stroke-linecap="round" stroke-linejoin="round" /><circle cx="6.2" cy="13.4" r="1.3" /><circle cx="12.2" cy="13.4" r="1.3" /></svg>
+          <span style="font-size: 16px; color: #322F2C; white-space: nowrap;">{{ cartLabel }}</span>
+        </button>
+
+        <sc-if value="{{ isNarrow }}" hint-placeholder-val="{{ false }}">
+        <button onClick="{{ toggleMenu }}" style="height: 50px; width: 50px; border-radius: 100px; border: 1px solid #E3D2E6; background: transparent; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;" aria-label="Menu">
+          <svg width="20" height="14" viewBox="0 0 20 14" stroke="#15001A" stroke-width="1.6"><path d="M0 1H20M0 7H20M0 13H20" stroke-linecap="round" /></svg>
+        </button>
+        </sc-if>
+      </div>
+    </div>
+  </header>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main data-screen-label="Homepage" style="animation: ness-fade .4s ease both;">
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(48px, 6vw, 96px) clamp(20px, 4vw, 150px) clamp(56px, 6vw, 104px); position: relative;">
+      <div style="position: absolute; inset: auto 0 0 0; height: clamp(180px, 22vw, 340px); display: flex; align-items: flex-end; justify-content: center; gap: clamp(12px, 2vw, 34px); opacity: 0.49; pointer-events: none; overflow: hidden;">
+        <div style="width: clamp(130px, 16vw, 280px); height: 88%; border-radius: 999px 999px 0 0; background: url(assets/hero-1.jpg) center 20% / cover no-repeat;"></div>
+        <div style="width: clamp(130px, 16vw, 280px); height: 100%; border-radius: 999px 999px 0 0; background: url(assets/hero-3.jpg) center 22% / cover no-repeat;"></div>
+        <div style="width: clamp(130px, 16vw, 280px); height: 88%; border-radius: 999px 999px 0 0; background: url(assets/hero-4.jpg) center 18% / cover no-repeat;"></div>
+      </div>
+      <div style="position: relative; display: flex; flex-direction: column; align-items: center; text-align: center; gap: clamp(18px, 2vw, 30px); padding-bottom: clamp(150px, 18vw, 250px);">
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(46px, 8.5vw, 120px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Be Bold, Be Exclusive</h1>
+        <p style="margin: 0; max-width: 760px; font-size: clamp(18px, 1.4vw, 24px); line-height: 1.5; color: #5F5462; text-wrap: pretty;">Let your Wig do the talking with Nessclusive</p>
+        <div style="display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;">
+          <button onClick="{{ goShop }}" style="height: 55px; min-width: 170px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 20px; cursor: pointer;" style-hover="background: #621E69;">Start Shopping</button>
+          <button onClick="{{ goBooking }}" style="height: 55px; min-width: 161px; border-radius: 10px; border: 1px solid #15001A; background: transparent; color: #15001A; font-size: 18px; font-weight: 500; padding: 0 20px; cursor: pointer;" style-hover="background: #15001A; color: #FFFDF8;">Book a Session</button>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
+      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Explore Collection</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(16px, 1.6vw, 20px);">
+        <sc-for list="{{ collections }}" as="c" hint-placeholder-count="3">
+          <a href="#" onClick="{{ c.go }}" style="display: block; border-radius: 20px; background: #F7E8F1; padding: 12px; text-decoration: none;" style-hover="background: #ECD6E3; text-decoration: none;">
+            <div style="border-radius: 10px; aspect-ratio: 439/502; background-image: {{ c.bg }}; background-size: cover; background-position: center;"></div>
+            <div style="margin-top: 11px; border-radius: 10px; background: #ECD6E3; height: 78px; display: flex; align-items: center; justify-content: center;">
+              <span style="font-size: clamp(19px, 1.5vw, 24px); font-weight: 500; letter-spacing: -0.01em; color: #621E69;">{{ c.label }}</span>
+            </div>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
+      <div style="position: relative; border-radius: 20px; overflow: hidden; background: url(assets/hero-bg.jpg) center 25% / cover no-repeat; min-height: clamp(420px, 40vw, 700px); display: flex; align-items: center;">
+        <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(21,0,26,0.86) 0%, rgba(21,0,26,0.62) 46%, rgba(21,0,26,0.18) 100%);"></div>
+        <div style="position: relative; padding: clamp(32px, 5vw, 96px); max-width: 800px; display: flex; flex-direction: column; gap: clamp(18px, 2vw, 28px);">
+          <div style="display: flex; gap: 8px; opacity: 0.33;">
+            <svg width="22" height="17" viewBox="0 0 23.001 17.001" fill="#D8C08E"><path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z" /><path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z" /></svg>
+          </div>
+          <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 4.4vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #FFE6D1; text-wrap: balance;">Step Up Your Style, Book Now</h2>
+          <p style="margin: 0; max-width: 569px; font-size: 18px; line-height: 26px; color: #FFE6D1; text-wrap: pretty;">With just a few clicks, you can secure your spot with our skilled wig  specialists. Our team is here to guide you through the process, ensuring you get the personalized attention you deserve.</p>
+          <button onClick="{{ goBooking }}" style="align-self: flex-start; height: 55px; border-radius: 10px; border: none; background: #FEF1D5; color: #6B0D83; font-size: 18px; font-weight: 500; padding: 0 24px; cursor: pointer;" style-hover="background: #FFFDF8;">Book a Session</button>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
+      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: clamp(28px, 3vw, 48px); flex-wrap: wrap;">
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Our Bestseller Hairpieces</h2>
+        <a href="#" onClick="{{ goShop }}" style="font-size: 18px; font-weight: 500; color: #621E69; border-bottom: 1px solid #621E69;">View all</a>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(16px, 1.6vw, 24px);">
+        <sc-for list="{{ bestsellers }}" as="p" hint-placeholder-count="4">
+          <div style="position: relative; display: flex; flex-direction: column;">
+            <a href="#" onClick="{{ p.go }}" style="display: block; border-radius: 20px; overflow: hidden; background: #F7E8F1;" style-hover="text-decoration: none;">
+              <div style="aspect-ratio: 390/463; background-image: {{ p.bg }}; background-size: cover; background-position: center top;"></div>
+            </a>
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 18px 8px 0;">
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <span style="font-size: 20px; line-height: 100%; color: rgba(21,0,26,0.83); text-transform: uppercase;">{{ p.name }}</span>
+                <span style="font-size: 20px; font-weight: 600; line-height: 100%; letter-spacing: -0.04em; color: #15001A;">{{ p.priceLabel }}</span>
+              </div>
+              <button onClick="{{ p.add }}" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #621E69; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;" style-hover="background: #6B0D83;" aria-label="Add to cart">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F1DEDE" stroke-width="1.6" stroke-linecap="round"><path d="M7 1.5V12.5M1.5 7H12.5" /></svg>
+              </button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
+      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center;">A little about us</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: clamp(24px, 3vw, 56px); align-items: center;">
+        <div style="display: flex; flex-direction: column; gap: clamp(16px, 2vw, 28px);">
+          <div style="border-radius: 10px; aspect-ratio: 390/317; background: url(assets/about-1.jpg) 88% 50% / cover no-repeat;"></div>
+          <div>
+            <h3 style="margin: 0 0 12px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); line-height: 110%; letter-spacing: -0.04em; color: #15001A;">Our story, Your style</h3>
+            <p style="margin: 0; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Nessclusive was born from a simple yet powerful idea to create high-quality wigs that allow people to express their true selves. We provide not just wigs, but a way for everyone to feel beautiful, bold, and unstoppable. </p>
+          </div>
+        </div>
+        <div style="border-radius: 10px; aspect-ratio: 526/412; background: url(assets/about-2.jpg) center / cover no-repeat;"></div>
+        <div style="display: flex; flex-direction: column; gap: clamp(16px, 2vw, 28px);">
+          <div style="border-radius: 10px; aspect-ratio: 390/434; background: url(assets/about-3.jpg) 50% 24% / cover no-repeat;"></div>
+          <div>
+            <h3 style="margin: 0 0 12px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); line-height: 110%; letter-spacing: -0.04em; color: #15001A;">We take pride in quality</h3>
+            <p style="margin: 0; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">We aim to build a global community celebrating diversity and self-expression. With various styles, colors, and customization, everyone can find their own personal wig.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section data-comment-anchor="home-testimonials" style="padding: 0 0 clamp(64px, 7vw, 120px);">
+      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center; padding: 0 20px;">Words from our Happy Clients</h2>
+      <div style="display: flex; gap: 20px; overflow-x: auto; padding: 4px clamp(20px, 4vw, 150px) 20px; scroll-snap-type: x mandatory;">
+        <sc-for list="{{ testimonials }}" as="t" hint-placeholder-count="4">
+          <div style="flex: 0 0 min(544px, 86vw); scroll-snap-align: start; border-radius: 20px; background: #FEF1D5; padding: 35px 27px; display: flex; flex-direction: column; gap: 20px; min-height: 223px;">
+            <div style="display: flex; justify-content: space-between; opacity: 0.75;">
+              <svg width="23" height="17" viewBox="0 0 23.001 17.001" fill="#D8C08E"><path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z" /><path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z" /></svg>
+              <svg width="23" height="17" viewBox="0 0 23.001 17.001" fill="#D8C08E" style="transform: scaleX(-1);"><path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z" /><path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z" /></svg>
+            </div>
+            <p style="margin: 0; flex: 1; font-size: 18px; line-height: 27px; color: #15001A; text-wrap: pretty;">{{ t.quote }}</p>
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+              <span style="font-size: 18px; font-weight: 600; color: #15001A;">{{ t.name }}</span>
+              <div style="display: flex; gap: 3px;">
+                <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+                <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+                <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+                <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+                <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
+      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center; text-wrap: balance;">Frequently Asked  Questions</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 0 clamp(40px, 5vw, 103px);">
+        <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="12">
+          <div style="border-bottom: 1px solid rgba(21,0,26,0.4);">
+            <button onClick="{{ f.toggle }}" style="width: 100%; background: none; border: none; padding: 18px 0; display: flex; align-items: center; justify-content: space-between; gap: 20px; cursor: pointer; text-align: left;">
+              <span style="font-size: 20px; font-weight: 500; letter-spacing: -0.02em; color: #15001A; text-wrap: pretty;">{{ f.q }}</span>
+              <span style="flex-shrink: 0; display: flex; transform: {{ f.rotate }}; transition: transform .22s ease;">
+                <svg width="24" height="24" viewBox="0 0 24 13" fill="#1A2016"><path d="M 0.319 0.317 C 0.746 -0.106 1.436 -0.106 1.862 0.317 L 12 10.385 L 22.138 0.317 C 22.564 -0.106 23.254 -0.106 23.681 0.317 C 24.106 0.74 24.106 1.426 23.681 1.849 L 12.771 12.683 C 12.345 13.106 11.655 13.106 11.229 12.683 L 0.319 1.849 C -0.106 1.426 -0.106 0.74 0.319 0.317 Z" /></svg>
+              </span>
+            </button>
+            <sc-if value="{{ f.open }}" hint-placeholder-val="{{ false }}">
+              <p style="margin: 0; padding: 0 44px 22px 0; font-size: 16px; line-height: 26px; color: #5F5462; text-wrap: pretty; animation: ness-rise .22s ease both;">{{ f.a }}</p>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+      <div style="margin-top: clamp(32px, 4vw, 60px); border-radius: 8px; background: #F7E8F1; padding: clamp(24px, 3vw, 43px) clamp(20px, 2vw, 37px); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+        <div>
+          <p style="margin: 0 0 6px; font-size: clamp(21px, 1.7vw, 26px); font-weight: 500; letter-spacing: -0.03em; color: #621E69;">Do You Have Any Question ?</p>
+          <p style="margin: 0; font-size: 16px; font-weight: 500; letter-spacing: -0.03em; color: #621E69; text-wrap: pretty;">If you have any question about delivery, return or refund policy, please feel free to contact</p>
+        </div>
+        <a href="#contact" style="height: 55px; display: flex; align-items: center; border-radius: 10px; background: #FEF1D5; color: #6B0D83; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; white-space: nowrap;" style-hover="background: #FFFDF8; text-decoration: none;">Contact Us</a>
+      </div>
+    </section>
+
+    <section id="contact" style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px); scroll-margin-top: 120px;">
+      <div style="border-radius: 20px; background: #621E69; padding: clamp(32px, 4vw, 66px) clamp(24px, 5vw, 97px);">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: clamp(32px, 4vw, 84px); align-items: center;">
+          <div style="display: flex; flex-direction: column; gap: clamp(20px, 2.5vw, 36px);">
+            <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 4.4vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #FEF1D5;">Let’s Stay Connected</h2>
+            <p style="margin: 0; max-width: 582px; font-size: 18px; line-height: 27px; color: #FEF1D5; text-wrap: pretty;">Have questions or need assistance? We're here to help! Drop us a message and let’s connect. Whether you’re looking for expert advice, customization options, or just want to say hello, we’d love to hear from you. Let us help you find your perfect style!"</p>
+            <div>
+              <p style="margin: 0 0 16px; font-size: 18px; font-weight: 600; line-height: 27px; color: #FEF1D5;">Follow Us on Social Medias</p>
+              <div style="display: flex; gap: 12px;">
+                <a href="#" aria-label="Facebook" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#621E69"><path d="M 24 12.03 C 24 5.389 18.624 0 12 0 C 5.376 0 0 5.389 0 12.03 C 0 17.853 4.128 22.701 9.6 23.82 L 9.6 15.639 L 7.2 15.639 L 7.2 12.03 L 9.6 12.03 L 9.6 9.023 C 9.6 6.701 11.484 4.812 13.8 4.812 L 16.8 4.812 L 16.8 8.421 L 14.4 8.421 C 13.74 8.421 13.2 8.962 13.2 9.624 L 13.2 12.03 L 16.8 12.03 L 16.8 15.639 L 13.2 15.639 L 13.2 24 C 19.26 23.398 24 18.274 24 12.03 Z" /></svg></a>
+                <a href="#" aria-label="Instagram" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6" /><circle cx="12" cy="12" r="4.6" /><circle cx="17.8" cy="6.2" r="1.2" fill="#621E69" stroke="none" /></svg></a>
+                <a href="#" aria-label="YouTube" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#621E69"><path d="M21.6 7.2c-.2-1-.9-1.7-1.9-1.9C17.9 5 12 5 12 5s-5.9 0-7.7.3c-1 .2-1.7.9-1.9 1.9C2.1 9 2.1 12 2.1 12s0 3 .3 4.8c.2 1 .9 1.7 1.9 1.9C6.1 19 12 19 12 19s5.9 0 7.7-.3c1-.2 1.7-.9 1.9-1.9.3-1.8.3-4.8.3-4.8s0-3-.3-4.8ZM9.9 15.3V8.7l5.6 3.3-5.6 3.3Z" /></svg></a>
+                <a href="#" aria-label="X" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="17" height="17" viewBox="0 0 13.224 13.515" fill="#621E69"><path d="M 7.87 5.723 L 12.793 0 L 11.627 0 L 7.352 4.969 L 3.938 0 L 0 0 L 5.163 7.514 L 0 13.515 L 1.167 13.515 L 5.681 8.268 L 9.286 13.515 L 13.224 13.515 L 7.87 5.723 L 7.87 5.723 Z M 1.587 0.878 L 3.379 0.878 L 11.627 12.677 L 9.835 12.677 L 1.587 0.878 Z" /></svg></a>
+              </div>
+            </div>
+          </div>
+          <div style="border-radius: 10px; background: #F4E8E8; padding: clamp(24px, 2.4vw, 35px); display: flex; flex-direction: column; gap: 18px;">
+            <label style="display: flex; flex-direction: column; gap: 11px;">
+              <span style="font-size: 16px; font-weight: 500; color: #333333;">Name</span>
+              <input type="text" placeholder="Ex. Park" style="height: 55px; border-radius: 6px; border: none; background: #FFFFFF; padding: 0 16px; font-size: 16px; letter-spacing: -0.01em; color: #15001A;" />
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 11px;">
+              <span style="font-size: 16px; font-weight: 500; color: #333333;">Email</span>
+              <input type="email" placeholder="example@mail.com" style="height: 55px; border-radius: 6px; border: none; background: #FFFFFF; padding: 0 16px; font-size: 16px; letter-spacing: -0.01em; color: #15001A;" />
+            </label>
+            <label style="display: flex; flex-direction: column; gap: 11px;">
+              <span style="font-size: 16px; font-weight: 500; color: #333333;">Write your message</span>
+              <textarea placeholder="Write your brief" rows="5" style="border-radius: 6px; border: none; background: #FFFFFF; padding: 16px; font-size: 16px; letter-spacing: -0.01em; color: #15001A; resize: vertical; min-height: 158px;"></textarea>
+            </label>
+            <button onClick="{{ submitContact }}" style="height: 55px; border-radius: 6px; border: none; background: #621E69; color: #FEF1D5; font-size: 18px; font-weight: 500; letter-spacing: -0.03em; cursor: pointer;" style-hover="background: #6B0D83;">Contact Us</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="padding: 0 0 clamp(64px, 7vw, 110px);">
+      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(30px, 4.2vw, 64px); line-height: 110%; letter-spacing: -0.04em; color: #15001A; text-align: center; padding: 0 20px; text-wrap: balance;">Follow &amp; Tag  on Instagram @Nessclusive</h2>
+      <div style="display: flex; gap: clamp(10px, 1vw, 16px); overflow-x: auto; padding: 0 clamp(14px, 2vw, 40px);">
+        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-1.jpg) center / cover no-repeat;"></div>
+        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-2.jpg) center / cover no-repeat;"></div>
+        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-3.jpg) center / cover no-repeat;"></div>
+        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-4.jpg) center / cover no-repeat;"></div>
+        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-5.jpg) center / cover no-repeat;"></div>
+      </div>
+    </section>
+
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isShop }}" hint-placeholder-val="{{ false }}">
+  <main data-screen-label="All Products" style="animation: ness-fade .4s ease both; max-width: 1770px; margin: 0 auto; padding: clamp(32px, 4vw, 60px) clamp(20px, 4vw, 150px) clamp(64px, 7vw, 110px);">
+
+    <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; flex-wrap: wrap; margin-bottom: clamp(24px, 3vw, 40px);">
+      <div>
+        <p style="margin: 0 0 12px; font-size: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; color: #621E69;">Shop by Collections</p>
+        <h1 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">{{ collectionTitle }}</h1>
+      </div>
+      <span style="font-size: 16px; color: #5F5462;">{{ resultCount }}</span>
+    </div>
+
+    <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: clamp(20px, 2vw, 28px);">
+      <sc-for list="{{ chips }}" as="chip" hint-placeholder-count="4">
+        <button onClick="{{ chip.pick }}" style="height: 46px; padding: 0 22px; border-radius: 42px; border: 1px solid #E3D2E6; background: {{ chip.bg }}; color: {{ chip.fg }}; font-size: 16px; cursor: pointer;" style-hover="border-color: #621E69;">{{ chip.label }}</button>
+      </sc-for>
+    </div>
+
+    <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; padding: 16px 0; border-top: 1px solid #E3D2E6; border-bottom: 1px solid #E3D2E6; margin-bottom: clamp(24px, 3vw, 40px);">
+      <button onClick="{{ toggleFilters }}" style="height: 50px; padding: 0 20px; border-radius: 41px; border: 1px solid #E3D2E6; background: transparent; display: flex; align-items: center; gap: 10px; font-size: 16px; color: #15001A; cursor: pointer;" style-hover="border-color: #621E69;">
+        <svg width="16" height="14" viewBox="0 0 16 14" stroke="#15001A" stroke-width="1.4" fill="none"><path d="M1 3h14M3.5 7h9M6 11h4" stroke-linecap="round" /></svg>
+        Filters
+      </button>
+      <div style="position: relative;">
+        <button onClick="{{ toggleSort }}" style="height: 50px; padding: 0 20px; border-radius: 41px; border: 1px solid #E3D2E6; background: transparent; display: flex; align-items: center; gap: 12px; font-size: 16px; color: #15001A; cursor: pointer;" style-hover="border-color: #621E69;">
+          <span style="color: #5F5462;">Sort By</span>
+          <span style="font-weight: 500;">{{ sortLabel }}</span>
+          <svg width="12" height="9" viewBox="0 0 12.126 8.907" fill="#15001A"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
+        </button>
+        <sc-if value="{{ sortOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position: absolute; right: 0; top: 58px; z-index: 40; min-width: 260px; background: #FFFDF8; border: 1px solid #E3D2E6; border-radius: 12px; padding: 8px; box-shadow: 0 18px 44px rgba(21,0,26,0.14); animation: ness-rise .18s ease both;">
+            <sc-for list="{{ sortOptions }}" as="o" hint-placeholder-count="6">
+              <button onClick="{{ o.pick }}" style="display: block; width: 100%; text-align: left; padding: 13px 14px; border: none; background: transparent; border-radius: 8px; font-size: 16px; font-weight: {{ o.weight }}; color: #15001A; cursor: pointer;" style-hover="background: #F7E8F1;">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ filtersOpen }}" hint-placeholder-val="{{ false }}">
+      <div style="border: 1px solid #E3D2E6; border-radius: 12px; padding: clamp(20px, 2.4vw, 32px); margin-bottom: clamp(24px, 3vw, 40px); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(24px, 3vw, 48px); animation: ness-rise .2s ease both;">
+        <div>
+          <p style="margin: 0 0 18px; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: #15001A;">Availability</p>
+          <sc-for list="{{ availOptions }}" as="a" hint-placeholder-count="2">
+            <label style="display: flex; align-items: center; gap: 12px; padding: 9px 0; cursor: pointer;">
+              <span style="width: 20px; height: 20px; border-radius: 4px; border: 1px solid #E3D2E6; background: {{ a.box }}; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke="#FEF1D5" stroke-width="2"><path d="M1 4.4L4.4 7.8L11 1.2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+              </span>
+              <input type="checkbox" checked="{{ a.on }}" onChange="{{ a.toggle }}" style="position: absolute; opacity: 0; width: 0; height: 0;" />
+              <span style="font-size: 16px; color: #15001A;">{{ a.label }}</span>
+              <span style="font-size: 16px; color: #5F5462;">{{ a.count }}</span>
+            </label>
+          </sc-for>
+        </div>
+        <div>
+          <p style="margin: 0 0 18px; font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: #15001A;">Price</p>
+          <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+            <span style="font-size: 16px; color: #5F5462;">$1.00</span>
+            <span style="font-size: 16px; color: #5F5462;">to</span>
+            <span style="font-size: 16px; font-weight: 600; color: #15001A;">{{ priceMaxLabel }}</span>
+          </div>
+          <input type="range" min="100" max="700" step="5" value="{{ priceMax }}" onInput="{{ onPrice }}" style="width: 100%; accent-color: #621E69;" />
+        </div>
+        <div style="display: flex; align-items: flex-end; gap: 12px;">
+          <button onClick="{{ toggleFilters }}" style="height: 55px; padding: 0 28px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #621E69;">Apply</button>
+          <button onClick="{{ clearFilters }}" style="height: 55px; padding: 0 20px; border-radius: 10px; border: 1px solid #15001A; background: transparent; color: #15001A; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #15001A; color: #FFFDF8;">Clear all</button>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+      <div style="border: 1px solid #E3D2E6; border-radius: 20px; background: #FDF9F0; padding: clamp(40px, 6vw, 88px) clamp(24px, 4vw, 60px); text-align: center;">
+        <p style="margin: 0 auto 24px; max-width: 480px; font-size: 20px; line-height: 30px; color: #5F5462; text-wrap: pretty;">{{ emptyLine }}</p>
+        <button onClick="{{ clearFilters }}" style="height: 55px; padding: 0 26px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #621E69;">Show all products</button>
+      </div>
+    </sc-if>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: clamp(20px, 2vw, 32px) clamp(16px, 1.6vw, 24px);">
+      <sc-for list="{{ products }}" as="p" hint-placeholder-count="10">
+        <div style="display: flex; flex-direction: column;">
+          <a href="#" onClick="{{ p.go }}" style="display: block; border-radius: 20px; overflow: hidden; background: #F7E8F1;" style-hover="text-decoration: none;">
+            <div style="aspect-ratio: 390/463; background-image: {{ p.bg }}; background-size: cover; background-position: center top;"></div>
+          </a>
+          <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 18px 8px 0;">
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+              <span style="font-size: 20px; line-height: 100%; color: rgba(21,0,26,0.83); text-transform: uppercase;">{{ p.name }}</span>
+              <span style="font-size: 20px; font-weight: 600; line-height: 100%; letter-spacing: -0.04em; color: #15001A;">{{ p.priceLabel }}</span>
+            </div>
+            <button onClick="{{ p.add }}" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #621E69; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;" style-hover="background: #6B0D83;" aria-label="Add to cart">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F1DEDE" stroke-width="1.6" stroke-linecap="round"><path d="M7 1.5V12.5M1.5 7H12.5" /></svg>
+            </button>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ hasResults }}" hint-placeholder-val="{{ true }}">
+      <div style="display: flex; justify-content: center; gap: 10px; margin-top: clamp(40px, 4vw, 64px);">
+        <span style="width: 46px; height: 46px; border-radius: 50%; background: #621E69; color: #FEF1D5; display: flex; align-items: center; justify-content: center; font-size: 16px;">1</span>
+      </div>
+    </sc-if>
+
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isProduct }}" hint-placeholder-val="{{ false }}">
+  <main data-screen-label="Single Product" style="animation: ness-fade .4s ease both; max-width: 1770px; margin: 0 auto; padding: clamp(24px, 3vw, 44px) clamp(20px, 4vw, 150px) clamp(64px, 7vw, 110px);">
+
+    <div style="display: flex; align-items: center; gap: 10px; font-size: 15px; line-height: 22px; color: #5F5462; margin-bottom: clamp(24px, 3vw, 40px);">
+      <a href="#" onClick="{{ goHome }}" style="color: #5F5462;">Home</a>
+      <span>/</span>
+      <a href="#" onClick="{{ goShop }}" style="color: #5F5462;">{{ p.collection }}</a>
+      <span>/</span>
+      <span style="color: #15001A;">{{ p.name }}</span>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: clamp(28px, 4vw, 72px); align-items: start;">
+      <div style="display: flex; flex-direction: column; gap: 16px;">
+        <div style="border-radius: 20px; overflow: hidden; background: #F7E8F1; aspect-ratio: 3/4; background-image: {{ p.hero }}; background-size: cover; background-position: center top;"></div>
+        <div style="display: flex; gap: 12px;">
+          <sc-for list="{{ galleryThumbs }}" as="th" hint-placeholder-count="3">
+            <button onClick="{{ th.pick }}" style="flex: 1; padding: 0; border: {{ th.border }}; border-radius: 10px; overflow: hidden; background: transparent; cursor: pointer; aspect-ratio: 3/4;">
+              <div style="width: 100%; height: 100%; background-image: {{ th.bg }}; background-size: cover; background-position: center top;"></div>
+            </button>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: clamp(20px, 2vw, 28px);">
+        <div>
+          <p style="margin: 0 0 10px; font-size: 15px; line-height: 22px; color: {{ p.stockColor }};">{{ p.stock }} · {{ p.spec }}</p>
+          <h1 style="margin: 0 0 14px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 3.6vw, 48px); line-height: 105%; letter-spacing: -0.04em; color: #15001A;">{{ p.name }}</h1>
+          <p style="margin: 0; font-size: 24px; font-weight: 600; letter-spacing: -0.04em; color: #15001A;">{{ p.priceLabel }}</p>
+        </div>
+
+        <p style="margin: 0; font-size: 15px; line-height: 22px; color: #5F5462; padding-bottom: 20px; border-bottom: 1px solid #E3D2E6;">{{ p.instalment }} <strong style="color: #15001A; font-weight: 600;">Shop Pay</strong></p>
+
+        <div>
+          <p style="margin: 0 0 12px; font-size: 16px; font-weight: 500; color: #15001A;">Select Size</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <sc-for list="{{ sizeOptions }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.pick }}" style="min-width: 74px; height: 50px; border-radius: 41px; border: 1px solid #E3D2E6; background: {{ o.bg }}; color: {{ o.fg }}; font-size: 16px; cursor: pointer;" style-hover="border-color: #621E69;">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <p style="margin: 0 0 12px; font-size: 16px; font-weight: 500; color: #15001A;">Select Part</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <sc-for list="{{ partOptions }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.pick }}" style="min-width: 88px; height: 50px; border-radius: 41px; border: {{ o.border }}; background: {{ o.bg }}; color: #15001A; font-size: 16px; cursor: pointer;">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <p style="margin: 0 0 12px; font-size: 16px; font-weight: 500; color: #15001A;">Select Cap Size</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <sc-for list="{{ capOptions }}" as="o" hint-placeholder-count="3">
+              <button onClick="{{ o.pick }}" style="min-width: 96px; height: 50px; border-radius: 41px; border: {{ o.border }}; background: {{ o.bg }}; color: #15001A; font-size: 16px; cursor: pointer;">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <p style="margin: 0 0 12px; font-size: 16px; font-weight: 500; color: #15001A;">Processing Time</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <sc-for list="{{ procOptions }}" as="o" hint-placeholder-count="2">
+              <button onClick="{{ o.pick }}" style="height: 50px; padding: 0 20px; border-radius: 41px; border: {{ o.border }}; background: {{ o.bg }}; color: #15001A; font-size: 16px; cursor: pointer;">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <p style="margin: 0 0 12px; font-size: 16px; font-weight: 500; color: #15001A;">Pickup Option</p>
+          <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+            <sc-for list="{{ pickupOptions }}" as="o" hint-placeholder-count="2">
+              <button onClick="{{ o.pick }}" style="height: 50px; padding: 0 20px; border-radius: 41px; border: {{ o.border }}; background: {{ o.bg }}; color: #15001A; font-size: 16px; cursor: pointer;">{{ o.label }}</button>
+            </sc-for>
+          </div>
+        </div>
+
+        <div>
+          <p style="margin: 0 0 12px; font-size: 16px; font-weight: 500; color: #15001A;">Quantity</p>
+          <div style="display: inline-flex; align-items: center; border: 1px solid #E3D2E6; border-radius: 41px; height: 50px;">
+            <button onClick="{{ qtyDec }}" style="width: 48px; height: 48px; border: none; background: transparent; cursor: pointer; font-size: 20px; color: #15001A;" aria-label="Decrease quantity">−</button>
+            <span style="min-width: 34px; text-align: center; font-size: 16px; color: #15001A;">{{ qty }}</span>
+            <button onClick="{{ qtyInc }}" style="width: 48px; height: 48px; border: none; background: transparent; cursor: pointer; font-size: 20px; color: #15001A;" aria-label="Increase quantity">+</button>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 12px;">
+          <button onClick="{{ addProduct }}" style="height: 55px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px;" style-hover="background: #621E69;">
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="#FFFCF8" stroke-width="1.4"><path d="M1.2 2.1 H3.3 L5.2 10.6 H13.1 L14.8 4.6 H4.1" stroke-linecap="round" stroke-linejoin="round" /><circle cx="6.2" cy="13.4" r="1.3" /><circle cx="12.2" cy="13.4" r="1.3" /></svg>
+            Add to Cart
+          </button>
+          <button onClick="{{ buyNow }}" style="height: 55px; border-radius: 10px; border: 1px solid #15001A; background: transparent; color: #15001A; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #15001A; color: #FFFDF8;">Buy with Shop Pay</button>
+        </div>
+
+        <p style="margin: 0; font-size: 15px; line-height: 22px; color: #5F5462;">Model is wearing Length 18"</p>
+
+        <div style="border-radius: 10px; background: #FEF1D5; padding: clamp(20px, 2.2vw, 28px);">
+          <p style="margin: 0 0 12px; font-size: 20px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.02em; color: #621E69;">Wig Authorization Form</p>
+          <p style="margin: 0 0 18px; font-size: 16px; line-height: 26px; color: #15001A; text-wrap: pretty;">After purchasing a unit , please fill out a wig authorization form through here Failure to do so will lead to order cancellation .</p>
+          <a href="#" style="display: inline-flex; align-items: center; height: 50px; padding: 0 22px; border-radius: 41px; background: #621E69; color: #FEF1D5; font-size: 16px; text-decoration: none;" style-hover="background: #6B0D83; text-decoration: none;">Wig authorization form</a>
+        </div>
+      </div>
+    </div>
+
+    <section style="padding-top: clamp(56px, 6vw, 104px);">
+      <h2 style="margin: 0 0 clamp(24px, 3vw, 40px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(30px, 3.4vw, 48px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">You may also Like</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: clamp(16px, 1.6vw, 24px);">
+        <sc-for list="{{ related }}" as="r" hint-placeholder-count="4">
+          <div style="display: flex; flex-direction: column;">
+            <a href="#" onClick="{{ r.go }}" style="display: block; border-radius: 20px; overflow: hidden; background: #F7E8F1;" style-hover="text-decoration: none;">
+              <div style="aspect-ratio: 390/463; background-image: {{ r.bg }}; background-size: cover; background-position: center top;"></div>
+            </a>
+            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 18px 8px 0;">
+              <div style="display: flex; flex-direction: column; gap: 10px;">
+                <span style="font-size: 20px; line-height: 100%; color: rgba(21,0,26,0.83); text-transform: uppercase;">{{ r.name }}</span>
+                <span style="font-size: 20px; font-weight: 600; line-height: 100%; letter-spacing: -0.04em; color: #15001A;">{{ r.priceLabel }}</span>
+              </div>
+              <button onClick="{{ r.add }}" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #621E69; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;" style-hover="background: #6B0D83;" aria-label="Add to cart">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F1DEDE" stroke-width="1.6" stroke-linecap="round"><path d="M7 1.5V12.5M1.5 7H12.5" /></svg>
+              </button>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isBooking }}" hint-placeholder-val="{{ false }}">
+  <main data-screen-label="Booking" style="animation: ness-fade .4s ease both;">
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(24px, 3vw, 44px) clamp(20px, 4vw, 150px) 0;">
+      <div style="position: relative; border-radius: 20px; overflow: hidden; min-height: clamp(220px, 22vw, 300px); display: flex; align-items: center; justify-content: center; background: url(assets/booking-hero.jpg) 50% 33% / cover no-repeat;">
+        <div style="position: absolute; inset: 0; background: rgba(107,13,131,0.73);"></div>
+        <h1 style="position: relative; margin: 0; text-align: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(40px, 7vw, 120px); line-height: 100%; letter-spacing: -0.04em; color: #FEF1D5;">Book Nessclusive</h1>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(48px, 5vw, 80px) clamp(20px, 4vw, 150px) 0;">
+      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 4.4vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center;">Plan your Perfect Style</h2>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(16px, 1.6vw, 24px);">
+        <sc-for list="{{ stepLabels }}" as="st" hint-placeholder-count="3">
+          <div style="border-radius: 20px; background: #F7E8F1; padding: clamp(28px, 3vw, 54px) clamp(20px, 2vw, 32px); display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center;">
+            <div style="width: 118px; height: 118px; border-radius: 50%; background: {{ st.bg }}; color: {{ st.fg }}; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 48px; font-weight: 600;">{{ st.n }}</div>
+            <p style="margin: 0; font-size: clamp(19px, 1.5vw, 24px); font-weight: 500; letter-spacing: -0.01em; color: #621E69; text-wrap: balance;">{{ st.label }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(40px, 4vw, 64px) clamp(20px, 4vw, 150px) 0;">
+      <div style="border-radius: 20px; border: 1px solid #E3D2E6; background: #FDF9F0; padding: clamp(24px, 3vw, 48px);">
+
+        <sc-if value="{{ bDone }}" hint-placeholder-val="{{ false }}">
+          <div style="text-align: center; padding: clamp(24px, 4vw, 56px) 0;">
+            <div style="width: 88px; height: 88px; border-radius: 50%; background: #621E69; margin: 0 auto 28px; display: flex; align-items: center; justify-content: center;">
+              <svg width="38" height="28" viewBox="0 0 38 28" fill="none" stroke="#FEF1D5" stroke-width="3.4"><path d="M2 15L13 26L36 3" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </div>
+            <h3 style="margin: 0 0 14px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(26px, 2.6vw, 36px); letter-spacing: -0.04em; color: #15001A;">Request received</h3>
+            <p style="margin: 0 auto 28px; max-width: 520px; font-size: 18px; line-height: 27px; color: #5F5462; text-wrap: pretty;">{{ bSummary }}</p>
+            <p style="margin: 0 auto 28px; max-width: 560px; font-size: 16px; line-height: 26px; color: #5F5462; text-wrap: pretty;">Your slot is held once the non-refundable deposit is paid. We will text the deposit link to the number on your request.</p>
+            <button onClick="{{ bReset }}" style="height: 55px; padding: 0 26px; border-radius: 10px; border: 1px solid #15001A; background: transparent; color: #15001A; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #15001A; color: #FFFDF8;">Book another service</button>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ bStep0 }}" hint-placeholder-val="{{ true }}">
+          <div>
+            <p style="margin: 0 0 6px; font-size: 15px; line-height: 22px; color: #5F5462;">Step 1 of 3</p>
+            <h3 style="margin: 0 0 clamp(20px, 2vw, 32px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Select Your Desired Service</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px;">
+              <sc-for list="{{ services }}" as="sv" hint-placeholder-count="5">
+                <button onClick="{{ sv.pick }}" style="text-align: left; border: {{ sv.border }}; border-radius: 12px; background: {{ sv.bg }}; padding: 22px; cursor: pointer; display: flex; flex-direction: column; gap: 8px;" style-hover="border-color: #621E69;">
+                  <span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: #15001A;">{{ sv.name }}</span>
+                  <span style="font-size: 15px; line-height: 22px; color: #5F5462;">{{ sv.note }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ bStep1 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <p style="margin: 0 0 6px; font-size: 15px; line-height: 22px; color: #5F5462;">Step 2 of 3</p>
+            <h3 style="margin: 0 0 clamp(20px, 2vw, 32px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Select your preferable Time &amp; date</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(24px, 3vw, 40px);">
+              <label style="display: flex; flex-direction: column; gap: 11px;">
+                <span style="font-size: 16px; font-weight: 500; color: #333333;">Date</span>
+                <input type="date" value="{{ bDate }}" onChange="{{ onDate }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
+              </label>
+              <div>
+                <p style="margin: 0 0 11px; font-size: 16px; font-weight: 500; color: #333333;">Time</p>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                  <sc-for list="{{ times }}" as="t" hint-placeholder-count="6">
+                    <button onClick="{{ t.pick }}" style="height: 50px; padding: 0 18px; border-radius: 41px; border: {{ t.border }}; background: {{ t.bg }}; color: {{ t.fg }}; font-size: 16px; cursor: pointer;">{{ t.label }}</button>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ bStep2 }}" hint-placeholder-val="{{ false }}">
+          <div>
+            <p style="margin: 0 0 6px; font-size: 15px; line-height: 22px; color: #5F5462;">Step 3 of 3</p>
+            <h3 style="margin: 0 0 clamp(20px, 2vw, 32px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Confirm and Get Ready </h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(20px, 2vw, 32px);">
+              <label style="display: flex; flex-direction: column; gap: 11px;">
+                <span style="font-size: 16px; font-weight: 500; color: #333333;">Name</span>
+                <input type="text" placeholder="Ex. Park" value="{{ bName }}" onInput="{{ onName }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 11px;">
+                <span style="font-size: 16px; font-weight: 500; color: #333333;">Email</span>
+                <input type="email" placeholder="example@mail.com" value="{{ bEmail }}" onInput="{{ onEmail }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
+              </label>
+              <label style="display: flex; flex-direction: column; gap: 11px;">
+                <span style="font-size: 16px; font-weight: 500; color: #333333;">Phone</span>
+                <input type="tel" placeholder="917-587-8962" value="{{ bPhone }}" onInput="{{ onPhone }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
+              </label>
+            </div>
+            <div style="margin-top: clamp(20px, 2vw, 28px); border-radius: 8px; background: #F7E8F1; padding: 20px;">
+              <p style="margin: 0; font-size: 16px; line-height: 26px; color: #621E69;">{{ bSummary }}</p>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ bFormOpen }}" hint-placeholder-val="{{ true }}">
+          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: clamp(24px, 3vw, 36px);">
+            <sc-if value="{{ bCanBack }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ bBack }}" style="height: 55px; padding: 0 24px; border-radius: 10px; border: 1px solid #15001A; background: transparent; color: #15001A; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #15001A; color: #FFFDF8;">Back</button>
+            </sc-if>
+            <sc-if value="{{ bCanNext }}" hint-placeholder-val="{{ true }}">
+              <button onClick="{{ bNext }}" style="height: 55px; padding: 0 28px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #621E69;">Continue</button>
+            </sc-if>
+            <sc-if value="{{ bStep2 }}" hint-placeholder-val="{{ false }}">
+              <button onClick="{{ bConfirm }}" style="height: 55px; padding: 0 28px; border-radius: 10px; border: none; background: {{ bConfirmBg }}; color: {{ bConfirmFg }}; font-size: 18px; font-weight: 500; cursor: pointer;">Confirm booking</button>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(48px, 5vw, 80px) clamp(20px, 4vw, 150px) 0;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: clamp(24px, 3vw, 48px);">
+        <div style="border-radius: 20px; background: #FEF1D5; padding: clamp(24px, 3vw, 40px);">
+          <h3 style="margin: 0 0 24px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Booking Policy</h3>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <sc-for list="{{ policy }}" as="line" hint-placeholder-count="6">
+              <p style="margin: 0; font-size: 15px; line-height: 24px; color: #15001A; white-space: pre-line;">{{ line.text }}</p>
+            </sc-for>
+          </div>
+        </div>
+        <div style="border-radius: 20px; background: #F4E8E8; padding: clamp(24px, 3vw, 40px);">
+          <h3 style="margin: 0 0 24px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Custom Wig , Coloring &amp; Drop off</h3>
+          <div style="display: flex; flex-direction: column; gap: 18px;">
+            <sc-for list="{{ dropoff }}" as="line" hint-placeholder-count="7">
+              <p style="margin: 0; font-size: 15px; line-height: 24px; color: #15001A; white-space: pre-line;">{{ line.text }}</p>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="height: clamp(48px, 5vw, 80px);"></div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isNotHome }}" hint-placeholder-val="{{ false }}">
+  <section style="padding: 0 0 clamp(64px, 7vw, 110px);">
+    <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center; padding: 0 20px;">Words from our Happy Clients</h2>
+    <div style="display: flex; gap: 20px; overflow-x: auto; padding: 4px clamp(20px, 4vw, 150px) 20px; scroll-snap-type: x mandatory;">
+      <sc-for list="{{ testimonials }}" as="t" hint-placeholder-count="4">
+        <div style="flex: 0 0 min(544px, 86vw); scroll-snap-align: start; border-radius: 20px; background: #FEF1D5; padding: 35px 27px; display: flex; flex-direction: column; gap: 20px; min-height: 223px;">
+          <div style="display: flex; justify-content: space-between; opacity: 0.75;">
+            <svg width="23" height="17" viewBox="0 0 23.001 17.001" fill="#D8C08E"><path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z" /><path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z" /></svg>
+            <svg width="23" height="17" viewBox="0 0 23.001 17.001" fill="#D8C08E" style="transform: scaleX(-1);"><path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z" /><path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z" /></svg>
+          </div>
+          <p style="margin: 0; flex: 1; font-size: 18px; line-height: 27px; color: #15001A; text-wrap: pretty;">{{ t.quote }}</p>
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+            <span style="font-size: 18px; font-weight: 600; color: #15001A;">{{ t.name }}</span>
+            <div style="display: flex; gap: 3px;">
+              <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+              <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+              <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+              <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+              <svg width="14" height="13" viewBox="0 0 14 13" fill="#D8C08E"><path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z" /></svg>
+            </div>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+
+  <section style="padding: 0 0 clamp(64px, 7vw, 110px);">
+    <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(30px, 4.2vw, 64px); line-height: 110%; letter-spacing: -0.04em; color: #15001A; text-align: center; padding: 0 20px; text-wrap: balance;">Follow &amp; Tag  on Instagram @Nessclusive</h2>
+    <div style="display: flex; gap: clamp(10px, 1vw, 16px); overflow-x: auto; padding: 0 clamp(14px, 2vw, 40px);">
+      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-1.jpg) center / cover no-repeat;"></div>
+      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-2.jpg) center / cover no-repeat;"></div>
+      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-3.jpg) center / cover no-repeat;"></div>
+      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-4.jpg) center / cover no-repeat;"></div>
+      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-5.jpg) center / cover no-repeat;"></div>
+    </div>
+  </section>
+  </sc-if>
+
+  <footer style="background: #621E69; padding: clamp(48px, 5vw, 79px) clamp(20px, 4vw, 150px) 0;">
+    <div style="max-width: 1620px; margin: 0 auto;">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr)); gap: clamp(32px, 3vw, 56px); padding-bottom: clamp(40px, 4vw, 72px);">
+        <div style="min-width: 196px;">
+          <p style="margin: 0 0 20px; font-size: 36px; font-weight: 500; line-height: 100%; letter-spacing: -0.03em; color: #FEF1D5;">Nessclusive</p>
+          <p style="margin: 0 0 26px; font-size: 16px; line-height: 140%; letter-spacing: -0.03em; color: #FEF1D5;">Let your wig do  the talking</p>
+          <div style="display: flex; gap: 16px; align-items: center;">
+            <a href="#" aria-label="Facebook" style="display: flex;"><svg width="24" height="24" viewBox="0 0 24 24" fill="#FEF1D5"><path d="M 24 12.03 C 24 5.389 18.624 0 12 0 C 5.376 0 0 5.389 0 12.03 C 0 17.853 4.128 22.701 9.6 23.82 L 9.6 15.639 L 7.2 15.639 L 7.2 12.03 L 9.6 12.03 L 9.6 9.023 C 9.6 6.701 11.484 4.812 13.8 4.812 L 16.8 4.812 L 16.8 8.421 L 14.4 8.421 C 13.74 8.421 13.2 8.962 13.2 9.624 L 13.2 12.03 L 16.8 12.03 L 16.8 15.639 L 13.2 15.639 L 13.2 24 C 19.26 23.398 24 18.274 24 12.03 Z" /></svg></a>
+            <a href="#" aria-label="Instagram" style="display: flex;"><svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#FEF1D5" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6" /><circle cx="12" cy="12" r="4.6" /><circle cx="17.8" cy="6.2" r="1.2" fill="#FEF1D5" stroke="none" /></svg></a>
+            <a href="#" aria-label="YouTube" style="display: flex;"><svg width="23" height="23" viewBox="0 0 24 24" fill="#FEF1D5"><path d="M21.6 7.2c-.2-1-.9-1.7-1.9-1.9C17.9 5 12 5 12 5s-5.9 0-7.7.3c-1 .2-1.7.9-1.9 1.9C2.1 9 2.1 12 2.1 12s0 3 .3 4.8c.2 1 .9 1.7 1.9 1.9C6.1 19 12 19 12 19s5.9 0 7.7-.3c1-.2 1.7-.9 1.9-1.9.3-1.8.3-4.8.3-4.8s0-3-.3-4.8ZM9.9 15.3V8.7l5.6 3.3-5.6 3.3Z" /></svg></a>
+            <a href="#" aria-label="X" style="display: flex;"><svg width="20" height="20" viewBox="0 0 13.224 13.515" fill="#FEF1D5"><path d="M 7.87 5.723 L 12.793 0 L 11.627 0 L 7.352 4.969 L 3.938 0 L 0 0 L 5.163 7.514 L 0 13.515 L 1.167 13.515 L 5.681 8.268 L 9.286 13.515 L 13.224 13.515 L 7.87 5.723 L 7.87 5.723 Z M 1.587 0.878 L 3.379 0.878 L 11.627 12.677 L 9.835 12.677 L 1.587 0.878 Z" /></svg></a>
+          </div>
+        </div>
+        <div>
+          <p style="margin: 0 0 22px; font-size: 20px; font-weight: 600; letter-spacing: -0.03em; color: #FEF1D5;">Shop</p>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <a href="#" onClick="{{ goShop }}" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Pre-order Wigs</a>
+            <a href="#" onClick="{{ goShop }}" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Ready to Ship</a>
+            <a href="#" onClick="{{ goShop }}" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Accessories</a>
+          </div>
+        </div>
+        <div>
+          <p style="margin: 0 0 22px; font-size: 20px; font-weight: 600; letter-spacing: -0.03em; color: #FEF1D5;">Quick Links</p>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <a href="#" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Terms of service </a>
+            <a href="#" onClick="{{ goBooking }}" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Book a Session</a>
+            <a href="#" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Privacy Policy</a>
+          </div>
+        </div>
+        <div>
+          <p style="margin: 0 0 22px; font-size: 20px; font-weight: 600; letter-spacing: -0.03em; color: #FEF1D5;">Contact</p>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <a href="mailto:info@nessclusive.com" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Email: info@nessclusive.com</a>
+            <a href="tel:9175878962" style="font-size: 16px; color: #FEF1D5;" style-hover="color: #FFFFFF;">Phone: 917-587-8962</a>
+          </div>
+        </div>
+        <div style="border-radius: 14px; background: #FEF1D5; padding: 40px 34px; min-width: 300px;">
+          <p style="margin: 0 0 20px; font-size: 24px; font-weight: 500; line-height: 100%; color: #15001A;">Subscribe &amp; Stay Updated</p>
+          <p style="margin: 0 0 24px; font-size: 16px; line-height: 30px; color: #828282; text-wrap: pretty;">News and promotions straight to your mailbox. Unsubscribe easily, whenever you like!</p>
+          <div style="display: flex; height: 50px; border-radius: 5px; background: #FFFFFF; overflow: hidden;">
+            <input type="email" placeholder="What’s your email ?" style="flex: 1; min-width: 0; border: none; background: transparent; padding: 0 15px; font-size: 16px; color: #15001A;" />
+            <button onClick="{{ submitSubscribe }}" style="width: 129px; border: none; border-radius: 5px; background: #621E69; color: #FEF1D5; font-size: 18px; cursor: pointer; flex-shrink: 0;" style-hover="background: #6B0D83;">Subscribe</button>
+          </div>
+        </div>
+      </div>
+      <div style="border-top: 1px solid rgba(255,255,255,0.53); padding: 26px 0; display: flex; justify-content: center;">
+        <span style="font-size: 16px; line-height: 30px; color: #FEF1D5;">© 2025 Nessclusive Hair Company</span>
+      </div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 90; background: rgba(21,0,26,0.45); animation: ness-fade .2s ease both;" onClick="{{ closeAll }}"></div>
+    <aside style="position: fixed; inset: 0 0 0 auto; z-index: 91; width: min(420px, 90vw); background: #FFFDF8; padding: 24px; display: flex; flex-direction: column; gap: 8px; animation: ness-slide-in .26s cubic-bezier(.22,.8,.3,1) both;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding-bottom: 16px; border-bottom: 1px solid #E3D2E6;">
+        <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.03em; color: #15001A;">Menu</span>
+        <button onClick="{{ closeAll }}" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #E3D2E6; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="Close">
+          <svg width="16" height="16" viewBox="0 0 16 16" stroke="#15001A" stroke-width="1.6"><path d="M1 1L15 15M15 1L1 15" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+      <sc-for list="{{ navLinks }}" as="link" hint-placeholder-count="6">
+        <a href="#" onClick="{{ link.go }}" style="padding: 18px 4px; font-size: 20px; font-weight: 500; letter-spacing: -0.02em; color: #15001A; border-bottom: 1px solid rgba(21,0,26,0.12);" style-hover="color: #621E69; text-decoration: none;">{{ link.label }}</a>
+      </sc-for>
+      <button onClick="{{ goBooking }}" style="margin-top: 20px; height: 55px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; cursor: pointer;">Book a Session</button>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ searchOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 90; background: rgba(21,0,26,0.5); animation: ness-fade .2s ease both;" onClick="{{ closeAll }}"></div>
+    <div style="position: fixed; top: 0; left: 0; right: 0; z-index: 91; background: #FFFDF8; padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 150px); animation: ness-rise .24s ease both;">
+      <div style="max-width: 1000px; margin: 0 auto;">
+        <div style="display: flex; align-items: center; gap: 16px; border-bottom: 1px solid #E3D2E6; padding-bottom: 14px;">
+          <svg width="22" height="22" viewBox="0 0 16 16" fill="none" stroke="#621E69" stroke-width="1.5"><circle cx="6.8" cy="6.8" r="6.05" /><path d="M11.4 11.4 L15.2 15.2" stroke-linecap="round" /></svg>
+          <input type="text" placeholder="Search wigs, closures, accessories" value="{{ query }}" onInput="{{ onQuery }}" autofocus="" style="flex: 1; min-width: 0; border: none; background: transparent; font-size: clamp(20px, 2.4vw, 32px); font-weight: 500; letter-spacing: -0.02em; color: #15001A;" />
+          <button onClick="{{ closeAll }}" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #E3D2E6; background: transparent; cursor: pointer; flex-shrink: 0; display: flex; align-items: center; justify-content: center;" aria-label="Close search">
+            <svg width="16" height="16" viewBox="0 0 16 16" stroke="#15001A" stroke-width="1.6"><path d="M1 1L15 15M15 1L1 15" stroke-linecap="round" /></svg>
+          </button>
+        </div>
+        <p style="margin: 18px 0 0; font-size: 15px; line-height: 22px; color: #5F5462;">{{ searchSummary }}</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; margin-top: 20px; max-height: 46vh; overflow-y: auto;">
+          <sc-for list="{{ searchResults }}" as="p" hint-placeholder-count="4">
+            <a href="#" onClick="{{ p.go }}" style="text-decoration: none;" style-hover="text-decoration: none;">
+              <div style="aspect-ratio: 3/4; border-radius: 10px; background-image: {{ p.bg }}; background-size: cover; background-position: center top;"></div>
+              <p style="margin: 10px 0 4px; font-size: 15px; text-transform: uppercase; color: rgba(21,0,26,0.83);">{{ p.name }}</p>
+              <p style="margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.04em; color: #15001A;">{{ p.priceLabel }}</p>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ cartOpen }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; inset: 0; z-index: 90; background: rgba(21,0,26,0.45); animation: ness-fade .2s ease both;" onClick="{{ closeAll }}"></div>
+    <aside style="position: fixed; inset: 0 0 0 auto; z-index: 91; width: min(460px, 94vw); background: #FFFDF8; display: flex; flex-direction: column; animation: ness-slide-in .26s cubic-bezier(.22,.8,.3,1) both;">
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 24px; border-bottom: 1px solid #E3D2E6;">
+        <span style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 24px; font-weight: 600; letter-spacing: -0.03em; color: #15001A;">{{ cartTitle }}</span>
+        <button onClick="{{ closeAll }}" style="width: 44px; height: 44px; border-radius: 50%; border: 1px solid #E3D2E6; background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center;" aria-label="Close cart">
+          <svg width="16" height="16" viewBox="0 0 16 16" stroke="#15001A" stroke-width="1.6"><path d="M1 1L15 15M15 1L1 15" stroke-linecap="round" /></svg>
+        </button>
+      </div>
+      <div style="flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 18px;">
+        <sc-if value="{{ cartEmpty }}" hint-placeholder-val="{{ true }}">
+          <div style="padding: 48px 0; text-align: center;">
+            <p style="margin: 0 0 20px; font-size: 18px; line-height: 27px; color: #5F5462;">Your bag is empty.</p>
+            <button onClick="{{ goShop }}" style="height: 55px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 24px; cursor: pointer;">Start Shopping</button>
+          </div>
+        </sc-if>
+        <sc-for list="{{ cartLines }}" as="line" hint-placeholder-count="0">
+          <div style="display: flex; gap: 16px;">
+            <div style="width: 88px; flex-shrink: 0; aspect-ratio: 3/4; border-radius: 8px; background-image: {{ line.bg }}; background-size: cover; background-position: center top;"></div>
+            <div style="flex: 1; min-width: 0;">
+              <p style="margin: 0 0 4px; font-size: 16px; text-transform: uppercase; color: #15001A;">{{ line.name }}</p>
+              <p style="margin: 0 0 10px; font-size: 15px; line-height: 22px; color: #5F5462;">{{ line.variant }}</p>
+              <div style="display: flex; align-items: center; gap: 14px;">
+                <div style="display: flex; align-items: center; border: 1px solid #E3D2E6; border-radius: 41px; height: 36px;">
+                  <button onClick="{{ line.dec }}" style="width: 34px; height: 34px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: #15001A;" aria-label="Decrease">−</button>
+                  <span style="min-width: 22px; text-align: center; font-size: 15px; color: #15001A;">{{ line.qty }}</span>
+                  <button onClick="{{ line.inc }}" style="width: 34px; height: 34px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: #15001A;" aria-label="Increase">+</button>
+                </div>
+                <span style="font-size: 18px; font-weight: 600; letter-spacing: -0.04em; color: #15001A;">{{ line.total }}</span>
+                <button onClick="{{ line.remove }}" style="margin-left: auto; border: none; background: transparent; cursor: pointer; font-size: 15px; color: #5F5462; text-decoration: underline;">Remove</button>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+      <sc-if value="{{ cartHasItems }}" hint-placeholder-val="{{ false }}">
+        <div style="border-top: 1px solid #E3D2E6; padding: 24px; display: flex; flex-direction: column; gap: 16px;">
+          <div style="display: flex; justify-content: space-between; align-items: baseline;">
+            <span style="font-size: 18px; color: #5F5462;">Subtotal</span>
+            <span style="font-size: 22px; font-weight: 600; letter-spacing: -0.04em; color: #15001A;">{{ cartSubtotal }}</span>
+          </div>
+          <p style="margin: 0; font-size: 15px; line-height: 22px; color: #5F5462;">Taxes and shipping calculated at checkout.</p>
+          <button onClick="{{ checkout }}" style="height: 55px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #621E69;">Checkout</button>
+        </div>
+      </sc-if>
+    </aside>
+  </sc-if>
+
+  <sc-if value="{{ hasToast }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; z-index: 95; bottom: 28px; left: 50%; transform: translateX(-50%); background: #15001A; color: #FEF1D5; padding: 15px 24px; border-radius: 41px; font-size: 16px; box-shadow: 0 12px 34px rgba(21,0,26,0.28); animation: ness-rise .24s ease both;">{{ toast }}</div>
+  </sc-if>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;announcementBar&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Storefront&quot;},&quot;currency&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;USD&quot;,&quot;CAD&quot;,&quot;GBP&quot;],&quot;default&quot;:&quot;USD&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Storefront&quot;},&quot;instalmentsBadge&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Product page&quot;}}">
+const PRODUCTS = [
+  { id:'mabel',    name:'MABEL',    price:490, img:'assets/prod-mabel.jpg',    alt:'assets/prod-alt-1.jpg',  collection:'Ready to Ship', stock:'In Stock',     spec:'5x5 Closure Unit', added:10 },
+  { id:'midnight', name:'MIDNIGHT', price:420, img:'assets/prod-midnight.jpg', alt:'assets/prod-alt-2.jpg',  collection:'Ready to Ship', stock:'In Stock',     spec:'5x5 Closure Unit', added:9 },
+  { id:'mocha',    name:'MOCHA',    price:420, img:'assets/prod-mocha.jpg',    alt:'assets/prod-mabel.jpg',  collection:'Ready to Ship', stock:'In Stock',     spec:'3 Bundles',        added:8 },
+  { id:'marley',   name:'MARLEY',   price:400, img:'assets/prod-marley.jpg',   alt:'assets/prod-alt-1.jpg',  collection:'Pre-order',     stock:'In Stock',     spec:'5x5 Closure Unit', added:7 },
+  { id:'nova',     name:'NOVA',     price:520, img:'assets/prod-alt-1.jpg',    alt:'assets/prod-marley.jpg', collection:'Pre-order',     stock:'In Stock',     spec:'5x5 Closure Unit', added:6 },
+  { id:'amara',    name:'AMARA',    price:475, img:'assets/prod-alt-2.jpg',    alt:'assets/prod-mocha.jpg',  collection:'Ready to Ship', stock:'In Stock',     spec:'3 Bundles',        added:5 },
+  { id:'sienna',   name:'SIENNA',   price:360, img:'assets/hero-5.jpg',        alt:'assets/ig-1.jpg',        collection:'Ready to Ship', stock:'In Stock',     spec:'3 Bundles',        added:4 },
+  { id:'zuri',     name:'ZURI',     price:540, img:'assets/ig-1.jpg',          alt:'assets/hero-5.jpg',      collection:'Pre-order',     stock:'In Stock',     spec:'5x5 Closure Unit', added:3 },
+  { id:'josie',    name:'JOSIE',    price:455, img:'assets/ig-5.jpg',          alt:'assets/ig-4.jpg',        collection:'Pre-order',     stock:'In Stock',     spec:'5x5 Closure Unit', added:2 },
+  { id:'lena',     name:'LENA',     price:385, img:'assets/ig-4.jpg',          alt:'assets/ig-5.jpg',        collection:'Pre-order',     stock:'Out of Stock', spec:'3 Bundles',        added:1 }
+];
+
+const FAQ = [
+  ['What is the processing time for Pre-Orders wigs?', 'Pre-order units are built to order. Construction takes 7–10 business days before the unit ships, and you will get a tracking email the moment it leaves the studio.'],
+  ['What is our return policy?', 'Because every unit is a hygiene-sensitive custom product, all sales are final. If your order arrives damaged or incorrect, email info@nessclusive.com within 48 hours of delivery and we will make it right.'],
+  ['Are your wigs suitable for daily wear?', 'Yes. Every unit is built on a breathable cap with a bleached, pre-plucked hairline so it can be worn daily and restyled with heat.'],
+  ['What is your shipping cost?', 'Shipping is calculated at checkout from your address. Nessclusive ships globally, and express options are offered at the payment step.'],
+  ['How do I care for my wig?', 'Wash every 8–10 wears with a sulphate-free shampoo, air dry on a mannequin head, and store on a stand away from direct sun.'],
+  ['When will my order get shipped?', 'Ready to Ship units leave the studio within 1–2 business days. Pre-order units ship once construction is complete.'],
+  ['How do I know my wig size?', 'Measure the circumference of your head at the hairline. Small is 20–21", Medium 21.5–22.5", Large 23"+. Choose your cap size at checkout.'],
+  ['How can I check the status of my order?', 'Every order gets a confirmation and a tracking link by email. You can also text 917-587-8962 with your order number.'],
+  ['Can I wear a wig if I have a full head of hair?', 'Yes. Braid or cornrow your hair flat and use a wig cap underneath so the unit sits smoothly.'],
+  ['Can I rush my order?', 'Rush construction may be available depending on the studio calendar. Text 917-587-8962 before ordering to confirm.'],
+  ['Do you offer styling services?', 'Yes. Custom wig construction, coloring and drop-off customization can all be booked on the Booking page.'],
+  ['What payment options are available?', 'All major cards, plus 4 interest-free installments at checkout. In-studio balances are paid in cash or Zelle.']
+];
+
+const TESTIMONIALS = [
+  { quote:'The wig fits perfectly, feels natural, and is so lightweight. I can’t believe how real it looks—absolutely love it!', name:'A. Stouten' },
+  { quote:'The quality of these wigs is amazing! They look and feel like real hair, and I’ve gotten so many compliments.', name:'N. Carry' },
+  { quote:'It looks and feels like real hair. perfect fit and style. finally found a wig that feels like me.', name:'L. Shanon' },
+  { quote:'The wig fits perfectly, feels natural, and is so lightweight. I can’t believe how real it looks—absolutely love it!', name:'A. Stouten' }
+];
+
+const SERVICES = [
+  { id:'custom',   name:'Custom Wig Construction', note:'Unit built from your bundles or ours. Drop off required 4–5 days in advance.' },
+  { id:'coloring', name:'Coloring',                note:'Root tint, full colour or highlights on a unit you already own.' },
+  { id:'dropoff',  name:'Drop Off Customization',  note:'Plucking, bleaching and styling on frontals, closures and wigs.' },
+  { id:'revamp',   name:'Wig Revamp',              note:'Wash, deep condition, reinstall lace and restyle an existing unit.' },
+  { id:'install',  name:'Wig Install',             note:'In-studio install with a custom melt and style.' }
+];
+
+const TIMES = ['10:00 AM','11:30 AM','1:00 PM','2:30 PM','4:00 PM','5:30 PM'];
+const RATES = { USD:{ s:'$', r:1 }, CAD:{ s:'CA$', r:1.37 }, GBP:{ s:'£', r:0.79 } };
+
+class Component extends DCLogic {
+  state = {
+    page:'home', collection:'All', sort:'Best Selling', avail:[], priceMax:700,
+    productId:'mabel', gallery:0, size:'18”', part:'Middle', cap:'Medium',
+    proc:'Standard — 7 to 10 days', pickup:'Ship to me', qty:1,
+    cart:[], cartOpen:false, menuOpen:false, searchOpen:false, query:'',
+    faqOpen:null, filtersOpen:false, sortOpen:false, currency:'USD',
+    bStep:0, bService:null, bDate:'', bTime:'', bName:'', bEmail:'', bPhone:'', bDone:false,
+    toast:''
+  };
+
+  componentDidMount() {
+    try {
+      const saved = localStorage.getItem('ness-cart');
+      if (saved) this.setState({ cart: JSON.parse(saved) });
+    } catch (e) {}
+    this._measure = () => {
+      const narrow = window.innerWidth < 1180;
+      if (narrow !== this.state.narrow) this.setState({ narrow });
+    };
+    this._measure();
+    window.addEventListener('resize', this._measure);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._measure);
+    clearTimeout(this._t);
+  }
+
+  persist(cart) {
+    try { localStorage.setItem('ness-cart', JSON.stringify(cart)); } catch (e) {}
+  }
+
+  money(n) {
+    const c = RATES[this.state.currency] || RATES.USD;
+    const v = n * c.r;
+    return c.s + v.toFixed(2) + ' ' + this.state.currency;
+  }
+
+  flash(msg) {
+    clearTimeout(this._t);
+    this.setState({ toast: msg });
+    this._t = setTimeout(() => this.setState({ toast:'' }), 2600);
+  }
+
+  go(page, productId) {
+    const next = { page, menuOpen:false, searchOpen:false, cartOpen:false, filtersOpen:false, sortOpen:false };
+    if (productId) { next.productId = productId; next.gallery = 0; next.qty = 1; next.size = '18”'; }
+    this.setState(next);
+    if (typeof window !== 'undefined') window.scrollTo({ top:0, behavior:'auto' });
+  }
+
+  addToCart(p, variant, qty) {
+    const key = p.id + '|' + (variant || '');
+    const cart = this.state.cart.slice();
+    const found = cart.find(l => l.key === key);
+    if (found) found.qty += (qty || 1);
+    else cart.push({ key, id:p.id, name:p.name, price:p.price, img:p.img, variant: variant || p.spec, qty: qty || 1 });
+    this.setState({ cart, cartOpen:true });
+    this.persist(cart);
+  }
+
+  setQty(key, delta) {
+    let cart = this.state.cart.map(l => l.key === key ? Object.assign({}, l, { qty: l.qty + delta }) : l);
+    cart = cart.filter(l => l.qty > 0);
+    this.setState({ cart });
+    this.persist(cart);
+  }
+
+  removeLine(key) {
+    const cart = this.state.cart.filter(l => l.key !== key);
+    this.setState({ cart });
+    this.persist(cart);
+  }
+
+  filtered() {
+    const s = this.state;
+    let list = PRODUCTS.filter(p => p.price <= s.priceMax);
+    if (s.collection !== 'All') list = list.filter(p => p.collection === s.collection);
+    if (s.avail.length) list = list.filter(p => s.avail.indexOf(p.stock) > -1);
+    const by = {
+      'Best Selling': (a,b) => b.added - a.added,
+      'Alphabetically: Z-A': (a,b) => b.name.localeCompare(a.name),
+      'Price: Low to High': (a,b) => a.price - b.price,
+      'Price: High to Low': (a,b) => b.price - a.price,
+      'Date: Old to New': (a,b) => a.added - b.added,
+      'Date: New to Old': (a,b) => b.added - a.added
+    };
+    return list.slice().sort(by[s.sort] || by['Best Selling']);
+  }
+
+  card(p) {
+    return Object.assign({}, p, {
+      bg: 'url(' + p.img + ')',
+      priceLabel: this.money(p.price),
+      go: (e) => { if (e) e.preventDefault(); this.go('product', p.id); },
+      add: (e) => { if (e) e.preventDefault(); this.addToCart(p, p.spec, 1); }
+    });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const product = PRODUCTS.find(p => p.id === s.productId) || PRODUCTS[0];
+    const list = this.filtered();
+    const q = s.query.trim().toLowerCase();
+    const results = q ? PRODUCTS.filter(p => (p.name + ' ' + p.collection + ' ' + p.spec).toLowerCase().indexOf(q) > -1) : PRODUCTS.slice(0, 8);
+    const cartCount = s.cart.reduce((n, l) => n + l.qty, 0);
+    const subtotal = s.cart.reduce((n, l) => n + l.qty * l.price, 0);
+    const galleryImgs = [product.img, product.alt];
+    const bookingReady = !!(s.bService && s.bDate && s.bTime && s.bName && s.bEmail);
+
+    return {
+      isHome: s.page === 'home', isShop: s.page === 'shop',
+      isProduct: s.page === 'product', isBooking: s.page === 'booking',
+      isNotHome: s.page !== 'home',
+      isWide: !s.narrow, isNarrow: !!s.narrow,
+
+      navLinks: [
+        { label:'Ready to Ship', go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Ready to Ship' }); this.go('shop'); } },
+        { label:'Pre-Order',     go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Pre-order' }); this.go('shop'); } },
+        { label:'Accessories',   go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Accessories' }); this.go('shop'); } },
+        { label:'Booking',       go:(e)=>{ if(e) e.preventDefault(); this.go('booking'); } },
+        { label:'FAQ',           go:(e)=>{ if(e) e.preventDefault(); this.go('home'); setTimeout(()=>{ const el=document.getElementById('contact'); if(el) window.scrollTo({ top: el.offsetTop - 400, behavior:'smooth' }); }, 60); } },
+        { label:'Contact Us',    go:(e)=>{ if(e) e.preventDefault(); this.go('home'); setTimeout(()=>{ const el=document.getElementById('contact'); if(el) window.scrollTo({ top: el.offsetTop - 100, behavior:'smooth' }); }, 60); } }
+      ],
+
+      goHome: (e) => { if (e) e.preventDefault(); this.go('home'); },
+      goShop: (e) => { if (e) e.preventDefault(); this.go('shop'); },
+      goBooking: (e) => { if (e) e.preventDefault(); this.go('booking'); },
+      toggleMenu: () => this.setState({ menuOpen: !s.menuOpen }),
+      openSearch: () => this.setState({ searchOpen:true, cartOpen:false, menuOpen:false }),
+      openCart: () => this.setState({ cartOpen:true, menuOpen:false, searchOpen:false }),
+      openAccount: () => this.flash('Sign in is wired to Shopify customer accounts at build time.'),
+      closeAll: () => this.setState({ menuOpen:false, searchOpen:false, cartOpen:false, filtersOpen:false, sortOpen:false }),
+      cycleCurrency: () => { const k = Object.keys(RATES); this.setState({ currency: k[(k.indexOf(s.currency) + 1) % k.length] }); },
+      currencyCode: s.currency,
+      menuOpen: s.menuOpen, searchOpen: s.searchOpen, cartOpen: s.cartOpen,
+
+      cartLabel: cartCount ? 'Cart (' + cartCount + ')' : 'Cart',
+      cartTitle: cartCount ? 'Your bag (' + cartCount + ')' : 'Your bag',
+      cartEmpty: s.cart.length === 0,
+      cartHasItems: s.cart.length > 0,
+      cartSubtotal: this.money(subtotal),
+      cartLines: s.cart.map(l => ({
+        name: l.name, variant: l.variant, qty: l.qty,
+        bg: 'url(' + l.img + ')',
+        total: this.money(l.price * l.qty),
+        inc: () => this.setQty(l.key, 1),
+        dec: () => this.setQty(l.key, -1),
+        remove: () => this.removeLine(l.key)
+      })),
+      checkout: () => this.flash('Checkout hands off to Shopify — no payment flow in this build.'),
+
+      query: s.query,
+      onQuery: (e) => this.setState({ query: e.target.value }),
+      searchResults: results.map(p => this.card(p)),
+      searchSummary: q ? (results.length + ' result' + (results.length === 1 ? '' : 's') + ' for “' + s.query.trim() + '”') : 'Popular right now',
+
+      collections: [
+        { label:'Pre-order Wigs',     bg:'url(assets/cat-preorder.jpg)',    go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Pre-order' }); this.go('shop'); } },
+        { label:'Ready to Ship Wigs', bg:'url(assets/cat-ready.jpg)',       go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Ready to Ship' }); this.go('shop'); } },
+        { label:'Accessories',        bg:'url(assets/cat-accessories.jpg)', go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Accessories' }); this.go('shop'); } }
+      ],
+      bestsellers: PRODUCTS.slice(0, 4).map(p => this.card(p)),
+      testimonials: TESTIMONIALS,
+
+      faqs: FAQ.map((f, i) => ({
+        q: f[0], a: f[1], open: s.faqOpen === i,
+        rotate: s.faqOpen === i ? 'rotate(180deg)' : 'rotate(0deg)',
+        toggle: () => this.setState({ faqOpen: s.faqOpen === i ? null : i })
+      })),
+
+      submitContact: () => this.flash('Message sent. We reply within one business day.'),
+      submitSubscribe: () => this.flash('You’re on the list.'),
+
+      hasToast: !!s.toast, toast: s.toast,
+
+      products: list.map(p => this.card(p)),
+      hasResults: list.length > 0,
+      noResults: list.length === 0,
+      emptyLine: s.collection === 'Accessories'
+        ? 'Accessories drop soon. Join the list below for first access.'
+        : 'Nothing matches those filters yet. Widen the price range or clear the filters.',
+      resultCount: list.length + (list.length === 1 ? ' product' : ' products'),
+      collectionTitle: s.collection === 'All' ? 'All Products' : s.collection,
+      chips: ['All','Ready to Ship','Pre-order','Accessories'].map(c => ({
+        label: c, active: s.collection === c,
+        bg: s.collection === c ? '#621E69' : 'transparent',
+        fg: s.collection === c ? '#FEF1D5' : '#15001A',
+        pick: () => this.setState({ collection: c })
+      })),
+      sortLabel: s.sort,
+      sortOpen: s.sortOpen,
+      toggleSort: () => this.setState({ sortOpen: !s.sortOpen, filtersOpen:false }),
+      sortOptions: ['Best Selling','Alphabetically: Z-A','Price: Low to High','Price: High to Low','Date: Old to New','Date: New to Old'].map(o => ({
+        label: o, weight: s.sort === o ? '600' : '400',
+        pick: () => this.setState({ sort:o, sortOpen:false })
+      })),
+      filtersOpen: s.filtersOpen,
+      toggleFilters: () => this.setState({ filtersOpen: !s.filtersOpen, sortOpen:false }),
+      availOptions: [
+        { label:'In Stock', count:'26', on: s.avail.indexOf('In Stock') > -1, box: s.avail.indexOf('In Stock') > -1 ? '#621E69' : 'transparent',
+          toggle: () => { const a = s.avail.indexOf('In Stock') > -1 ? s.avail.filter(x=>x!=='In Stock') : s.avail.concat(['In Stock']); this.setState({ avail:a }); } },
+        { label:'Out of Stock', count:'10', on: s.avail.indexOf('Out of Stock') > -1, box: s.avail.indexOf('Out of Stock') > -1 ? '#621E69' : 'transparent',
+          toggle: () => { const a = s.avail.indexOf('Out of Stock') > -1 ? s.avail.filter(x=>x!=='Out of Stock') : s.avail.concat(['Out of Stock']); this.setState({ avail:a }); } }
+      ],
+      priceMax: s.priceMax,
+      priceMaxLabel: '$' + s.priceMax,
+      onPrice: (e) => this.setState({ priceMax: Number(e.target.value) }),
+      clearFilters: () => this.setState({ avail:[], priceMax:700, collection:'All', sort:'Best Selling' }),
+
+      p: {
+        name: product.name, spec: product.spec, collection: product.collection,
+        priceLabel: this.money(product.price),
+        instalment: '4 interest-free installments or from $36.10/mo with',
+        hero: 'url(' + galleryImgs[s.gallery] + ')',
+        stock: product.stock,
+        stockColor: product.stock === 'In Stock' ? '#621E69' : '#5F5462'
+      },
+      galleryThumbs: galleryImgs.map((src, i) => ({
+        bg: 'url(' + src + ')',
+        border: s.gallery === i ? '2px solid #621E69' : '1px solid #E3D2E6',
+        pick: () => this.setState({ gallery: i })
+      })),
+      sizeOptions: ['14”','16”','18”'].map(v => ({
+        label: v, bg: s.size === v ? '#621E69' : 'transparent', fg: s.size === v ? '#FEF1D5' : '#15001A',
+        pick: () => this.setState({ size: v })
+      })),
+      partOptions: ['Middle','Free','Side'].map(v => ({
+        label: v, bg: s.part === v ? '#ECD6E3' : 'transparent', fg: '#15001A',
+        border: s.part === v ? '1px solid #621E69' : '1px solid #E3D2E6',
+        pick: () => this.setState({ part: v })
+      })),
+      capOptions: ['Small','Medium','Large'].map(v => ({
+        label: v, bg: s.cap === v ? '#ECD6E3' : 'transparent',
+        border: s.cap === v ? '1px solid #621E69' : '1px solid #E3D2E6',
+        pick: () => this.setState({ cap: v })
+      })),
+      procOptions: ['Standard — 7 to 10 days','Rush — text to confirm'].map(v => ({
+        label: v, bg: s.proc === v ? '#ECD6E3' : 'transparent',
+        border: s.proc === v ? '1px solid #621E69' : '1px solid #E3D2E6',
+        pick: () => this.setState({ proc: v })
+      })),
+      pickupOptions: ['Ship to me','Studio pickup'].map(v => ({
+        label: v, bg: s.pickup === v ? '#ECD6E3' : 'transparent',
+        border: s.pickup === v ? '1px solid #621E69' : '1px solid #E3D2E6',
+        pick: () => this.setState({ pickup: v })
+      })),
+      qty: s.qty,
+      qtyInc: () => this.setState({ qty: s.qty + 1 }),
+      qtyDec: () => this.setState({ qty: Math.max(1, s.qty - 1) }),
+      addProduct: () => this.addToCart(product, s.size + ' · ' + s.part + ' part · ' + s.cap + ' cap', s.qty),
+      buyNow: () => { this.addToCart(product, s.size + ' · ' + s.part + ' part · ' + s.cap + ' cap', s.qty); this.flash('Express checkout hands off to Shopify.'); },
+      related: PRODUCTS.filter(x => x.id !== product.id).slice(0, 4).map(x => this.card(x)),
+
+      services: SERVICES.map(sv => ({
+        name: sv.name, note: sv.note,
+        bg: s.bService === sv.id ? '#F7E8F1' : '#FFFFFF',
+        border: s.bService === sv.id ? '2px solid #621E69' : '1px solid #E3D2E6',
+        pick: () => this.setState({ bService: sv.id })
+      })),
+      bStep: s.bStep,
+      stepLabels: [
+        { n:'1', label:'Select Your Desired Service',        bg: s.bStep >= 0 ? '#621E69' : '#E3D2E6', fg: s.bStep >= 0 ? '#FEF1D5' : '#15001A' },
+        { n:'2', label:'Select your preferable Time & date',  bg: s.bStep >= 1 ? '#621E69' : '#E3D2E6', fg: s.bStep >= 1 ? '#FEF1D5' : '#15001A' },
+        { n:'3', label:'Confirm and Get Ready ',              bg: s.bStep >= 2 ? '#621E69' : '#E3D2E6', fg: s.bStep >= 2 ? '#FEF1D5' : '#15001A' }
+      ],
+      bServiceChosen: !!s.bService,
+      bStep0: !s.bDone && s.bStep === 0,
+      bStep1: !s.bDone && s.bStep === 1,
+      bStep2: !s.bDone && s.bStep === 2,
+      bFormOpen: !s.bDone,
+      bCanBack: !s.bDone && s.bStep > 0,
+      bCanNext: !s.bDone && s.bStep < 2,
+      bNext: () => {
+        if (s.bStep === 0 && !s.bService) return this.flash('Choose a service to continue.');
+        if (s.bStep === 1 && !(s.bDate && s.bTime)) return this.flash('Pick a date and a time.');
+        this.setState({ bStep: Math.min(2, s.bStep + 1) });
+      },
+      bBack: () => this.setState({ bStep: Math.max(0, s.bStep - 1) }),
+      bDate: s.bDate,
+      onDate: (e) => this.setState({ bDate: e.target.value }),
+      times: TIMES.map(t => ({
+        label: t, bg: s.bTime === t ? '#621E69' : 'transparent', fg: s.bTime === t ? '#FEF1D5' : '#15001A',
+        border: s.bTime === t ? '1px solid #621E69' : '1px solid #E3D2E6',
+        pick: () => this.setState({ bTime: t })
+      })),
+      bName: s.bName, bEmail: s.bEmail, bPhone: s.bPhone,
+      onName: (e) => this.setState({ bName: e.target.value }),
+      onEmail: (e) => this.setState({ bEmail: e.target.value }),
+      onPhone: (e) => this.setState({ bPhone: e.target.value }),
+      bSummary: s.bService ? (SERVICES.find(x => x.id === s.bService).name + ' · ' + (s.bDate || 'date TBC') + ' · ' + (s.bTime || 'time TBC')) : 'No service selected yet',
+      bReady: bookingReady,
+      bConfirmBg: bookingReady ? '#6B0D83' : '#E3D2E6',
+      bConfirmFg: bookingReady ? '#FFFCF8' : '#5F5462',
+      bDone: s.bDone,
+      bConfirm: () => {
+        if (!bookingReady) return this.flash('Fill in your name and email to confirm.');
+        this.setState({ bDone:true });
+      },
+      bReset: () => this.setState({ bDone:false, bStep:0, bService:null, bDate:'', bTime:'', bName:'', bEmail:'', bPhone:'' }),
+      policy: [
+        'Deposit : ALL APPOINTMENTS REQUIRE A NON REFUNDABLE\nDEPOSIT TO SECURE YOUR SPOT.\nREMAINING BALANCE MUST BE PAID IN CASH OR ZELLE\nON THE DAY OF YOUR APPOINTMENT.',
+        'Reschedule : YOU CAN RESCHEDULE ONCE WITH YOUR DEPOSIT\nIN THE SAME MONTH RESCHEDULE UPTO 3 DAYS\nbEFORE YOUR ORIGINAL APPOINTMENT. NO EXCEPTIONS!',
+        'Lateness : AFTER 10 MIN, YOU WILL BE CHARGED A $20 FEE.\nAFTER 20 MINS APPOINTMENT WILL BE CANCELLED',
+        'Same day cancelation : DEPOSIT LOST AND 50% OF SERVICE CHARGED.',
+        'No call, No show : DEPOSIT LOST AND 50% OF SERVICE CHARGED.',
+        '** BY BOOKING YOU HAVE ACCEPTED AND AGREED TO THE TERM OF MY POLICY**'
+      ].map(t => ({ text: t })),
+      dropoff: [
+        'For Order : TEXT 917-587-8962\nOR EMAIL INFO@NESSCLUSIVE.COM FOR ALL WIG ORDERS ',
+        'ALL FRONTALS, CLOSURES AND WIGS\nMUST BE DROPPED OFF 4-5 DAYS IN ADVANCE\nOR A FEE WILL BE CHARGED!',
+        'For Late Drop Off Policy:',
+        '3 Days - $15 FEE,',
+        '2 Days - $25 FEE,',
+        'No 1 Day Drop off',
+        '$40 FEE CHARGED FOR SAME DAY CUSTOMIZATION.'
+      ].map(t => ({ text: t }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

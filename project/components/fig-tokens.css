@@ -1,0 +1,27 @@
+/* Generated from Figma Variables. First mode = :root default.
+   FLOAT tokens are unitless — multiply by 1px in calc() where a length is needed. */
+
+:root {
+  --black-2: rgb(26,31,21); /* @kind color */
+  --black: rgb(26,31,21); /* @kind color */
+  --body-text-2: rgb(95,84,98); /* @kind color */
+  --card-3-2: rgb(254,241,213); /* @kind color */
+  --card-3: rgb(254,241,213); /* @kind color */
+  --cart: rgb(247,232,241); /* @kind color */
+  --primary-base-black-2: rgb(0,0,0); /* @kind color */
+  --primary-base-black: rgb(0,0,0); /* @kind color */
+  --primary-base-white-2: rgb(255,255,255); /* @kind color */
+  --primary-base-white: rgb(255,255,255); /* @kind color */
+  --primary-gray-400-2: rgb(156,163,175); /* @kind color */
+  --primary-gray-400: rgb(156,163,175); /* @kind color */
+  --primary-gray-50-2: rgb(249,250,251); /* @kind color */
+  --primary-gray-50: rgb(249,250,251); /* @kind color */
+  --primary-gray-700-2: rgb(55,65,81); /* @kind color */
+  --primary-gray-700: rgb(55,65,81); /* @kind color */
+  --secondary: rgb(254,241,213); /* @kind color */
+  --tertiary: rgb(247,232,241); /* @kind color */
+  --text-2-2: rgb(95,84,98); /* @kind color */
+  --text-2: rgb(95,84,98); /* @kind color */
+  --text-dark-2: rgb(51,51,51); /* @kind color */
+  --text-dark: rgb(51,51,51); /* @kind color */
+}
