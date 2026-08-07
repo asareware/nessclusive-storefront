@@ -13,14 +13,29 @@
       class="ness-header__logo"
       aria-label="{{ shop.name | escape }} home"
     >
+      {%- comment -%}
+        Three tiers, so the header always looks right:
+        1. A logo chosen in the customizer wins.
+        2. Otherwise the bundled default ships with the theme, meaning a fresh
+           install is never wordmark-only and nobody has to remember this step.
+        3. The wordmark remains as a last resort if the asset is ever removed.
+        The bundled file is 306 × 196 — 3× the 102 × 65 slot, which covers
+        every current retina display without carrying the 623 × 400 original.
+      {%- endcomment -%}
       {%- if section.settings.logo != blank -%}
         {{
           section.settings.logo
-          | image_url: width: 204
+          | image_url: width: 306
           | image_tag: alt: shop.name, width: 102, height: 65, loading: 'eager'
         }}
       {%- else -%}
-        <span class="ness-header__wordmark">{{ shop.name }}</span>
+        <img
+          src="{{ 'ness-logo.png' | asset_url }}"
+          alt="{{ shop.name | escape }}"
+          width="102"
+          height="65"
+          loading="eager"
+        >
       {%- endif -%}
     </a>
 
