@@ -1,0 +1,486 @@
+/* ==========================================================================
+   Nessclusive — global chrome
+   Announcement marquee, header, mobile drawer, footer, toast.
+   Values transcribed from project/Nessclusive Storefront.dc.html.
+   ========================================================================== */
+
+/* --- Announcement marquee ---------------------------------------------- */
+
+.ness-marquee {
+  background: var(--ness-primary-deep);
+  height: 40px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+.ness-marquee__track {
+  display: flex;
+  width: max-content;
+  animation: ness-marquee 38s linear infinite;
+}
+
+.ness-marquee__group {
+  display: flex;
+  align-items: center;
+  gap: 64px;
+  padding-right: 64px;
+}
+
+.ness-marquee__item {
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-secondary);
+  white-space: nowrap;
+}
+
+@keyframes ness-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* The duplicated half exists only to make the loop seamless. Pausing on hover
+   lets anyone who wants to read a message actually do so. */
+.ness-marquee:hover .ness-marquee__track,
+.ness-marquee:focus-within .ness-marquee__track {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ness-marquee__track {
+    animation: none;
+  }
+}
+
+/* --- Header ------------------------------------------------------------- */
+
+.ness-header {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  background: var(--ness-background);
+  border-bottom: 1px solid var(--ness-border);
+}
+
+.ness-header__inner {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: 8px var(--ness-shell-pad);
+  min-height: 81px;
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 2.2vw, 40px);
+}
+
+.ness-header__logo {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.ness-header__logo img {
+  width: 102px;
+  height: 65px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Wordmark fallback when no logo image is set. */
+.ness-header__wordmark {
+  font-family: var(--ness-font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ness-ink);
+  white-space: nowrap;
+}
+
+.ness-header__nav {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 1.8vw, 34px);
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.ness-header__link {
+  font-size: 16px;
+  line-height: 100%;
+  color: var(--ness-ink);
+  white-space: nowrap;
+  padding: 6px 0;
+  border-bottom: 1px solid transparent;
+  text-decoration: none;
+}
+
+.ness-header__link:hover,
+.ness-header__link[aria-current='page'] {
+  border-bottom-color: var(--ness-primary);
+  color: var(--ness-primary);
+  text-decoration: none;
+}
+
+.ness-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+/* Shared pill button used by search / account / currency. */
+.ness-pill {
+  height: var(--ness-chip-height);
+  border-radius: var(--ness-radius-pill);
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  padding: 0 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--ness-ink);
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.ness-pill:hover {
+  border-color: var(--ness-primary);
+  text-decoration: none;
+}
+
+.ness-pill--currency {
+  height: 46px;
+  border-radius: 42px;
+  padding: 0 17px;
+  gap: 10px;
+}
+
+.ness-pill--cart {
+  border: none;
+  border-radius: 100px;
+  background: var(--ness-border);
+  color: #322f2c;
+}
+
+.ness-pill--cart:hover {
+  background: var(--ness-card-cta);
+}
+
+.ness-pill--icon {
+  width: var(--ness-chip-height);
+  padding: 0;
+  border-radius: 100px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+/* --- Responsive: collapse to hamburger --------------------------------- */
+
+.ness-header__burger {
+  display: none;
+}
+
+@media (max-width: 1180px) {
+  .ness-header__nav,
+  .ness-header__actions .ness-pill--currency,
+  .ness-header__actions .ness-pill--account,
+  .ness-header__search-label {
+    display: none;
+  }
+
+  .ness-header__burger {
+    display: flex;
+  }
+}
+
+/* --- Mobile drawer ------------------------------------------------------ */
+
+.ness-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(21, 0, 26, 0.45);
+  animation: ness-fade 0.2s ease both;
+  border: 0;
+  padding: 0;
+  width: 100%;
+  cursor: default;
+}
+
+.ness-drawer {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 91;
+  width: min(420px, 90vw);
+  background: var(--ness-background);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: ness-slide-in 0.26s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+  overflow-y: auto;
+}
+
+.ness-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ness-border);
+}
+
+.ness-drawer__title {
+  font-family: var(--ness-font-display);
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ness-ink);
+}
+
+.ness-drawer__close {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.ness-drawer__link {
+  padding: 18px 4px;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ness-ink);
+  border-bottom: 1px solid rgba(21, 0, 26, 0.12);
+  text-decoration: none;
+}
+
+.ness-drawer__link:hover {
+  color: var(--ness-primary);
+  text-decoration: none;
+}
+
+.ness-drawer__cta {
+  margin-top: 20px;
+  height: var(--ness-cta-height);
+  border-radius: var(--ness-radius-cta);
+  border: none;
+  background: var(--ness-primary-deep);
+  color: #fffcf8;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.ness-drawer__cta:hover {
+  text-decoration: none;
+  color: #fffcf8;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+@keyframes ness-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes ness-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* --- Footer ------------------------------------------------------------- */
+
+.ness-footer {
+  background: var(--ness-primary);
+  padding: clamp(48px, 5vw, 79px) var(--ness-shell-pad) 0;
+}
+
+.ness-footer__inner {
+  max-width: 1620px;
+  margin-inline: auto;
+}
+
+.ness-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: clamp(32px, 3vw, 56px);
+  padding-bottom: clamp(40px, 4vw, 72px);
+}
+
+.ness-footer__brand {
+  min-width: 196px;
+}
+
+.ness-footer__wordmark {
+  margin: 0 0 20px;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 100%;
+  letter-spacing: -0.03em;
+  color: var(--ness-secondary);
+}
+
+.ness-footer__tagline {
+  margin: 0 0 26px;
+  font-size: 16px;
+  line-height: 140%;
+  letter-spacing: -0.03em;
+  color: var(--ness-secondary);
+}
+
+.ness-footer__socials {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.ness-footer__socials a {
+  display: flex;
+}
+
+.ness-footer__heading {
+  margin: 0 0 22px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+  color: var(--ness-secondary);
+}
+
+.ness-footer__links {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ness-footer__links a {
+  font-size: 16px;
+  color: var(--ness-secondary);
+  text-decoration: none;
+}
+
+.ness-footer__links a:hover {
+  color: #ffffff;
+  text-decoration: none;
+}
+
+.ness-footer__signup {
+  border-radius: var(--ness-radius-panel);
+  background: var(--ness-secondary);
+  padding: 40px 34px;
+  min-width: 300px;
+}
+
+.ness-footer__signup-title {
+  margin: 0 0 20px;
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 100%;
+  color: var(--ness-ink);
+}
+
+.ness-footer__signup-body {
+  margin: 0 0 24px;
+  font-size: 16px;
+  line-height: 30px;
+  color: var(--ness-muted-2);
+}
+
+.ness-footer__form {
+  display: flex;
+  height: var(--ness-chip-height);
+  border-radius: 5px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.ness-footer__form input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 0 15px;
+  font-size: 16px;
+  color: var(--ness-ink);
+}
+
+.ness-footer__form button {
+  width: 129px;
+  border: none;
+  border-radius: 5px;
+  background: var(--ness-primary);
+  color: var(--ness-secondary);
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.ness-footer__form button:hover {
+  background: var(--ness-primary-deep);
+}
+
+.ness-footer__success,
+.ness-footer__error {
+  margin: 12px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-ink);
+}
+
+.ness-footer__bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.53);
+  padding: 26px 0;
+  display: flex;
+  justify-content: center;
+}
+
+.ness-footer__copy {
+  font-size: 16px;
+  line-height: 30px;
+  color: var(--ness-secondary);
+}
+
+/* --- Toast -------------------------------------------------------------- */
+
+.ness-toast {
+  position: fixed;
+  z-index: 95;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--ness-ink);
+  color: var(--ness-secondary);
+  padding: 15px 24px;
+  border-radius: var(--ness-radius-pill);
+  font-size: 16px;
+  box-shadow: 0 12px 34px rgba(21, 0, 26, 0.28);
+  animation: ness-rise 0.24s ease both;
+  max-width: min(90vw, 520px);
+  text-align: center;
+}

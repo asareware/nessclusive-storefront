@@ -339,7 +339,15 @@
       {%- render 'cart-drawer' -%}
     {%- endif -%}
 
-    {% sections 'header-group' %}
+    {%- comment -%}
+      Chrome is rendered with static {% section %} tags rather than section
+      groups. Section groups are reorderable and removable in the customizer;
+      static sections expose their settings for editing but fix the running
+      order in code. That is the mechanism behind the Editability policy —
+      see PLAN.md, Decision #12.
+    {%- endcomment -%}
+    {% section 'ness-announcement-marquee' %}
+    {% section 'ness-header' %}
 
     <main
       id="MainContent"
@@ -351,7 +359,7 @@
       {{ content_for_layout }}
     </main>
 
-    {% sections 'footer-group' %}
+    {% section 'ness-footer' %}
 
     <ul hidden>
       <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>

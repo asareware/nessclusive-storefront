@@ -1,0 +1,65 @@
+{%- comment -%}
+  Mobile menu drawer. Rendered from the header section so it shares its nav
+  blocks — the drawer and the desktop nav are always the same links, and there
+  is no second place to edit.
+
+  Hidden by default and shown by ness-chrome.js. If that script fails the
+  drawer simply never opens; the desktop nav is still present in the DOM above
+  1180px, so no navigation is lost on the devices that rely on it.
+
+  Accepts: nav_items (array of blocks), settings (section settings)
+{%- endcomment -%}
+
+<ness-drawer id="ness-menu-drawer" hidden>
+  <button
+    type="button"
+    class="ness-overlay"
+    data-drawer-overlay
+    tabindex="-1"
+    aria-hidden="true"
+  ></button>
+
+  <aside
+    class="ness-drawer"
+    data-drawer-panel
+    role="dialog"
+    aria-modal="true"
+    aria-label="Menu"
+  >
+    <div class="ness-drawer__head">
+      <span class="ness-drawer__title">Menu</span>
+      <button
+        type="button"
+        class="ness-drawer__close"
+        data-drawer-close
+        aria-label="Close menu"
+      >
+        <svg width="16" height="16" viewBox="0 0 16 16" stroke="#15001A" stroke-width="1.6" fill="none" aria-hidden="true" focusable="false">
+          <path d="M1 1L15 15M15 1L1 15" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    {%- for block in nav_items -%}
+      {%- capture nav_url -%}
+        {%- render 'ness-nav-url', destination: block.settings.destination -%}
+      {%- endcapture -%}
+      <a href="{{ nav_url }}" class="ness-drawer__link">{{ block.settings.label }}</a>
+    {%- endfor -%}
+
+    {%- comment -%}
+      Account and currency live only in the drawer on narrow screens, since
+      the header hides both below 1180px.
+    {%- endcomment -%}
+    <a href="{{ routes.account_url }}" class="ness-drawer__link">
+      {% if customer %}Account{% else %}Sign in{% endif %}
+    </a>
+
+    {%- if settings.drawer_cta_label != blank -%}
+      {%- capture cta_url -%}
+        {%- render 'ness-nav-url', destination: settings.drawer_cta_destination -%}
+      {%- endcapture -%}
+      <a href="{{ cta_url }}" class="ness-drawer__cta">{{ settings.drawer_cta_label }}</a>
+    {%- endif -%}
+  </aside>
+</ness-drawer>

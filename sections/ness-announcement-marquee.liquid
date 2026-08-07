@@ -1,0 +1,64 @@
+{{ 'ness-chrome.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign messages = section.blocks | where: 'type', 'message'
+-%}
+
+{%- if messages.size > 0 -%}
+  <div class="ness-marquee">
+    {%- comment -%}
+      The track holds two identical groups. The keyframe translates by -50%,
+      so the second group is exactly where the first started when the loop
+      restarts — that is what makes it seamless. Duplicating in markup rather
+      than JS keeps it working with scripting disabled.
+    {%- endcomment -%}
+    <div class="ness-marquee__track">
+      {%- for pass in (1..2) -%}
+        <div class="ness-marquee__group" {% if pass == 2 %}aria-hidden="true"{% endif %}>
+          {%- for block in messages -%}
+            <span class="ness-marquee__item" {{ block.shopify_attributes }}>
+              {{- block.settings.text -}}
+            </span>
+          {%- endfor -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Announcement marquee",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Scrolling bar above the header. Colours, height, and speed are fixed by the design and are not editable."
+    }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "message",
+      "name": "Message",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Message",
+          "default": "Ships Globally",
+          "info": "Keep it short — long messages slow the loop and read poorly."
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "message", "settings": { "text": "Unique Solution For Everyone" } },
+      { "type": "message", "settings": { "text": "Ships Globally" } },
+      { "type": "message", "settings": { "text": "Fast Delivery Options" } },
+      { "type": "message", "settings": { "text": "24/7 Customer Support" } },
+      { "type": "message", "settings": { "text": "Cost Effective" } }
+    ]
+  }
+}
+{% endschema %}

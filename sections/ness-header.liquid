@@ -1,0 +1,196 @@
+{{ 'ness-chrome.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ness-chrome.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign nav_items = section.blocks | where: 'type', 'link'
+  assign cart_count = cart.item_count
+-%}
+
+<header class="ness-header">
+  <div class="ness-header__inner">
+    <a
+      href="{{ routes.root_url }}"
+      class="ness-header__logo"
+      aria-label="{{ shop.name | escape }} home"
+    >
+      {%- if section.settings.logo != blank -%}
+        {{
+          section.settings.logo
+          | image_url: width: 204
+          | image_tag: alt: shop.name, width: 102, height: 65, loading: 'eager'
+        }}
+      {%- else -%}
+        <span class="ness-header__wordmark">{{ shop.name }}</span>
+      {%- endif -%}
+    </a>
+
+    {%- if nav_items.size > 0 -%}
+      <nav class="ness-header__nav" role="navigation" aria-label="Main">
+        {%- for block in nav_items -%}
+          {%- capture nav_url -%}
+            {%- render 'ness-nav-url', destination: block.settings.destination -%}
+          {%- endcapture -%}
+          <a
+            href="{{ nav_url }}"
+            class="ness-header__link"
+            {% if request.path == nav_url %}aria-current="page"{% endif %}
+            {{ block.shopify_attributes }}
+          >
+            {{- block.settings.label -}}
+          </a>
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    <div class="ness-header__actions">
+      {%- comment -%}
+        Currency. Rendered only when Markets actually offers a choice, so the
+        pill does not appear on a single-currency store. A native select keeps
+        this keyboard- and screen-reader-accessible; the pill styling makes it
+        match the design.
+      {%- endcomment -%}
+      {%- if section.settings.show_currency
+          and localization.available_countries.size > 1
+      -%}
+        {%- form 'localization', class: 'ness-header__currency' -%}
+          <div class="ness-pill ness-pill--currency">
+            <label class="visually-hidden" for="ness-currency">
+              {{ 'localization.country_label' | t | default: 'Country/region' }}
+            </label>
+            <select
+              id="ness-currency"
+              name="country_code"
+              onchange="this.form.submit()"
+            >
+              {%- for country in localization.available_countries -%}
+                <option
+                  value="{{ country.iso_code }}"
+                  {% if country.iso_code == localization.country.iso_code %}selected{% endif %}
+                >
+                  {{ country.currency.iso_code }}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        {%- endform -%}
+      {%- endif -%}
+
+      {%- comment -%}
+        Search and cart are plain links for now and become overlays in Phase 5.
+        Building them as links first means they work without JavaScript, which
+        is the behaviour we want to keep underneath the overlay anyway.
+      {%- endcomment -%}
+      <a href="{{ routes.search_url }}" class="ness-pill" aria-label="Search">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#322F2C" stroke-width="1.5" aria-hidden="true" focusable="false">
+          <circle cx="6.8" cy="6.8" r="6.05"/>
+          <path d="M11.4 11.4 L15.2 15.2" stroke-linecap="round"/>
+        </svg>
+        <span class="ness-header__search-label">Search</span>
+      </a>
+
+      <a href="{{ routes.account_url }}" class="ness-pill ness-pill--account">
+        <svg width="15" height="16" viewBox="0 0 15 16" fill="none" stroke="#322F2C" stroke-width="1.5" aria-hidden="true" focusable="false">
+          <circle cx="7.5" cy="4.6" r="3.85"/>
+          <path d="M0.9 15.2 C1.6 12.1 4.3 10.4 7.5 10.4 C10.7 10.4 13.4 12.1 14.1 15.2" stroke-linecap="round"/>
+        </svg>
+        <span>{% if customer %}{{ customer.first_name | default: 'Account' }}{% else %}Sign in{% endif %}</span>
+      </a>
+
+      <a href="{{ routes.cart_url }}" class="ness-pill ness-pill--cart">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#322F2C" stroke-width="1.4" aria-hidden="true" focusable="false">
+          <path d="M1.2 2.1 H3.3 L5.2 10.6 H13.1 L14.8 4.6 H4.1" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="6.2" cy="13.4" r="1.3"/>
+          <circle cx="12.2" cy="13.4" r="1.3"/>
+        </svg>
+        <span>Cart{% if cart_count > 0 %} ({{ cart_count }}){% endif %}</span>
+      </a>
+
+      <button
+        type="button"
+        class="ness-pill ness-pill--icon ness-header__burger"
+        data-drawer-open
+        aria-label="Menu"
+        aria-expanded="false"
+        aria-controls="ness-menu-drawer"
+      >
+        <svg width="20" height="14" viewBox="0 0 20 14" stroke="#15001A" stroke-width="1.6" fill="none" aria-hidden="true" focusable="false">
+          <path d="M0 1H20M0 7H20M0 13H20" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+{%- render 'ness-menu-drawer', nav_items: nav_items, settings: section.settings -%}
+
+{% schema %}
+{
+  "name": "Header",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Fonts, colours, and sizes are fixed by the design. You can change each link's wording and where it points, but not the number of links or their styling."
+    },
+    { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Shown at 102 × 65. Use at least 306 × 195 so it stays sharp on high-resolution screens. Falls back to the store name if empty." },
+    { "type": "header", "content": "Currency" },
+    { "type": "checkbox", "id": "show_currency", "label": "Show currency selector", "default": true, "info": "Only appears if more than one country is enabled in Markets." },
+    { "type": "header", "content": "Mobile menu" },
+    { "type": "text", "id": "drawer_cta_label", "label": "Button label", "default": "Book a Session" },
+    {
+      "type": "select",
+      "id": "drawer_cta_destination",
+      "label": "Button goes to",
+      "default": "booking",
+      "options": [
+        { "value": "home", "label": "Home" },
+        { "value": "ready_to_ship", "label": "Ready to Ship" },
+        { "value": "pre_order", "label": "Pre-Order" },
+        { "value": "accessories", "label": "Accessories" },
+        { "value": "all_products", "label": "All products" },
+        { "value": "booking", "label": "Booking page" },
+        { "value": "faqs", "label": "FAQs page" },
+        { "value": "contact", "label": "Contact page" }
+      ]
+    }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Nav link",
+      "settings": [
+        { "type": "text", "id": "label", "label": "Wording", "default": "Ready to Ship", "info": "Change the wording freely — for example \"Booking\" to \"Book Me\"." },
+        {
+          "type": "select",
+          "id": "destination",
+          "label": "Goes to",
+          "default": "ready_to_ship",
+          "info": "Chosen from real pages on this store, so a link can never 404.",
+          "options": [
+            { "value": "home", "label": "Home" },
+            { "value": "ready_to_ship", "label": "Ready to Ship" },
+            { "value": "pre_order", "label": "Pre-Order" },
+            { "value": "accessories", "label": "Accessories" },
+            { "value": "all_products", "label": "All products" },
+            { "value": "collections", "label": "All collections" },
+            { "value": "booking", "label": "Booking page" },
+            { "value": "faqs", "label": "FAQs page" },
+            { "value": "contact", "label": "Contact page" },
+            { "value": "search", "label": "Search" }
+          ]
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "link", "settings": { "label": "Ready to Ship", "destination": "ready_to_ship" } },
+      { "type": "link", "settings": { "label": "Pre-Order", "destination": "pre_order" } },
+      { "type": "link", "settings": { "label": "Accessories", "destination": "accessories" } },
+      { "type": "link", "settings": { "label": "Booking", "destination": "booking" } },
+      { "type": "link", "settings": { "label": "FAQs", "destination": "faqs" } },
+      { "type": "link", "settings": { "label": "Contact Us", "destination": "contact" } }
+    ]
+  }
+}
+{% endschema %}

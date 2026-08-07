@@ -1,0 +1,212 @@
+{{ 'ness-chrome.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Blocks are split by their `column` setting inside the loops below rather than
+  with a `where` filter — `where` matches top-level block properties only and
+  cannot reach into block.settings.
+{%- endcomment -%}
+
+<footer class="ness-footer">
+  <div class="ness-footer__inner">
+    <div class="ness-footer__grid">
+      <div class="ness-footer__brand">
+        <p class="ness-footer__wordmark">{{ section.settings.wordmark | default: shop.name }}</p>
+        {%- if section.settings.tagline != blank -%}
+          <p class="ness-footer__tagline">{{ section.settings.tagline }}</p>
+        {%- endif -%}
+
+        <div class="ness-footer__socials">
+          {%- if section.settings.social_facebook != blank -%}
+            <a href="{{ section.settings.social_facebook }}" aria-label="Facebook" rel="noopener" target="_blank">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="#FEF1D5" aria-hidden="true" focusable="false"><path d="M 24 12.03 C 24 5.389 18.624 0 12 0 C 5.376 0 0 5.389 0 12.03 C 0 17.853 4.128 22.701 9.6 23.82 L 9.6 15.639 L 7.2 15.639 L 7.2 12.03 L 9.6 12.03 L 9.6 9.023 C 9.6 6.701 11.484 4.812 13.8 4.812 L 16.8 4.812 L 16.8 8.421 L 14.4 8.421 C 13.74 8.421 13.2 8.962 13.2 9.624 L 13.2 12.03 L 16.8 12.03 L 16.8 15.639 L 13.2 15.639 L 13.2 24 C 19.26 23.398 24 18.274 24 12.03 Z"/></svg>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.social_instagram != blank -%}
+            <a href="{{ section.settings.social_instagram }}" aria-label="Instagram" rel="noopener" target="_blank">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#FEF1D5" stroke-width="2" aria-hidden="true" focusable="false"><rect x="2" y="2" width="20" height="20" rx="6"/><circle cx="12" cy="12" r="4.6"/><circle cx="17.8" cy="6.2" r="1.2" fill="#FEF1D5" stroke="none"/></svg>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.social_youtube != blank -%}
+            <a href="{{ section.settings.social_youtube }}" aria-label="YouTube" rel="noopener" target="_blank">
+              <svg width="23" height="23" viewBox="0 0 24 24" fill="#FEF1D5" aria-hidden="true" focusable="false"><path d="M21.6 7.2c-.2-1-.9-1.7-1.9-1.9C17.9 5 12 5 12 5s-5.9 0-7.7.3c-1 .2-1.7.9-1.9 1.9C2.1 9 2.1 12 2.1 12s0 3 .3 4.8c.2 1 .9 1.7 1.9 1.9C6.1 19 12 19 12 19s5.9 0 7.7-.3c1-.2 1.7-.9 1.9-1.9.3-1.8.3-4.8.3-4.8s0-3-.3-4.8ZM9.9 15.3V8.7l5.6 3.3-5.6 3.3Z"/></svg>
+            </a>
+          {%- endif -%}
+          {%- if section.settings.social_x != blank -%}
+            <a href="{{ section.settings.social_x }}" aria-label="X" rel="noopener" target="_blank">
+              <svg width="20" height="20" viewBox="0 0 13.224 13.515" fill="#FEF1D5" aria-hidden="true" focusable="false"><path d="M 7.87 5.723 L 12.793 0 L 11.627 0 L 7.352 4.969 L 3.938 0 L 0 0 L 5.163 7.514 L 0 13.515 L 1.167 13.515 L 5.681 8.268 L 9.286 13.515 L 13.224 13.515 L 7.87 5.723 L 7.87 5.723 Z M 1.587 0.878 L 3.379 0.878 L 11.627 12.677 L 9.835 12.677 L 1.587 0.878 Z"/></svg>
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- comment -%}
+        Two link columns, each fed by blocks tagged with its column. The count
+        of columns is fixed by the design; only their headings and contents are
+        editable.
+      {%- endcomment -%}
+      <div>
+        <p class="ness-footer__heading">{{ section.settings.heading_shop }}</p>
+        <div class="ness-footer__links">
+          {%- for block in section.blocks -%}
+            {%- if block.settings.column == 'shop' -%}
+              {%- capture url -%}{%- render 'ness-nav-url', destination: block.settings.destination -%}{%- endcapture -%}
+              <a href="{{ url }}" {{ block.shopify_attributes }}>{{ block.settings.label }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <div>
+        <p class="ness-footer__heading">{{ section.settings.heading_quick }}</p>
+        <div class="ness-footer__links">
+          {%- for block in section.blocks -%}
+            {%- if block.settings.column == 'quick' -%}
+              {%- capture url -%}{%- render 'ness-nav-url', destination: block.settings.destination -%}{%- endcapture -%}
+              <a href="{{ url }}" {{ block.shopify_attributes }}>{{ block.settings.label }}</a>
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      </div>
+
+      <div>
+        <p class="ness-footer__heading">{{ section.settings.heading_contact }}</p>
+        <div class="ness-footer__links">
+          {%- if section.settings.contact_email != blank -%}
+            <a href="mailto:{{ section.settings.contact_email }}">Email: {{ section.settings.contact_email }}</a>
+          {%- endif -%}
+          {%- if section.settings.contact_phone != blank -%}
+            <a href="tel:{{ section.settings.contact_phone | remove: ' ' | remove: '-' }}">
+              Phone: {{ section.settings.contact_phone }}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+
+      {%- if section.settings.show_newsletter -%}
+        <div class="ness-footer__signup">
+          <p class="ness-footer__signup-title">{{ section.settings.newsletter_title }}</p>
+          {%- if section.settings.newsletter_body != blank -%}
+            <p class="ness-footer__signup-body">{{ section.settings.newsletter_body }}</p>
+          {%- endif -%}
+
+          {%- form 'customer', class: 'ness-footer__newsletter' -%}
+            <input type="hidden" name="contact[tags]" value="newsletter">
+            <div class="ness-footer__form">
+              <label class="visually-hidden" for="ness-newsletter-email">Email</label>
+              <input
+                id="ness-newsletter-email"
+                type="email"
+                name="contact[email]"
+                placeholder="{{ section.settings.newsletter_placeholder }}"
+                autocomplete="email"
+                required
+              >
+              <button type="submit">{{ section.settings.newsletter_button }}</button>
+            </div>
+
+            {%- if form.posted_successfully? -%}
+              <p class="ness-footer__success" role="status">
+                {{ section.settings.newsletter_success }}
+              </p>
+            {%- elsif form.errors -%}
+              <p class="ness-footer__error" role="alert">
+                {{ form.errors.messages['email'] }}
+              </p>
+            {%- endif -%}
+          {%- endform -%}
+        </div>
+      {%- endif -%}
+    </div>
+
+    <div class="ness-footer__bottom">
+      <span class="ness-footer__copy">
+        &copy; {{ 'now' | date: '%Y' }} {{ section.settings.copyright | default: shop.name }}
+      </span>
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Footer",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Column count and layout are fixed by the design. Headings, links, and copy are editable."
+    },
+    { "type": "header", "content": "Brand" },
+    { "type": "text", "id": "wordmark", "label": "Wordmark", "default": "Nessclusive" },
+    { "type": "text", "id": "tagline", "label": "Tagline", "default": "Let your wig do the talking" },
+    { "type": "text", "id": "copyright", "label": "Copyright name", "default": "Nessclusive Hair Company", "info": "The year is added automatically." },
+    { "type": "header", "content": "Social links" },
+    { "type": "url", "id": "social_facebook", "label": "Facebook" },
+    { "type": "url", "id": "social_instagram", "label": "Instagram" },
+    { "type": "url", "id": "social_youtube", "label": "YouTube" },
+    { "type": "url", "id": "social_x", "label": "X" },
+    { "type": "header", "content": "Column headings" },
+    { "type": "text", "id": "heading_shop", "label": "First column", "default": "Shop" },
+    { "type": "text", "id": "heading_quick", "label": "Second column", "default": "Quick Links" },
+    { "type": "text", "id": "heading_contact", "label": "Third column", "default": "Contact" },
+    { "type": "header", "content": "Contact details" },
+    { "type": "text", "id": "contact_email", "label": "Email", "default": "info@nessclusive.com" },
+    { "type": "text", "id": "contact_phone", "label": "Phone", "default": "917-587-8962" },
+    { "type": "header", "content": "Newsletter" },
+    { "type": "checkbox", "id": "show_newsletter", "label": "Show signup panel", "default": true },
+    { "type": "text", "id": "newsletter_title", "label": "Title", "default": "Subscribe & Stay Updated" },
+    { "type": "textarea", "id": "newsletter_body", "label": "Body", "default": "News and promotions straight to your mailbox. Unsubscribe easily, whenever you like!" },
+    { "type": "text", "id": "newsletter_placeholder", "label": "Field placeholder", "default": "What's your email ?" },
+    { "type": "text", "id": "newsletter_button", "label": "Button label", "default": "Subscribe" },
+    { "type": "text", "id": "newsletter_success", "label": "Success message", "default": "Thanks for subscribing." }
+  ],
+  "max_blocks": 12,
+  "blocks": [
+    {
+      "type": "link",
+      "name": "Footer link",
+      "settings": [
+        {
+          "type": "select",
+          "id": "column",
+          "label": "Column",
+          "default": "shop",
+          "options": [
+            { "value": "shop", "label": "First column" },
+            { "value": "quick", "label": "Second column" }
+          ]
+        },
+        { "type": "text", "id": "label", "label": "Wording", "default": "Ready to Ship" },
+        {
+          "type": "select",
+          "id": "destination",
+          "label": "Goes to",
+          "default": "ready_to_ship",
+          "options": [
+            { "value": "home", "label": "Home" },
+            { "value": "ready_to_ship", "label": "Ready to Ship" },
+            { "value": "pre_order", "label": "Pre-Order" },
+            { "value": "accessories", "label": "Accessories" },
+            { "value": "all_products", "label": "All products" },
+            { "value": "booking", "label": "Booking page" },
+            { "value": "faqs", "label": "FAQs page" },
+            { "value": "contact", "label": "Contact page" },
+            { "value": "terms", "label": "Terms of service" },
+            { "value": "privacy", "label": "Privacy policy" },
+            { "value": "refund", "label": "Refund policy" },
+            { "value": "shipping", "label": "Shipping policy" }
+          ]
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "link", "settings": { "column": "shop", "label": "Pre-order Wigs", "destination": "pre_order" } },
+      { "type": "link", "settings": { "column": "shop", "label": "Ready to Ship", "destination": "ready_to_ship" } },
+      { "type": "link", "settings": { "column": "shop", "label": "Accessories", "destination": "accessories" } },
+      { "type": "link", "settings": { "column": "quick", "label": "Terms of service", "destination": "terms" } },
+      { "type": "link", "settings": { "column": "quick", "label": "Book a Session", "destination": "booking" } },
+      { "type": "link", "settings": { "column": "quick", "label": "Privacy Policy", "destination": "privacy" } }
+    ]
+  }
+}
+{% endschema %}

@@ -1,0 +1,35 @@
+{%- comment -%}
+  Resolves a nav destination key to a real URL.
+
+  Destinations are a closed set (Decision #9 / Editability policy): the owner
+  picks from this list in the customizer and cannot type a URL, so a broken
+  link cannot be authored. Collection and page handles here must match the
+  live store exactly — they carry existing SEO and are never to be recreated.
+
+  Usage:
+    {%- capture url -%}{%- render 'ness-nav-url', destination: block.settings.destination -%}{%- endcapture -%}
+
+  Accepts: destination (string)
+{%- endcomment -%}
+
+{%- case destination -%}
+  {%- when 'home' -%}{{ routes.root_url }}
+  {%- when 'ready_to_ship' -%}{{ routes.collections_url }}/ready-to-ship
+  {%- when 'pre_order' -%}{{ routes.collections_url }}/pre-order
+  {%- when 'accessories' -%}{{ routes.collections_url }}/accessories
+  {%- when 'all_products' -%}{{ routes.all_products_collection_url }}
+  {%- when 'collections' -%}{{ routes.collections_url }}
+  {%- when 'booking' -%}/pages/booking
+  {%- when 'faqs' -%}/pages/faqs
+  {%- when 'contact' -%}/pages/contact-us
+  {%- when 'search' -%}{{ routes.search_url }}
+  {%- comment -%}
+    Policy URLs come from the shop object rather than being hardcoded, so they
+    stay correct if a policy is renamed in admin.
+  {%- endcomment -%}
+  {%- when 'terms' -%}{{ shop.terms_of_service.url | default: '/policies/terms-of-service' }}
+  {%- when 'privacy' -%}{{ shop.privacy_policy.url | default: '/policies/privacy-policy' }}
+  {%- when 'refund' -%}{{ shop.refund_policy.url | default: '/policies/refund-policy' }}
+  {%- when 'shipping' -%}{{ shop.shipping_policy.url | default: '/policies/shipping-policy' }}
+  {%- else -%}{{ routes.root_url }}
+{%- endcase -%}
