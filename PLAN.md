@@ -355,8 +355,19 @@ replacements** (Decision #9):
 4. **Store access** → store address is **`nessclusive-llc.myshopify.com`** (confirmed from Shopify admin → Settings → Domains; `nessclusive.myshopify.com` is an older alias). Live site runs on the custom domain **www.nessclusive.com** (Primary, Online Store channel). Owner (Vanessa Amoako / info@nessclusive.com) is on the store; development runs via the owner's login with Shopify CLI.
    - ⚠️ **Oxygen environments exist** on the store: "nessclusive (Production)" and "nessclusive (staging)" with `*.o2.myshopify.dev` domains — remnants of a Hydrogen (headless) storefront setup. They don't hold the custom domain, so they don't affect this build; at cutover, verify www.nessclusive.com remains targeted at the Online Store channel where the new theme is published.
 5. **Newsletter** → assume **Shopify Email**; Google MX records for mailbox email are unaffected.
-6. **Installed apps** → clean slate holds. Search & Discovery remains for
-   collection filtering; no Instagram app (see #10).
+6. **Installed apps** → ⚠️ **"clean slate" was wrong — corrected in Phase 0.**
+   Inspecting the live theme and storefront shows apps that do touch the
+   presentation layer:
+
+   | App | How it attaches | Action needed |
+   |---|---|---|
+   | **Shopify Inbox** (chat) | Active app embed on the live theme (`shopify://apps/inbox/blocks/chat/…`) | App embeds do **not** transfer between themes. Must be re-enabled on the new theme before publish, or live chat silently disappears |
+   | **Elfsight** (`static.elfsight.com`, app `1e24767f-…`) | Client-side script | Almost certainly the current Instagram feed — it injects client-side, which is why "instagram" appears nowhere in the page source. This is exactly the locked-widget pattern rejected in #10. Drop it once the Worker ships, and cancel the subscription |
+   | **Hextom: Sales Boost** | Theme app extension | Confirm what it actually renders. Theme-extension apps need re-adding per theme |
+   | **Translate & Adapt** | Content layer, not theme | Survives the swap, but any static string in the new theme must use `| t` filters or it will not be translatable |
+   | **Udesly Nexus** | Headless converter | Leftover from the Hydrogen experiment. Not theme-relevant; safe to remove |
+
+   Search & Discovery also remains, for collection filtering.
 7. **Checkout path** → **no express button on the product page.** Both prototype
    buttons stay: **Add to Cart**, and **Buy Now** which adds to cart then
    redirects to `/checkout`. Shopify offers Shop Pay / Apple Pay / Google Pay at
@@ -416,9 +427,10 @@ countries are actually being sold to.
 swap untouched — which also means they will not automatically reflect anything
 new. Review at minimum the order confirmation (see Decision #3).
 
-**Analytics.** GA4 and Meta Pixel configured through Shopify's Customer Events
-survive a theme swap. Anything hardcoded into the old `theme.liquid` will not —
-audit the current theme for inline tracking scripts before publishing.
+**Analytics — RESOLVED in Phase 0.** Pulled the live theme and grepped
+`layout/theme.liquid` for inline tracking: **zero hardcoded scripts**. Nothing
+is lost in the swap. Whatever analytics exist run through Customer Events or app
+embeds, both of which are configured outside the theme.
 
 ## Remaining items to confirm
 
