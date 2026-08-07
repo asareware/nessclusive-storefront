@@ -1,0 +1,174 @@
+/* ==========================================================================
+   Nessclusive — FAQ
+   "Frequently Asked Questions" accordion plus the contact prompt beneath it.
+   Values transcribed from project/Nessclusive Storefront.dc.html:217-241.
+   ========================================================================== */
+
+/* One element does what the prototype's single <section> did: shell width,
+   fluid gutter, and the section gap underneath. No top padding — the section
+   above owns that gap. */
+.ness-faq {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: 0 var(--ness-shell-pad) var(--ness-section-gap);
+}
+
+.ness-faq__heading {
+  margin: 0 0 clamp(28px, 3vw, 48px);
+  font: 600 clamp(34px, 4.6vw, 64px) / 100% var(--ness-font-display);
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* --- Accordion ---------------------------------------------------------- */
+
+/* auto-fit with a 420px floor: two columns on desktop, one below roughly
+   940px, no media queries. Row gap is deliberately zero — the dividers do the
+   separating, exactly as drawn. */
+.ness-faq__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: 0 clamp(40px, 5vw, 103px);
+}
+
+/* The prototype's rgba(21,0,26,0.4) — the ink token at 40%, derived rather
+   than restated so the divider follows the token if it ever moves. */
+.ness-faq__item {
+  border-bottom: 1px solid color-mix(in srgb, var(--ness-ink) 40%, transparent);
+}
+
+/* <summary> is the whole control row: focusable, toggles natively, and works
+   with JavaScript disabled. list-style covers the Chrome/Firefox marker, the
+   -webkit pseudo-element covers Safari's. */
+.ness-faq__summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 0;
+  list-style: none;
+  cursor: pointer;
+}
+
+.ness-faq__summary::-webkit-details-marker {
+  display: none;
+}
+
+/* An h3 for document structure, styled as the design's plain question row
+   rather than as a display heading — hence the overrides of the h1–h4
+   defaults in base. */
+.ness-faq__question {
+  margin: 0;
+  font-family: var(--ness-font-text);
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  line-height: 1.5;
+  color: var(--ness-ink);
+  text-wrap: pretty;
+}
+
+/* #1A2016 is the prototype's chevron fill and is the one colour in this
+   section with no token — near-ink, but not the ink value. */
+.ness-faq__chevron {
+  flex-shrink: 0;
+  width: 24px;
+  height: 13px;
+  color: #1a2016;
+  transition: transform 0.22s ease;
+}
+
+.ness-faq__item[open] .ness-faq__chevron {
+  transform: rotate(180deg);
+}
+
+.ness-faq__answer {
+  padding: 0 44px 22px 0;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--ness-muted);
+  animation: ness-faq-rise 0.22s ease both;
+}
+
+/* Rich text may hold more than one block. The design shows a single
+   paragraph, so that case is untouched and only extras get separated. */
+.ness-faq__answer > * + * {
+  margin-top: 12px;
+}
+
+.ness-faq__answer ul,
+.ness-faq__answer ol {
+  padding-left: 20px;
+}
+
+.ness-faq__answer a {
+  color: var(--ness-primary-deep);
+}
+
+/* --- Contact prompt ----------------------------------------------------- */
+
+.ness-faq__prompt {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: clamp(32px, 4vw, 60px);
+  padding: clamp(24px, 3vw, 43px) clamp(20px, 2vw, 37px);
+  border-radius: var(--ness-radius-band);
+  background: var(--ness-card-1);
+}
+
+.ness-faq__prompt-title {
+  margin: 0 0 6px;
+  font-family: var(--ness-font-text);
+  font-size: clamp(21px, 1.7vw, 26px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  line-height: 1.5;
+  color: var(--ness-primary);
+}
+
+.ness-faq__prompt-body {
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--ness-primary);
+}
+
+.ness-faq__prompt-cta {
+  display: flex;
+  align-items: center;
+  height: var(--ness-cta-height);
+  padding: 0 24px;
+  border-radius: var(--ness-radius-cta);
+  background: var(--ness-secondary);
+  color: var(--ness-primary-deep);
+  font-size: 18px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.ness-faq__prompt-cta:hover {
+  background: var(--ness-background);
+  text-decoration: none;
+}
+
+/* --- Motion ------------------------------------------------------------- */
+
+/* The prototype's ness-rise, namespaced and kept local so no shared
+   stylesheet has to be touched. base.css neutralises it for anyone who has
+   asked for reduced motion. */
+@keyframes ness-faq-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

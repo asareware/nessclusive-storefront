@@ -65,10 +65,49 @@ button {
 }
 
 /* Visible focus for keyboard users only — the design has no focus treatment,
-   so this supplies one without affecting mouse interaction. */
+   so this supplies one without affecting mouse interaction.
+
+   box-shadow is reset explicitly: Dawn's base.css sets both an outline AND a
+   large box-shadow halo on :focus-visible at the same specificity. Ours loads
+   later so the outline wins, but without this reset the halo survives and
+   focused controls render with two rings. */
 :focus-visible {
   outline: 2px solid var(--ness-primary-deep);
   outline-offset: 2px;
+  box-shadow: none;
+}
+
+/* --- Overrides for Dawn's base.css ------------------------------------- */
+
+/* Dawn hides any empty div/section/heading:
+     div:empty, section:empty, h1:empty … { display: none }
+   Our sections legitimately emit empty containers when optional copy is left
+   blank, and a hidden container takes its padding with it — collapsing the
+   section and letting absolutely-positioned decoration spill outside it.
+
+   Dawn's selector is (0,1,1), so loading later is not enough to beat it;
+   these are (0,2,1). Scoped to our namespace so Dawn's own sections keep
+   their behaviour until they are replaced. */
+div[class^='ness-']:empty,
+div[class*=' ness-']:empty,
+section[class^='ness-']:empty,
+section[class*=' ness-']:empty {
+  display: block;
+}
+
+/* Dawn sets `word-break: break-word` on every heading. The prototype sets no
+   such rule, and mid-word breaking is visibly wrong on the display face.
+   overflow-wrap only engages for a word that would otherwise overflow its
+   container, so normal copy renders identically to the prototype while a long
+   merchant-entered word still cannot break the layout. */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 /* --- Layout shell ------------------------------------------------------ */

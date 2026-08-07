@@ -1,0 +1,130 @@
+{{ 'ness-about.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Three photo slots, fixed. They are section settings rather than blocks on
+  purpose: the arrangement is asymmetric — tall photo plus copy, a single
+  centred photo, tall photo plus copy — so adding or removing one would not
+  degrade gracefully, it would break the grid. See PLAN.md, Editability policy:
+  "About — editable: heading, body copy, the 3 photos; locked: layout, image
+  arrangement."
+
+  Each image is drawn at a fixed aspect ratio with object-fit: cover, so an
+  upload of any shape crops to the design rather than distorting it.
+{%- endcomment -%}
+
+<section
+  class="ness-about"
+  {% if section.settings.heading != blank %}aria-labelledby="ness-about-heading"{% endif %}
+>
+  <div class="ness-about__inner">
+    {%- if section.settings.heading != blank -%}
+      <h2 class="ness-about__heading" id="ness-about-heading">
+        {{- section.settings.heading -}}
+      </h2>
+    {%- endif -%}
+
+    <div class="ness-about__grid">
+      <div class="ness-about__column">
+        <div class="ness-about__media ness-about__media--1">
+          {%- if section.settings.image_1 != blank -%}
+            {{
+              section.settings.image_1
+              | image_url: width: 1170
+              | image_tag:
+                alt: section.settings.image_1.alt,
+                widths: '390, 520, 780, 910, 1170',
+                sizes: '(min-width: 1200px) 28vw, (min-width: 700px) 46vw, 92vw',
+                loading: 'lazy'
+            }}
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'ness-about__placeholder' }}
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.title_1 != blank or section.settings.body_1 != blank -%}
+          <div>
+            {%- if section.settings.title_1 != blank -%}
+              <h3 class="ness-about__title">{{ section.settings.title_1 }}</h3>
+            {%- endif -%}
+            {%- if section.settings.body_1 != blank -%}
+              <p class="ness-about__body">{{ section.settings.body_1 }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- comment -%}
+        The centre photo is a grid child in its own right — that, plus
+        align-items: center on the grid, is what floats it between the two
+        taller columns.
+      {%- endcomment -%}
+      <div class="ness-about__media ness-about__media--2">
+        {%- if section.settings.image_2 != blank -%}
+          {{
+            section.settings.image_2
+            | image_url: width: 1578
+            | image_tag:
+              alt: section.settings.image_2.alt,
+              widths: '526, 700, 1052, 1300, 1578',
+              sizes: '(min-width: 1200px) 28vw, (min-width: 700px) 46vw, 92vw',
+              loading: 'lazy'
+          }}
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'ness-about__placeholder' }}
+        {%- endif -%}
+      </div>
+
+      <div class="ness-about__column">
+        <div class="ness-about__media ness-about__media--3">
+          {%- if section.settings.image_3 != blank -%}
+            {{
+              section.settings.image_3
+              | image_url: width: 1170
+              | image_tag:
+                alt: section.settings.image_3.alt,
+                widths: '390, 520, 780, 910, 1170',
+                sizes: '(min-width: 1200px) 28vw, (min-width: 700px) 46vw, 92vw',
+                loading: 'lazy'
+            }}
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'ness-about__placeholder' }}
+          {%- endif -%}
+        </div>
+
+        {%- if section.settings.title_2 != blank or section.settings.body_2 != blank -%}
+          <div>
+            {%- if section.settings.title_2 != blank -%}
+              <h3 class="ness-about__title">{{ section.settings.title_2 }}</h3>
+            {%- endif -%}
+            {%- if section.settings.body_2 != blank -%}
+              <p class="ness-about__body">{{ section.settings.body_2 }}</p>
+            {%- endif -%}
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "About",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Wording and the three photos are editable. The layout, the photo shapes, and all colours and sizes are fixed by the design. Every photo is cropped to fill its slot, so uploads never stretch — set a focal point in Shopify's image editor if an important part is being trimmed."
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "A little about us" },
+    { "type": "header", "content": "Left column" },
+    { "type": "image_picker", "id": "image_1", "label": "Photo", "info": "Cropped to a 390 × 317 shape. Upload at least 1170 × 951 so it stays sharp on high-resolution screens." },
+    { "type": "text", "id": "title_1", "label": "Title", "default": "Our story, Your style" },
+    { "type": "textarea", "id": "body_1", "label": "Body copy", "default": "Nessclusive was born from a simple yet powerful idea to create high-quality wigs that allow people to express their true selves. We provide not just wigs, but a way for everyone to feel beautiful, bold, and unstoppable." },
+    { "type": "header", "content": "Centre column" },
+    { "type": "image_picker", "id": "image_2", "label": "Photo", "info": "The wide photo between the two columns. Cropped to a 526 × 412 shape. Upload at least 1578 × 1236 so it stays sharp on high-resolution screens." },
+    { "type": "header", "content": "Right column" },
+    { "type": "image_picker", "id": "image_3", "label": "Photo", "info": "Cropped to a 390 × 434 shape. Upload at least 1170 × 1302 so it stays sharp on high-resolution screens." },
+    { "type": "text", "id": "title_2", "label": "Title", "default": "We take pride in quality" },
+    { "type": "textarea", "id": "body_2", "label": "Body copy", "default": "We aim to build a global community celebrating diversity and self-expression. With various styles, colors, and customization, everyone can find their own personal wig." }
+  ]
+}
+{% endschema %}

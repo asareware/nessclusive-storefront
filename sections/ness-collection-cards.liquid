@@ -1,0 +1,109 @@
+{{ 'ness-collection-cards.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Explore Collection — three category cards.
+
+  The count is fixed at three by the design (max_blocks 3, and the grid is
+  drawn for three). Only each card's photo, wording, and destination are
+  editable; the section heading is part of the design and is not a setting.
+  See the Editability policy in PLAN.md.
+{%- endcomment -%}
+
+{%- if section.blocks.size > 0 -%}
+  <section
+    class="ness-collection-cards"
+    aria-labelledby="ness-collection-cards-heading-{{ section.id }}"
+  >
+    <h2 class="ness-collection-cards__heading" id="ness-collection-cards-heading-{{ section.id }}">
+      Explore Collection
+    </h2>
+
+    <div class="ness-collection-cards__grid">
+      {%- for block in section.blocks -%}
+        {%- capture url -%}
+          {%- render 'ness-nav-url', destination: block.settings.destination -%}
+        {%- endcapture -%}
+        <a
+          href="{{ url }}"
+          class="ness-collection-cards__card"
+          {{ block.shopify_attributes }}
+        >
+          {%- comment -%}
+            The frame is a fixed 439 : 502 with object-fit: cover, so an upload
+            of any shape crops to the design instead of distorting the row.
+            Widths stop at 1200: the card is ~453px at the 1770px shell, so
+            that already covers 2× displays.
+          {%- endcomment -%}
+          <div class="ness-collection-cards__media">
+            {%- if block.settings.image != blank -%}
+              {{
+                block.settings.image
+                | image_url: width: 1200
+                | image_tag:
+                  class: 'ness-collection-cards__image',
+                  alt: block.settings.image.alt,
+                  widths: '300, 452, 600, 906, 1200',
+                  sizes: '(min-width: 1180px) 30vw, (min-width: 750px) 45vw, 92vw',
+                  loading: 'lazy'
+              }}
+            {%- else -%}
+              {{
+                'image'
+                | placeholder_svg_tag: 'ness-collection-cards__image ness-collection-cards__image--placeholder'
+              }}
+            {%- endif -%}
+          </div>
+
+          <div class="ness-collection-cards__label">
+            <h3 class="ness-collection-cards__title">{{ block.settings.title }}</h3>
+          </div>
+        </a>
+      {%- endfor -%}
+    </div>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Explore Collection",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Three cards, fixed by the design. Each card's photo, wording, and destination are editable — the number of cards, the heading, and all colours, sizes, and spacing are not."
+    }
+  ],
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "card",
+      "name": "Collection card",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "Photo", "info": "Shown in a 439 × 502 frame. Upload at least 878 × 1004 so it stays sharp on high-resolution screens. Any shape works — it is cropped from the centre, never squashed." },
+        { "type": "text", "id": "title", "label": "Wording", "default": "Ready to Ship Wigs", "info": "Keep it to a few words — it sits on one line in the card's label bar." },
+        {
+          "type": "select",
+          "id": "destination",
+          "label": "Goes to",
+          "default": "ready_to_ship",
+          "info": "Chosen from real pages on this store, so a card can never 404.",
+          "options": [
+            { "value": "ready_to_ship", "label": "Ready to Ship" },
+            { "value": "pre_order", "label": "Pre-Order" },
+            { "value": "accessories", "label": "Accessories" },
+            { "value": "all_products", "label": "All products" },
+            { "value": "collections", "label": "All collections" },
+            { "value": "booking", "label": "Booking page" }
+          ]
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "card", "settings": { "title": "Pre-order Wigs", "destination": "pre_order" } },
+      { "type": "card", "settings": { "title": "Ready to Ship Wigs", "destination": "ready_to_ship" } },
+      { "type": "card", "settings": { "title": "Accessories", "destination": "accessories" } }
+    ]
+  }
+}
+{% endschema %}

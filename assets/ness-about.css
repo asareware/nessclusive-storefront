@@ -1,0 +1,99 @@
+/* ==========================================================================
+   Nessclusive — About
+   "A little about us": a centred heading over a three-column grid of photos
+   and copy. Values transcribed from project/Nessclusive Storefront.dc.html.
+   ========================================================================== */
+
+.ness-about {
+  /* No top padding — the section above owns the gap, as in the prototype. */
+  padding-bottom: var(--ness-section-gap);
+}
+
+.ness-about__inner {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding-inline: var(--ness-shell-pad);
+}
+
+.ness-about__heading {
+  margin: 0 0 clamp(28px, 3vw, 48px);
+  font: 600 clamp(34px, 4.6vw, 64px) / 100% var(--ness-font-display);
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+  text-align: center;
+  text-wrap: balance;
+}
+
+/* auto-fit with a 320px floor is the whole responsive story: three columns on
+   desktop, two mid-width, one on phones — no media queries, and a column can
+   never be squeezed narrower than the photos were drawn for. */
+.ness-about__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(24px, 3vw, 56px);
+  align-items: center;
+}
+
+.ness-about__column {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vw, 28px);
+}
+
+/* --- Media -------------------------------------------------------------- */
+
+/* Every slot is a fixed-ratio box the image fills and crops inside, so an
+   upload of any shape holds the layout instead of stretching. The ratios and
+   the crop weighting are part of the design and are not exposed as settings. */
+.ness-about__media {
+  border-radius: var(--ness-radius-media);
+  overflow: hidden;
+}
+
+.ness-about__media img,
+.ness-about__media .ness-about__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ness-about__media--1 {
+  aspect-ratio: 390 / 317;
+}
+
+.ness-about__media--1 img {
+  object-position: 88% 50%;
+}
+
+.ness-about__media--2 {
+  aspect-ratio: 526 / 412;
+}
+
+.ness-about__media--2 img {
+  object-position: 50% 50%;
+}
+
+.ness-about__media--3 {
+  aspect-ratio: 390 / 434;
+}
+
+.ness-about__media--3 img {
+  object-position: 50% 24%;
+}
+
+/* --- Copy --------------------------------------------------------------- */
+
+.ness-about__title {
+  margin: 0 0 12px;
+  font: 600 clamp(24px, 2.4vw, 36px) / 110% var(--ness-font-display);
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-about__body {
+  margin: 0;
+  font: 400 18px / 28px var(--ness-font-text);
+  color: var(--ness-muted);
+  text-wrap: pretty;
+}

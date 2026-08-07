@@ -1,0 +1,228 @@
+/* ==========================================================================
+   Nessclusive — Contact
+   "Let's Stay Connected": a purple panel holding the copy column beside the
+   contact form card. Values transcribed from
+   project/Nessclusive Storefront.dc.html.
+   ========================================================================== */
+
+.ness-contact {
+  /* No top padding — the section above owns the gap, as in the prototype. */
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: 0 var(--ness-shell-pad) var(--ness-section-gap);
+  /* Clears the sticky header when the FAQ's "Contact Us" button jumps here. */
+  scroll-margin-top: 120px;
+}
+
+.ness-contact__panel {
+  border-radius: var(--ness-radius-card);
+  background: var(--ness-primary);
+  padding: clamp(32px, 4vw, 66px) clamp(24px, 5vw, 97px);
+}
+
+/* auto-fit with a 380px floor is the whole responsive story: copy beside form
+   on desktop, stacked on anything narrower, and no media query — the form card
+   can never be squeezed below the width its fields were drawn for. */
+.ness-contact__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
+  gap: clamp(32px, 4vw, 84px);
+  align-items: center;
+}
+
+/* --- Copy column -------------------------------------------------------- */
+
+.ness-contact__copy {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2.5vw, 36px);
+}
+
+.ness-contact__heading {
+  margin: 0;
+  font: 600 clamp(32px, 4.4vw, 64px) / 100% var(--ness-font-display);
+  letter-spacing: -0.04em;
+  color: var(--ness-on-primary);
+}
+
+.ness-contact__body {
+  margin: 0;
+  max-width: 582px;
+  font: 400 18px / 27px var(--ness-font-text);
+  color: var(--ness-on-primary);
+  text-wrap: pretty;
+}
+
+/* --- Social row --------------------------------------------------------- */
+
+/* An h3 for the document outline, dressed back down to body type: in the
+   design this line is 18px text, not a display heading, so the defaults
+   ness-base.css gives h1–h4 have to be undone here. */
+.ness-contact__follow-heading {
+  margin: 0 0 16px;
+  font: 600 18px / 27px var(--ness-font-text);
+  letter-spacing: normal;
+  color: var(--ness-on-primary);
+  text-wrap: pretty;
+}
+
+.ness-contact__socials {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  gap: 12px;
+}
+
+.ness-contact__social {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--ness-on-primary);
+  /* The icons are drawn with currentColor, so this one declaration paints
+     all four rather than a hex being baked into every path. */
+  color: var(--ness-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ness-contact__social:hover {
+  opacity: 0.82;
+}
+
+/* --- Form card ---------------------------------------------------------- */
+
+/* The form element is the card. Shopify's injected hidden inputs are
+   display: none and so add no gap to this flex column. */
+/* Every element a post-submit jump can land on needs to clear the sticky
+   header (81px + breathing room), not just the section wrapper. Three paths
+   land here: autofocus on the notice, the error list's links to individual
+   fields, and Shopify's own redirect, which appends #<form id> to the action.
+   Without this the target sits underneath the header. */
+.ness-contact__form,
+.ness-contact__notice,
+.ness-contact__input,
+.ness-contact__textarea {
+  scroll-margin-top: 120px;
+}
+
+.ness-contact__form {
+  margin: 0;
+  border-radius: var(--ness-radius-media);
+  background: var(--ness-card-2);
+  padding: clamp(24px, 2.4vw, 35px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ness-contact__field {
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.ness-contact__label {
+  /* line-height: normal, not the 1.5 ness-base.css puts on body — the
+     prototype leaves these labels at the browser default and the tighter box
+     is what sets the 11px gap to the field below.
+     #333333 is a prototype one-off and is deliberately not a design token. */
+  font: 500 16px / normal var(--ness-font-text);
+  color: #333333;
+}
+
+.ness-contact__input,
+.ness-contact__textarea {
+  border: none;
+  border-radius: var(--ness-radius-input);
+  background: #ffffff;
+  font: 400 16px / normal var(--ness-font-text);
+  letter-spacing: -0.01em;
+  color: var(--ness-ink);
+}
+
+.ness-contact__input {
+  height: var(--ness-cta-height);
+  padding: 0 16px;
+}
+
+.ness-contact__textarea {
+  min-height: 158px;
+  padding: 16px;
+  resize: vertical;
+}
+
+/* The prototype gives form controls their own focus ring — kept, because the
+   fields sit on a pale card where the global one is easy to miss. */
+.ness-contact__input:focus,
+.ness-contact__textarea:focus {
+  outline: 2px solid var(--ness-primary);
+  outline-offset: 1px;
+}
+
+/* Placeholder colour is left to the browser, as in the prototype. The design's
+   --ness-placeholder (#9B9B9B) would only reach 2.6:1 on white; every field
+   here carries a permanent visible label, so there is nothing to gain by
+   dimming the hint below the UA default's contrast. */
+
+.ness-contact__submit {
+  height: var(--ness-cta-height);
+  flex-shrink: 0;
+  border: none;
+  border-radius: var(--ness-radius-input);
+  background: var(--ness-primary);
+  font: 500 18px / normal var(--ness-font-text);
+  letter-spacing: -0.03em;
+  color: var(--ness-on-primary);
+  cursor: pointer;
+}
+
+.ness-contact__submit:hover {
+  background: var(--ness-primary-deep);
+}
+
+/* --- Submission states -------------------------------------------------- */
+
+/* The design specifies neither state, so both are built from the existing
+   palette rather than introducing a foreign green and red. They share the
+   field radius so they read as part of the card. */
+.ness-contact__notice {
+  margin: 0;
+  border-radius: var(--ness-radius-input);
+  padding: 14px 16px;
+  font: 400 16px / 24px var(--ness-font-text);
+}
+
+.ness-contact__notice:focus-visible {
+  outline: 2px solid var(--ness-primary);
+  outline-offset: 1px;
+}
+
+.ness-contact__notice--success {
+  background: var(--ness-secondary);
+  color: var(--ness-primary);
+}
+
+/* Ringed rather than bordered so the panel does not shift the fields when it
+   appears. Colour alone never carries the meaning — the heading says it. */
+.ness-contact__notice--error {
+  background: #ffffff;
+  box-shadow: inset 0 0 0 1.5px var(--ness-primary-deep);
+  color: var(--ness-primary-deep);
+}
+
+.ness-contact__notice-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.ness-contact__notice-list {
+  margin: 4px 0 0;
+  padding-left: 18px;
+}
+
+.ness-contact__notice-list a {
+  color: inherit;
+  text-decoration: underline;
+}

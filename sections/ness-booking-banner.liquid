@@ -1,0 +1,120 @@
+{{ 'ness-booking-banner.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  The two `default` filters below mean an emptied field cannot break the
+  banner: an empty href would silently link to the current page, and an empty
+  label would render an invisible button.
+
+  The booking URL is the one link on the site that is typed rather than picked
+  from the destination dropdown, because Acuity is an outside service
+  (PLAN.md, Booking flow).
+{%- endcomment -%}
+
+{%- liquid
+  assign heading_id = 'ness-booking-banner-heading-' | append: section.id
+  assign banner_image = section.settings.background_image
+  comment
+    Booking URL, most specific first: a per-section override, then the
+    site-wide theme setting (PLAN.md specifies a theme setting so every
+    "Book a Session" control reads one value), then the known Acuity link as a
+    last resort so the button is never dead. Kept on one line because inside a
+    liquid tag every newline starts a new statement.
+  endcomment
+  assign booking_url = section.settings.booking_url | default: settings.acuity_url | default: 'https://nessclusive.as.me/schedule/6f74a017'
+  assign cta_label = section.settings.cta_label | default: 'Book a Session'
+-%}
+
+{%- comment -%}
+  aria-labelledby is only emitted when the heading actually exists. Pointing it
+  at an element that was never rendered leaves the region with an empty
+  accessible name, which is worse than having none.
+{%- endcomment -%}
+<section
+  class="ness-booking-banner"
+  {% if section.settings.heading != blank %}aria-labelledby="{{ heading_id }}"{% endif %}
+>
+  <div class="ness-shell">
+    <div class="ness-booking-banner__frame">
+      {%- comment -%}
+        The artwork is a real <img> rather than a CSS background so it can be
+        lazy-loaded and served as a srcset. The frame's height is set by CSS
+        and the image covers it, so any upload crops instead of distorting —
+        see the Editability policy in PLAN.md.
+
+        `sizes`: the banner is the shell width less its side padding, which
+        tops out at 1630px once the 1770px shell is reached and is roughly
+        the viewport minus 40px below that.
+      {%- endcomment -%}
+      <div class="ness-booking-banner__media">
+        {%- if banner_image != blank -%}
+          {{
+            banner_image
+            | image_url: width: 3000
+            | image_tag:
+              class: 'ness-booking-banner__image',
+              alt: banner_image.alt,
+              widths: '750, 1100, 1500, 1900, 2400, 3000',
+              sizes: '(min-width: 1770px) 1630px, calc(100vw - 40px)',
+              loading: 'lazy'
+          }}
+        {%- else -%}
+          {{ 'image' | placeholder_svg_tag: 'ness-booking-banner__image' }}
+        {%- endif -%}
+      </div>
+
+      <div class="ness-booking-banner__content">
+        {%- comment -%}
+          Decorative quote mark from the Figma file — hidden from assistive
+          tech, as it carries no meaning the heading does not already give.
+        {%- endcomment -%}
+        <svg class="ness-booking-banner__mark" width="22" height="17" viewBox="0 0 23.001 17.001" aria-hidden="true" focusable="false"><path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z"/><path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z"/></svg>
+
+        {%- if section.settings.heading != blank -%}
+          <h2 class="ness-booking-banner__heading" id="{{ heading_id }}">
+            {{- section.settings.heading | escape -}}
+          </h2>
+        {%- endif -%}
+
+        {%- if section.settings.body != blank -%}
+          <p class="ness-booking-banner__body">{{ section.settings.body }}</p>
+        {%- endif -%}
+
+        <a class="ness-booking-banner__cta" href="{{ booking_url }}">{{ cta_label }}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Booking banner",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The wording, the button label, and the photo are yours to change. The layout, the dark overlay, and the button styling are fixed by the design."
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image",
+      "info": "Fills the banner and is cropped to fit, so nothing ever stretches. Use a wide landscape photo of at least 2400 × 1100. Keep the subject to the right — the left side sits under the dark overlay that the text reads against."
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Step Up Your Style, Book Now" },
+    {
+      "type": "textarea",
+      "id": "body",
+      "label": "Body copy",
+      "default": "With just a few clicks, you can secure your spot with our skilled wig specialists. Our team is here to guide you through the process, ensuring you get the personalized attention you deserve.",
+      "info": "Around 200 characters is what the design was drawn for. Much longer and the banner grows taller than the rest of the page expects."
+    },
+    { "type": "header", "content": "Button" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Book a Session" },
+    {
+      "type": "url",
+      "id": "booking_url",
+      "label": "Booking link (optional override)",
+      "info": "Leave empty to use the site-wide Acuity link from Theme settings → Nessclusive. Only set this to send THIS banner somewhere different."
+    }
+  ]
+}
+{% endschema %}

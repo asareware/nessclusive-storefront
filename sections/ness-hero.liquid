@@ -1,0 +1,172 @@
+{{ 'ness-hero.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Homepage hero. The arched image strip is drawn behind the copy purely as
+  artwork: it is half-transparent, takes no pointer events, and contains no
+  links or controls, so the headline and the two buttons are the whole
+  interactive surface.
+
+  The arches are blocks rather than three fixed settings because, unlike the
+  About section's asymmetric photo grid, this is a symmetric centred row —
+  dropping to two still centres and still reads as designed. max_blocks caps
+  it at three so the row can never wrap onto a second line.
+
+  Each slot is a fixed-size arch with object-fit: cover, so an upload of any
+  shape is cropped to the design rather than distorting it. See PLAN.md,
+  Editability policy: "Hero — editable: headline, subcopy, CTA label, CTA
+  destination (dropdown), the arched images; locked: layout, arch shapes,
+  overlay gradient."
+{%- endcomment -%}
+
+<section
+  class="ness-hero"
+  {% if section.settings.heading != blank %}aria-labelledby="ness-hero-heading"{% endif %}
+>
+  {%- if section.blocks.size > 0 -%}
+    {%- comment -%}
+      aria-hidden because the strip is decoration — half-transparent, behind the
+      copy, pointer-events off. It also precedes the <h1> in DOM order, so
+      without this a merchant who fills in alt text (Shopify actively prompts
+      for it) would have up to three photo descriptions read out before the
+      headline.
+    {%- endcomment -%}
+    <div class="ness-hero__arches" aria-hidden="true">
+      {%- for block in section.blocks -%}
+        <div class="ness-hero__arch" {{ block.shopify_attributes }}>
+          {%- comment -%}
+            Alt text comes from the file's own alt field in Shopify, so it is
+            edited where the photo lives rather than duplicated into a theme
+            setting. Left unset — the usual case for decorative artwork —
+            image_tag emits alt="" and screen readers skip the strip.
+          {%- endcomment -%}
+          {%- if block.settings.image != blank -%}
+            {{
+              block.settings.image
+              | image_url: width: 840
+              | image_tag:
+                alt: block.settings.image.alt,
+                widths: '260, 390, 560, 840',
+                sizes: '(max-width: 812px) 130px, (min-width: 1750px) 280px, 16vw',
+                loading: 'eager'
+            }}
+          {%- else -%}
+            {{ 'image' | placeholder_svg_tag: 'ness-hero__placeholder' }}
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+
+  <div class="ness-hero__content">
+    {%- if section.settings.heading != blank -%}
+      <h1 class="ness-hero__heading" id="ness-hero-heading">
+        {{- section.settings.heading -}}
+      </h1>
+    {%- endif -%}
+
+    {%- if section.settings.subheading != blank -%}
+      <p class="ness-hero__subheading">{{ section.settings.subheading }}</p>
+    {%- endif -%}
+
+    {%- if section.settings.primary_cta_label != blank
+        or section.settings.secondary_cta_label != blank
+    -%}
+      <div class="ness-hero__actions">
+        {%- if section.settings.primary_cta_label != blank -%}
+          {%- capture primary_url -%}
+            {%- render 'ness-nav-url', destination: section.settings.primary_cta_destination -%}
+          {%- endcapture -%}
+          <a href="{{ primary_url }}" class="ness-hero__cta ness-hero__cta--primary">
+            {{- section.settings.primary_cta_label -}}
+          </a>
+        {%- endif -%}
+
+        {%- if section.settings.secondary_cta_label != blank -%}
+          {%- capture secondary_url -%}
+            {%- render 'ness-nav-url', destination: section.settings.secondary_cta_destination -%}
+          {%- endcapture -%}
+          <a href="{{ secondary_url }}" class="ness-hero__cta ness-hero__cta--secondary">
+            {{- section.settings.secondary_cta_label -}}
+          </a>
+        {%- endif -%}
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Hero",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Fonts, colours, sizes, and the arch layout are fixed by the design. You can change the wording, where each button points, and the three photos."
+    },
+    { "type": "text", "id": "heading", "label": "Headline", "default": "Be Bold, Be Exclusive", "info": "Leave empty to hide it." },
+    { "type": "text", "id": "subheading", "label": "Line underneath", "default": "Let your Wig do the talking with Nessclusive" },
+    { "type": "header", "content": "Main button" },
+    { "type": "text", "id": "primary_cta_label", "label": "Button label", "default": "Start Shopping", "info": "Leave empty to hide this button." },
+    {
+      "type": "select",
+      "id": "primary_cta_destination",
+      "label": "Button goes to",
+      "default": "all_products",
+      "info": "Chosen from real pages on this store, so a link can never 404.",
+      "options": [
+        { "value": "home", "label": "Home" },
+        { "value": "ready_to_ship", "label": "Ready to Ship" },
+        { "value": "pre_order", "label": "Pre-Order" },
+        { "value": "accessories", "label": "Accessories" },
+        { "value": "all_products", "label": "All products" },
+        { "value": "collections", "label": "All collections" },
+        { "value": "booking", "label": "Booking page" },
+        { "value": "faqs", "label": "FAQs page" },
+        { "value": "contact", "label": "Contact page" },
+        { "value": "search", "label": "Search" }
+      ]
+    },
+    { "type": "header", "content": "Second button" },
+    { "type": "text", "id": "secondary_cta_label", "label": "Button label", "default": "Book a Session", "info": "Leave empty to hide this button." },
+    {
+      "type": "select",
+      "id": "secondary_cta_destination",
+      "label": "Button goes to",
+      "default": "booking",
+      "options": [
+        { "value": "home", "label": "Home" },
+        { "value": "ready_to_ship", "label": "Ready to Ship" },
+        { "value": "pre_order", "label": "Pre-Order" },
+        { "value": "accessories", "label": "Accessories" },
+        { "value": "all_products", "label": "All products" },
+        { "value": "collections", "label": "All collections" },
+        { "value": "booking", "label": "Booking page" },
+        { "value": "faqs", "label": "FAQs page" },
+        { "value": "contact", "label": "Contact page" },
+        { "value": "search", "label": "Search" }
+      ]
+    }
+  ],
+  "max_blocks": 3,
+  "blocks": [
+    {
+      "type": "arch",
+      "name": "Arched image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Photo",
+          "info": "Shown up to 280 × 340 and cropped to an arch, anchored near the top of the photo — so keep the face in the upper third. Use a portrait image of at least 560 × 680 so it stays sharp on high-resolution screens. Shows a placeholder if empty."
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "arch" },
+      { "type": "arch" },
+      { "type": "arch" }
+    ]
+  }
+}
+{% endschema %}

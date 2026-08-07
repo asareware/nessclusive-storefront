@@ -1,0 +1,170 @@
+/* ==========================================================================
+   Nessclusive — homepage hero
+   "Be Bold, Be Exclusive" headline standing over the arched image strip.
+   Values transcribed from project/Nessclusive Storefront.dc.html:102-116.
+   ========================================================================== */
+
+.ness-hero {
+  position: relative;
+  max-width: var(--ness-shell-max);
+  margin: 0 auto;
+  padding: clamp(48px, 6vw, 96px) var(--ness-shell-pad) clamp(56px, 6vw, 104px);
+}
+
+/* --- Arched image strip ------------------------------------------------- */
+
+/* Anchored to the bottom edge of the section and sitting behind the copy.
+   Half-transparent and inert — it never takes a click and holds nothing
+   focusable, so the headline and the two buttons are the whole interactive
+   surface and there is no way to tab into the artwork. */
+.ness-hero__arches {
+  position: absolute;
+  inset: auto 0 0 0;
+  height: clamp(180px, 22vw, 340px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: clamp(12px, 2vw, 34px);
+  opacity: 0.49;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Both axes are pinned, rather than one axis plus an aspect-ratio, because
+   the design scales width and height on different curves. Pinning both is
+   the stricter constraint: whatever shape a merchant uploads, object-fit
+   crops it into this box instead of stretching the row. */
+.ness-hero__arch {
+  position: relative;
+  width: clamp(130px, 16vw, 280px);
+  height: 88%;
+  border-radius: 999px 999px 0 0;
+  overflow: hidden;
+  /* Flex items default to min-width: auto, which on a box holding an <img>
+     refuses to shrink below the image's intrinsic width. Zeroing it restores
+     the prototype's behaviour — its arches were empty divs — so on narrow
+     screens the three arches narrow together instead of overflowing. */
+  min-width: 0;
+}
+
+/* The centre arch stands taller than the ones flanking it.
+
+   Keyed off :not(:first-child):not(:last-child) rather than :nth-child(2), so
+   the silhouette stays symmetric at any block count. With nth-child(2) a
+   two-arch strip rendered short-then-tall — lopsided, and nothing enforces a
+   floor of three: max_blocks caps the ceiling only. A single arch now reads as
+   one full-height arch rather than a stunted 88% one. */
+.ness-hero__arch:not(:first-child):not(:last-child),
+.ness-hero__arch:only-child {
+  height: 100%;
+}
+
+.ness-hero__arch img,
+.ness-hero__placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 20%;
+}
+
+/* Per-slot crop anchors, carried over from the prototype. Matched to the same
+   "middle" rule as the height above so the anchor and the height never
+   disagree about which arch is the centre one. */
+.ness-hero__arch:not(:first-child):not(:last-child) img,
+.ness-hero__arch:only-child img {
+  object-position: center 22%;
+}
+
+.ness-hero__arch:nth-child(3) img {
+  object-position: center 18%;
+}
+
+.ness-hero__placeholder {
+  background: var(--ness-card-cta);
+  fill: var(--ness-primary);
+}
+
+/* --- Copy ---------------------------------------------------------------- */
+
+.ness-hero__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(18px, 2vw, 30px);
+  padding-bottom: clamp(150px, 18vw, 250px);
+}
+
+/* The hero headline runs slightly hotter than the shared .ness-h1 scale
+   (46px floor, 8.5vw slope), so it is set here rather than borrowed. */
+.ness-hero__heading {
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  font-size: clamp(46px, 8.5vw, 120px);
+  line-height: 100%;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-hero__subheading {
+  max-width: 760px;
+  font-size: clamp(18px, 1.4vw, 24px);
+  line-height: 1.5;
+  color: var(--ness-muted);
+}
+
+/* --- Buttons ------------------------------------------------------------- */
+
+.ness-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.ness-hero__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--ness-cta-height);
+  padding: 0 20px;
+  border-radius: var(--ness-radius-cta);
+  font-size: 18px;
+  font-weight: 500;
+  /* The prototype's CTAs are <button>s, which inherit no line-height from the
+     body. These are anchors, so the body's 1.5 has to be undone to land on the
+     same label metrics. */
+  line-height: normal;
+  text-decoration: none;
+}
+
+/* #fffcf8 is the button-label off-white from the prototype. It is a shade
+   warmer than --ness-background and has no token of its own; ness-chrome.css
+   carries the same literal for the drawer CTA. */
+.ness-hero__cta--primary {
+  min-width: 170px;
+  border: none;
+  background: var(--ness-primary-deep);
+  color: #fffcf8;
+}
+
+.ness-hero__cta--primary:hover {
+  background: var(--ness-primary);
+  color: #fffcf8;
+  text-decoration: none;
+}
+
+.ness-hero__cta--secondary {
+  min-width: 161px;
+  border: 1px solid var(--ness-ink);
+  background: transparent;
+  color: var(--ness-ink);
+}
+
+.ness-hero__cta--secondary:hover {
+  background: var(--ness-ink);
+  color: var(--ness-background);
+  text-decoration: none;
+}

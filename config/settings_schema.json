@@ -1,11 +1,43 @@
 [
   {
     "name": "theme_info",
-    "theme_name": "Dawn",
-    "theme_version": "15.5.0",
-    "theme_author": "Shopify",
+    "theme_name": "Nessclusive",
+    "theme_version": "1.0.0",
+    "theme_author": "Asareware",
     "theme_documentation_url": "https://help.shopify.com/manual/online-store/themes",
     "theme_support_url": "https://support.shopify.com/"
+  },
+  {
+    "name": "Nessclusive",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Booking"
+      },
+      {
+        "type": "paragraph",
+        "content": "Every “Book a Session” button on the site sends visitors here."
+      },
+      {
+        "type": "url",
+        "id": "acuity_url",
+        "label": "Acuity Scheduling link",
+        "info": "External scheduler. Currently https://nessclusive.as.me/schedule/6f74a017"
+      },
+      {
+        "type": "header",
+        "content": "Wig Authorization Form"
+      },
+      {
+        "type": "paragraph",
+        "content": "Linked from the product page and, ideally, the order confirmation email. Point this at the Google Form once it exists."
+      },
+      {
+        "type": "url",
+        "id": "authorization_form_url",
+        "label": "Authorization form link"
+      }
+    ]
   },
   {
     "name": "t:settings_schema.logo.name",

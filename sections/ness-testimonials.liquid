@@ -1,0 +1,149 @@
+{{ 'ness-testimonials.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign quotes = section.blocks | where: 'type', 'quote'
+  assign heading_id = 'ness-testimonials-heading-' | append: section.id
+  assign mark_id = 'ness-testimonials-mark-' | append: section.id
+  assign star_id = 'ness-testimonials-star-' | append: section.id
+-%}
+
+{%- if quotes.size > 0 -%}
+  <section class="ness-testimonials" aria-labelledby="{{ heading_id }}">
+    <h2 class="ness-testimonials__heading" id="{{ heading_id }}">Words from our Happy Clients</h2>
+
+    {%- comment -%}
+      The quote marks and the star repeat 7× per card, so they are defined once
+      here and referenced with <use>. Identical output to the prototype's inline
+      copies, a fraction of the markup. IDs carry the section id because a
+      section can legally be rendered more than once on a page.
+    {%- endcomment -%}
+    <svg class="ness-testimonials__sprite" width="0" height="0" aria-hidden="true" focusable="false">
+      <defs>
+        <symbol id="{{ mark_id }}" viewBox="0 0 23.001 17.001" fill="currentColor">
+          <path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z"/>
+          <path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z"/>
+        </symbol>
+        <symbol id="{{ star_id }}" viewBox="0 0 14 13" fill="currentColor">
+          <path d="M7 0L8.9 4.3L13.6 4.8L10.1 7.9L11.1 12.5L7 10.1L2.9 12.5L3.9 7.9L0.4 4.8L5.1 4.3Z"/>
+        </symbol>
+      </defs>
+    </svg>
+
+    {%- comment -%}
+      Scroll-snap carousel, no JavaScript — the design's behaviour is exactly
+      what the browser already does natively, so there is nothing to script.
+
+      tabindex="0" is the accessibility fix for a scrollable region that holds
+      no focusable children: without it a keyboard user can never reach the
+      cards past the first. It is not a trap — Tab moves straight back out.
+      role="list" is restated because list-style: none strips list semantics
+      in Safari/VoiceOver.
+    {%- endcomment -%}
+    <ul
+      class="ness-testimonials__track"
+      role="list"
+      tabindex="0"
+      aria-label="Client testimonials"
+    >
+      {%- for block in quotes -%}
+        <li class="ness-testimonials__card" {{ block.shopify_attributes }}>
+          <div class="ness-testimonials__marks" aria-hidden="true">
+            <svg class="ness-testimonials__mark" width="23" height="17" focusable="false">
+              <use href="#{{ mark_id }}"></use>
+            </svg>
+            <svg class="ness-testimonials__mark ness-testimonials__mark--flip" width="23" height="17" focusable="false">
+              <use href="#{{ mark_id }}"></use>
+            </svg>
+          </div>
+
+          <blockquote class="ness-testimonials__quote">
+            <p>{{ block.settings.quote | escape | newline_to_br }}</p>
+          </blockquote>
+
+          <div class="ness-testimonials__meta">
+            <cite class="ness-testimonials__name">{{ block.settings.author | escape }}</cite>
+            {%- comment -%}
+              Five stars are decoration, not data — the design shows them on
+              every card. Labelled once for screen readers rather than five
+              times, and the glyphs themselves are hidden.
+            {%- endcomment -%}
+            <span class="ness-testimonials__stars" role="img" aria-label="Rated 5 out of 5 stars">
+              {%- for star in (1..5) -%}
+                <svg class="ness-testimonials__star" width="14" height="13" aria-hidden="true" focusable="false">
+                  <use href="#{{ star_id }}"></use>
+                </svg>
+              {%- endfor -%}
+            </span>
+          </div>
+        </li>
+      {%- endfor -%}
+    </ul>
+  </section>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Testimonials",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The heading, card design, and carousel behaviour are fixed by the design. You can edit each quote and client name, and add or remove cards up to six."
+    }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "quote",
+      "name": "Testimonial",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "quote",
+          "label": "Quote",
+          "default": "The wig fits perfectly, feels natural, and is so lightweight. I can’t believe how real it looks—absolutely love it!",
+          "info": "Around 100–180 characters reads best. Much longer and the card grows taller than the others."
+        },
+        {
+          "type": "text",
+          "id": "author",
+          "label": "Client name",
+          "default": "A. Stouten",
+          "info": "Shown under the quote. Initial plus surname, as in the design, keeps client privacy."
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "quote",
+        "settings": {
+          "quote": "The wig fits perfectly, feels natural, and is so lightweight. I can’t believe how real it looks—absolutely love it!",
+          "author": "A. Stouten"
+        }
+      },
+      {
+        "type": "quote",
+        "settings": {
+          "quote": "The quality of these wigs is amazing! They look and feel like real hair, and I’ve gotten so many compliments.",
+          "author": "N. Carry"
+        }
+      },
+      {
+        "type": "quote",
+        "settings": {
+          "quote": "It looks and feels like real hair. perfect fit and style. finally found a wig that feels like me.",
+          "author": "L. Shanon"
+        }
+      },
+      {
+        "type": "quote",
+        "settings": {
+          "quote": "The wig fits perfectly, feels natural, and is so lightweight. I can’t believe how real it looks—absolutely love it!",
+          "author": "A. Stouten"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}

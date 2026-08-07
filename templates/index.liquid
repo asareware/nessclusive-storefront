@@ -1,0 +1,23 @@
+{%- comment -%}
+  Nessclusive homepage.
+
+  A .liquid template with static {% section %} tags, deliberately NOT
+  templates/index.json. A JSON template lets the merchant reorder, delete, and
+  duplicate sections from the customizer — someone could drop the hero or push
+  testimonials above the fold. Static sections still expose every setting for
+  editing, but the running order is fixed here in code.
+
+  That is the mechanism behind the Editability policy. See PLAN.md, Decision #12.
+
+  Order matches the prototype, lines 102-288.
+{%- endcomment -%}
+
+{% section 'ness-hero' %}
+{% section 'ness-collection-cards' %}
+{% section 'ness-booking-banner' %}
+{% section 'ness-bestsellers' %}
+{% section 'ness-about' %}
+{% section 'ness-testimonials' %}
+{% section 'ness-faq' %}
+{% section 'ness-contact' %}
+{% section 'ness-instagram' %}

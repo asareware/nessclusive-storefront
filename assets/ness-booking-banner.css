@@ -1,0 +1,114 @@
+/* ==========================================================================
+   Nessclusive — booking banner
+   "Step Up Your Style, Book Now". Values transcribed from
+   project/Nessclusive Storefront.dc.html. Layout shell comes from
+   .ness-shell in ness-base.css.
+   ========================================================================== */
+
+.ness-booking-banner {
+  padding-bottom: var(--ness-section-gap);
+}
+
+/* --- Frame -------------------------------------------------------------- */
+
+.ness-booking-banner__frame {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: clamp(420px, 40vw, 700px);
+  border-radius: var(--ness-radius-card);
+  overflow: hidden;
+}
+
+.ness-booking-banner__media {
+  position: absolute;
+  inset: 0;
+}
+
+.ness-booking-banner__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Mirrors the prototype's `center 25%` background position: the crop sits
+     high, so faces stay in frame instead of being cut off. */
+  object-position: center 25%;
+}
+
+/* Empty state — only seen in the customizer before a photo is chosen. */
+svg.ness-booking-banner__image {
+  fill: var(--ness-border);
+  background: var(--ness-card-1);
+}
+
+/* The scrim that keeps cream text legible over any photograph: the ink token
+   at 86% / 62% / 18%, left to right. The first declaration is a fallback for
+   browsers without color-mix(); the second wins everywhere else. */
+.ness-booking-banner__media::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, var(--ness-ink) 0%, transparent 100%);
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--ness-ink) 86%, transparent) 0%,
+    color-mix(in srgb, var(--ness-ink) 62%, transparent) 46%,
+    color-mix(in srgb, var(--ness-ink) 18%, transparent) 100%
+  );
+}
+
+/* --- Content ------------------------------------------------------------ */
+
+/* Positioned so it paints over the absolutely placed media and its scrim. */
+.ness-booking-banner__content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2vw, 28px);
+  max-width: 800px;
+  padding: clamp(32px, 5vw, 96px);
+}
+
+/* Width and height are pinned because the column would otherwise stretch the
+   icon to the full text width. */
+.ness-booking-banner__mark {
+  align-self: flex-start;
+  width: 22px;
+  height: 17px;
+  fill: var(--ness-gold);
+  opacity: 0.33;
+}
+
+/* Family, weight, tracking, and the 100% line height come from the shared
+   heading rule in ness-base.css; only the size and the over-image colour
+   differ here. */
+.ness-booking-banner__heading {
+  font-size: clamp(32px, 4.4vw, 64px);
+  color: var(--ness-hero-body);
+}
+
+.ness-booking-banner__body {
+  max-width: 569px;
+  font-size: 18px;
+  line-height: 26px;
+  color: var(--ness-hero-body);
+}
+
+.ness-booking-banner__cta {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  height: var(--ness-cta-height);
+  padding: 0 24px;
+  border-radius: var(--ness-radius-cta);
+  background: var(--ness-secondary);
+  color: var(--ness-primary-deep);
+  font-size: 18px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.ness-booking-banner__cta:hover {
+  background: var(--ness-background);
+  color: var(--ness-primary-deep);
+  text-decoration: none;
+}

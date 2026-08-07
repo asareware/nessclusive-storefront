@@ -24,6 +24,15 @@
   {%- when 'contact' -%}/pages/contact-us
   {%- when 'search' -%}{{ routes.search_url }}
   {%- comment -%}
+    In-page anchors. The FAQ section's "Contact Us" button jumps to the contact
+    panel on the same page rather than navigating away — that is what the
+    prototype does (design line 239), and the contact section already carries
+    the matching id and scroll-margin-top. From anywhere other than the
+    homepage the anchor still resolves, because it is prefixed with the root
+    URL rather than left bare.
+  {%- endcomment -%}
+  {%- when 'contact_anchor' -%}{{ routes.root_url }}#contact
+  {%- comment -%}
     Policy URLs come from the shop object rather than being hardcoded, so they
     stay correct if a policy is renamed in admin.
   {%- endcomment -%}

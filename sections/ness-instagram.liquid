@@ -1,0 +1,144 @@
+{{ 'ness-instagram.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Instagram strip — five tiles, live feed.
+
+  The photos are not settings. A Cloudflare Worker pulls the five most recent
+  posts on a cron, re-hosts each image to Shopify Files, and writes
+  [{ src, permalink }] into the shop metafield ness.instagram_feed
+  (PLAN.md, Decision #10). This section reads that metafield and renders it
+  server-side, so the tiles are in the HTML on first paint — no layout shift,
+  no CORS, and no third-party script touching the DOM.
+
+  Two tiers, so the strip is never a hole in the homepage:
+  1. The metafield, whenever it holds at least one usable entry. Each tile
+     links to its own post.
+  2. The five bundled photos otherwise — before the first cron run, and if the
+     Worker ever stops. Those tiles link to the profile instead, since there
+     is no per-post URL to send anyone to.
+
+  Entries with no `src` are skipped rather than drawn as a broken tile, and
+  the live count is taken *after* that filter — so a metafield holding only
+  malformed entries falls back rather than rendering an empty strip.
+{%- endcomment -%}
+
+{%- liquid
+  assign feed = shop.metafields.ness.instagram_feed.value
+
+  comment
+    Five is the design, not the data: the strip is drawn for five tiles, so
+    the loops are capped here rather than trusting the Worker to send exactly
+    that many. Both loops share the cap so the "N of M" labels always agree.
+  endcomment
+  assign max_tiles = 5
+
+  assign live_count = 0
+  for post in feed limit: max_tiles
+    if post.src != blank
+      assign live_count = live_count | plus: 1
+    endif
+  endfor
+
+  comment
+    The profile link has no schema default — Shopify's url setting type does
+    not accept one — so the known profile stands in if the field is cleared.
+    Same three-tier thinking as the header logo: a fresh install is never
+    broken and nobody has to remember this step.
+  endcomment
+  assign profile_url = section.settings.profile_url | default: 'https://www.instagram.com/nessclusive'
+-%}
+
+<section
+  class="ness-instagram"
+  {% if section.settings.heading != blank %}aria-labelledby="ness-instagram-heading-{{ section.id }}"{% endif %}
+>
+  {%- if section.settings.heading != blank -%}
+    <h2 class="ness-instagram__heading" id="ness-instagram-heading-{{ section.id }}">
+      {{- section.settings.heading | escape -}}
+    </h2>
+  {%- endif -%}
+
+  {%- comment -%}
+    Each tile is an image-only link, so the accessible name goes on the anchor
+    and the image is marked decorative. The feed contract carries no caption or
+    alt text, and a bundled photo has no alt field either, so there is nothing
+    truthful to put in alt="" — an invented description would be worse than
+    none. The anchor label also announces the new tab, which target="_blank"
+    otherwise springs on screen reader users unannounced.
+  {%- endcomment -%}
+  <div class="ness-instagram__strip">
+    {%- if live_count > 0 -%}
+      {%- assign tile_number = 0 -%}
+      {%- for post in feed limit: max_tiles -%}
+        {%- if post.src != blank -%}
+          {%- assign tile_number = tile_number | plus: 1 -%}
+          {%- assign post_url = post.permalink | default: profile_url -%}
+          <a
+            class="ness-instagram__tile"
+            href="{{ post_url | escape }}"
+            target="_blank"
+            rel="noopener"
+            aria-label="Instagram post {{ tile_number }} of {{ live_count }}, opens in a new tab"
+          >
+            {%- comment -%}
+              Rendered at the URL the Worker stored, untouched by image_url:
+              the src may be a Shopify Files URL or — in the simpler Worker
+              variant — a raw Instagram CDN one, and image_url handles only
+              the first. Sizing is the Worker's job. The tile's fixed 4:5
+              frame means neither choice can shift the layout.
+
+              width/height describe the frame, not the file: the source's own
+              dimensions are unknown here and irrelevant, because the tile
+              crops to 4:5 either way. Stating the rendered ratio is what
+              reserves the right space before the photo arrives.
+            {%- endcomment -%}
+            <img
+              class="ness-instagram__image"
+              src="{{ post.src | escape }}"
+              alt=""
+              width="640"
+              height="800"
+              loading="lazy"
+              decoding="async"
+            >
+          </a>
+        {%- endif -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..max_tiles) -%}
+        {%- assign fallback_image = 'ness-ig-fallback-' | append: i | append: '.jpg' -%}
+        <a
+          class="ness-instagram__tile"
+          href="{{ profile_url | escape }}"
+          target="_blank"
+          rel="noopener"
+          aria-label="Nessclusive on Instagram, photo {{ i }} of {{ max_tiles }}, opens in a new tab"
+        >
+          <img
+            class="ness-instagram__image"
+            src="{{ fallback_image | asset_url }}"
+            alt=""
+            width="640"
+            height="800"
+            loading="lazy"
+            decoding="async"
+          >
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Instagram",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The photos are live — they come straight from the Instagram account and refresh on their own, so there is nothing to upload here. Only the heading and the profile link are editable; the number of tiles, their shape, and all colours and spacing are fixed by the design."
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Follow & Tag on Instagram @Nessclusive" },
+    { "type": "url", "id": "profile_url", "label": "Instagram profile", "info": "Used only while the live feed is unavailable and the five bundled photos are showing — those tiles open the profile instead. Live tiles always open their own post. Leave empty to use instagram.com/nessclusive." }
+  ]
+}
+{% endschema %}
