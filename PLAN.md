@@ -33,10 +33,10 @@ The prototype is a single-file mock with 4 screens plus global overlays. Mapping
 | Testimonials carousel | `sections/testimonials.liquid` (blocks = quotes) |
 | FAQ accordion + contact prompt | `sections/faq.liquid` (blocks = Q&A pairs) |
 | "Let's Stay Connected" contact block | `sections/contact.liquid` using `{% form 'contact' %}` |
-| Instagram strip | `sections/instagram-strip.liquid` (image blocks) |
+| Instagram strip | `sections/instagram-strip.liquid` — **live feed**, see Instagram decision below |
 | Footer (links, socials, newsletter) | `sections/footer.liquid`, newsletter via `{% form 'customer' %}` |
 | All Products page (chips, filters, sort, grid) | `templates/collection.json` + `sections/main-collection.liquid` using Shopify's **Search & Discovery** filtering (availability, price) and native `sort_by` |
-| Single Product page (gallery, options, qty, Shop Pay, authorization form callout) | `templates/product.json` + `sections/main-product.liquid`; "You may also Like" via product recommendations API |
+| Single Product page (gallery, options, qty, accelerated checkout, authorization form callout) | `templates/product.json` + `sections/main-product.liquid`; "You may also Like" via product recommendations API |
 | Booking page (3-step wizard) | `templates/page.booking.json` — see Booking decision below |
 | Cart drawer | `snippets/cart-drawer.liquid` + **AJAX Cart API** (add/change/remove, persisted server-side — replaces the prototype's localStorage cart) |
 | Search overlay | **Predictive Search API** styled as the full-screen overlay |
@@ -48,7 +48,36 @@ The prototype is a single-file mock with 4 screens plus global overlays. Mapping
 Prototype product page offers: Size, Part, Cap Size, Processing Time, Pickup Option.
 - **Variants (max 3 options):** Size, Part, Cap Size — these can affect price/inventory.
 - **Line item properties:** Processing Time, Pickup Option — informational choices carried on the order.
-- **Wig Authorization Form callout:** link block on the product template pointing to the real form (page or external form — confirm URL with owner).
+- **Wig Authorization Form callout:** link block on the product template pointing to the
+  Google Form (see Decisions log #3).
+
+### Checkout path — DECIDED: no express button on the product page
+
+The prototype's secondary CTA reads "Buy with Shop Pay"
+(`project/Nessclusive Storefront.dc.html:487`). **Dropped.** Shopify's checkout
+page already presents Shop Pay, Apple Pay, and Google Pay as express options,
+picking the right one for the buyer's device — so the product page does not need
+to duplicate them.
+
+Everything routes **Add to Cart → cart → checkout**. This is the safer design:
+because nothing skips the cart, Processing Time and Pickup Option are guaranteed
+to reach the order. Express buttons on the product page bypass the cart, which
+is exactly where those fulfillment-critical properties could have been lost.
+
+**Both buttons stay — DECIDED.** The prototype's two-button layout is preserved:
+
+- **Add to Cart** (primary, `#6B0D83`) — adds and opens the cart drawer.
+- **Buy Now** (secondary, outlined) — adds to cart, then redirects straight to
+  `/checkout`. Same markup and styling as the prototype's second button, only
+  the label changes from "Buy with Shop Pay".
+
+Because Buy Now still routes through the cart, line item properties carry
+normally. The buyer meets Apple Pay / Google Pay / Shop Pay one step later, on
+the checkout page, where Shopify picks the right one for their device.
+
+*(Trade-off, for the record: removing product-page express buttons costs a
+little conversion for repeat buyers who would have checked out in one tap. Given
+that a lost Pickup Option means a mis-fulfilled wig, the trade is worth it.)*
 
 ### Theme settings (from the prototype's `data-props`)
 - `announcementBar` (boolean) → section toggle
@@ -68,15 +97,113 @@ The studio already has an **Acuity Scheduling** page set up. The theme's booking
 
 *Optional enhancement to evaluate later:* Acuity supports an inline embed (iframe), so the scheduler could live inside the booking page instead of redirecting. Start with the redirect; embedding is a one-line change if the owner prefers it.
 
+## Instagram strip — DECIDED: live feed, tiles link to the profile
+
+The prototype hardcodes five images (`Nessclusive Storefront.dc.html:281-285`)
+and the tiles are plain `div`s with no links. Both change: the strip pulls
+**live posts from @Nessclusive**, and clicking a tile opens Instagram.
+
+**This is harder than it looks.** Meta shut down the Instagram Basic Display API
+on **4 December 2024**. The replacement (Instagram API with Instagram Login /
+Graph API) requires:
+
+- an Instagram **Business or Creator** account, linked to a Facebook Page —
+  ✅ **confirmed present for @Nessclusive**
+- a Meta developer app and an access token
+- **token refresh every ~60 days** — tokens expire
+
+A Liquid theme has no backend, and theme assets are publicly readable, so the
+token cannot live in theme code or theme settings.
+
+**DECIDED: serverless proxy (option B).** No feed app.
+
+### Design fidelity: yes, exactly
+
+The proxy approach keeps the prototype **pixel-for-pixel**, because the theme
+renders its own markup and the proxy supplies only data. Nothing third-party
+touches the DOM. The strip stays exactly as designed — five tiles, 4:5 aspect
+ratio, 10px radius, horizontal scroll, `clamp(10px, 1vw, 16px)` gap — with each
+`div` becoming an `<a href="{permalink}" target="_blank" rel="noopener">`.
+
+### Scope
+
+Confirmed requirement, deliberately small: **the 5 most recent posts, kept
+current, each linking to its Instagram post.** No captions, likes, carousels, or
+lightbox. That keeps the API surface to a single call.
+
+### Architecture — scheduled push into Shopify (recommended)
+
+Rather than having the browser call the proxy at page load, a **Cloudflare
+Worker on a cron trigger** pushes the data into Shopify, and Liquid renders it
+server-side:
+
+```
+Cloudflare Worker (cron, hourly)
+  → Instagram Graph API: /me/media?fields=id,media_type,media_url,thumbnail_url,permalink&limit=5
+  → download each image, upload to Shopify Files (Admin API)
+  → write [{src, permalink}] into a shop metafield
+Theme: sections/instagram-strip.liquid reads the metafield, renders normally
+```
+
+Why this shape over a browser-side fetch:
+
+| | Scheduled push | Browser fetch |
+|---|---|---|
+| Renders server-side in Liquid | ✅ | ❌ appears after JS |
+| Layout shift / Lighthouse | none | CLS risk |
+| CORS handling | not needed | required |
+| If the Worker dies | last images persist | empty strip |
+
+The last row matters most: a failure degrades to slightly stale photos rather
+than a hole in the homepage.
+
+### ⚠️ Instagram CDN URLs expire — re-host the images
+
+`media_url` from the Graph API is a **signed, expiring CDN link**. Meta
+explicitly warns against storing it long-term. Writing those URLs straight into
+a metafield produces a strip that works on launch day and silently breaks a few
+weeks later — the failure mode most likely to go unnoticed.
+
+So the Worker **downloads each image and re-uploads it to Shopify Files**,
+storing the permanent Shopify CDN URL. This also serves the images from the same
+CDN as the rest of the site.
+
+*(Simpler variant if that proves fiddly: store the raw Instagram URLs, refresh
+hourly, and put an `onerror` fallback to the static images on each `<img>`.
+Accepts a small risk of a broken tile between refreshes.)*
+
+### Other implementation notes
+
+- **Token refresh.** Long-lived tokens last ~60 days. The same cron refreshes
+  the token weekly, so it never reaches expiry. Add a failure alert — this is
+  the one component with an ongoing failure mode.
+- **Reels/video posts.** When `media_type` is `VIDEO`, use `thumbnail_url`;
+  `media_url` returns the video file. Easy to miss until a reel is posted.
+- **Fallback.** Ship the five prototype images as the metafield's default so the
+  section renders correctly before the first cron run and if data ever goes
+  missing.
+- **Cost.** Cloudflare Workers free tier covers this comfortably.
+
+**Effort:** ~1–2 days including the Shopify Files re-hosting and cron setup.
+This is real infrastructure the business now owns — small, but not zero.
+
 ## Catalog & content — DECIDED: Shopify catalog is the CMS
 
 Confirmed approach: the **Shopify product catalog is the single source of truth**, and the theme pulls everything from it dynamically via Liquid — this is native theme behavior, no extra tooling needed. The owner manages products, prices, photos, inventory, and collections entirely in Shopify admin; the storefront updates automatically. The prototype's hardcoded products (MABEL $490, MIDNIGHT $420, …) are placeholders only and will not be baked into the theme.
 
-To set up in Shopify admin:
-- Collections: **Pre-order Wigs**, **Ready to Ship**, **Accessories** (nav + collection cards target these)
+To set up in Shopify admin — **reusing existing records, never creating
+replacements** (Decision #9):
+- Collections: the existing `/collections/pre-order`, `/collections/ready-to-ship`,
+  `/collections/accessories`. Display headings may be restyled (e.g. "Pre-Order
+  Wigs"); **handles and SEO fields are not touched.**
 - Products with photos, prices, variants (Size/Part/Cap Size), inventory, and collection assignments — sourced from the store's existing catalog
-- Pages: Booking, Terms of Service, Privacy Policy
-- **Wig Authorization Form:** lives externally as a **Google Form** (assumed — confirm the link). The product-page callout button links to it via a theme setting, same pattern as the Acuity URL.
+- Pages: the existing `/pages/booking`, `/pages/faqs`, `/pages/contact-us`, and
+  the existing policy pages
+- **Wig Authorization Form:** hosted as a **Google Form**. The product-page
+  callout button links to it via a theme setting, same pattern as the Acuity URL.
+  **To-do, not a blocker:** the form exists today in another format and the
+  theme setting points at its current location. Swap in the Google Form URL when
+  it is ready — a one-field change, no redeploy (see Decision #3).
 - Navigation menus (main + footer), Markets (USD/CAD/GBP), Shop Pay + installments enabled
 - Search & Discovery app configured for availability + price filters
 - **Newsletter:** footer signup uses Shopify's native customer form, which feeds the store's customer list; campaigns sent via **Shopify Email** (assumed until confirmed). Note: the domain's Google MX records (Google Workspace mailboxes) are unaffected — Shopify Email sends campaigns via its own infrastructure and only needs sender-domain verification (SPF/DKIM CNAMEs), not MX changes.
@@ -85,27 +212,98 @@ To set up in Shopify admin:
 
 - [ ] **Phase 0 — Setup:** CLI + Git + store access; scaffold theme from Dawn; strip to skeleton; wire design tokens, fonts, base styles
 - [ ] **Phase 1 — Global chrome:** announcement marquee, header (sticky, responsive ≤1180px hamburger behavior), mobile menu drawer, footer, toast utility
-- [ ] **Phase 2 — Homepage:** hero, collection cards, booking banner, bestsellers, about, testimonials, FAQ, contact, Instagram strip
+- [ ] **Phase 2 — Homepage:** hero, collection cards, booking banner, bestsellers, about, testimonials, FAQ, contact, Instagram strip (renders from the metafield, with the five prototype images as fallback)
+- [ ] **Phase 2b — Instagram worker:** Meta app + long-lived token, Cloudflare Worker with hourly cron, image re-hosting to Shopify Files, metafield write, token auto-refresh, failure alert. Independent of the theme work and can run in parallel
 - [ ] **Phase 3 — Shop:** collection template with chips/filters/sort, product card snippet, pagination
-- [ ] **Phase 4 — Product page:** gallery + thumbs, variant/option pickers, qty, add-to-cart, Shop Pay/installments, authorization callout, recommendations
+- [ ] **Phase 4 — Product page:** gallery + thumbs, variant/option pickers, qty, add-to-cart (no express button — Decision #7), installments line, authorization callout, recommendations
 - [ ] **Phase 5 — Cart & search:** AJAX cart drawer, predictive search overlay
 - [ ] **Phase 6 — Booking page:** redesigned page with Acuity redirect CTA (hero, steps, policy cards)
-- [ ] **Phase 7 — Content & data:** collections, products, pages, menus, Markets, policies
+- [ ] **Phase 7 — Content & data:** collections, products, pages, menus, Markets, policies, shipping zones/duties. **Reuse existing collection and page handles** — do not create duplicates (see Amendments)
 - [ ] **Phase 8 — QA:** cross-device/browser pass vs. prototype, Lighthouse/a11y (focus states, aria labels, reduced-motion), 404/gift-card/account templates styled
+- [ ] **Phase 8b — Live order test:** place a real paid order and refund it. Verify Processing Time and Pickup Option appear on the order, that the confirmation email carries the **real** Google Form link (not the placeholder), and that international currency/shipping behave. This is the only step that proves the store actually works
 - [ ] **Phase 9 — Cutover:** push final theme, owner review in customizer, publish; keep old theme as rollback; verify domains, analytics, and app embeds
 
 ## Decisions log (answered 2026-08-06)
 
-1. **Booking** → redirect to the existing **Acuity Scheduling** page (URL as a theme setting; inline embed optional later).
+1. **Booking** → redirect to the existing **Acuity Scheduling** page (URL as a theme setting; inline embed optional later). **Confirmed URL: `https://nessclusive.as.me/schedule/6f74a017`**
 2. **Catalog** → Shopify product catalog is the CMS; theme pulls all real products/collections from it dynamically.
-3. **Wig Authorization Form** → assumed **Google Form**; button links to it via theme setting. *(Owner to confirm the actual link.)*
+3. **Wig Authorization Form** → will be hosted as a **Google Form**; button links to it via a theme setting. The form already exists in another format and customers know where to find it, so converting it to a Google Form is a **to-do, not a launch blocker** — the theme setting simply points at wherever it currently lives and is updated when the Google Form is ready. Because failure to submit it cancels the order, the link should also go in the **order confirmation notification** (Settings → Notifications), not just the product page — that template is not part of the theme and is easy to forget.
 4. **Store access** → store address is **`nessclusive-llc.myshopify.com`** (confirmed from Shopify admin → Settings → Domains; `nessclusive.myshopify.com` is an older alias). Live site runs on the custom domain **www.nessclusive.com** (Primary, Online Store channel). Owner (Vanessa Amoako / info@nessclusive.com) is on the store; development runs via the owner's login with Shopify CLI.
    - ⚠️ **Oxygen environments exist** on the store: "nessclusive (Production)" and "nessclusive (staging)" with `*.o2.myshopify.dev` domains — remnants of a Hydrogen (headless) storefront setup. They don't hold the custom domain, so they don't affect this build; at cutover, verify www.nessclusive.com remains targeted at the Online Store channel where the new theme is published.
 5. **Newsletter** → assume **Shopify Email**; Google MX records for mailbox email are unaffected.
-6. **Installed apps** → none that must survive the theme swap. Clean slate.
+6. **Installed apps** → clean slate holds. Search & Discovery remains for
+   collection filtering; no Instagram app (see #10).
+7. **Checkout path** → **no express button on the product page.** Both prototype
+   buttons stay: **Add to Cart**, and **Buy Now** which adds to cart then
+   redirects to `/checkout`. Shopify offers Shop Pay / Apple Pay / Google Pay at
+   checkout, per device. Nothing skips the cart, so fulfillment-critical line
+   item properties always carry.
+8. **Feature parity with the old site is explicitly NOT a goal.** The new site
+   replaces the current one outright; anything on nessclusive.com that is not in
+   the prototype is dropped by design, including the existing UGC treatment.
+   *(This governs features only — see #9.)*
+9. **URLs, slugs, and SEO metadata are preserved exactly.** Only the front end
+   changes. No collection, product, or page handle is created, renamed, or
+   replaced; existing SEO titles and meta descriptions stay as they are.
+   **Display headings are independent of handles** — a collection may show
+   "Pre-Order Wigs" as its on-page heading while remaining
+   `/collections/pre-order`. Shopify does not change an existing record's handle
+   when its title is edited, so renaming for display is safe; just never touch
+   the handle field itself.
+10. **Instagram** → **self-hosted serverless proxy**, no app. Cloudflare Worker
+    on a cron pulls the 5 most recent posts, re-hosts the images to Shopify
+    Files, and writes them to a metafield the theme renders server-side. Keeps
+    the prototype's markup exactly. Account confirmed Business/Creator + Page.
+
+## Amendments — carried over from review, still open
+
+**URL preservation — RESOLVED, see Decision #9.** Existing handles are kept
+verbatim:
+
+```
+/collections/pre-order        /pages/booking      /policies/terms-of-service
+/collections/ready-to-ship    /pages/faqs         /policies/privacy-policy
+/collections/accessories      /pages/contact-us
+```
+
+⚠️ **This supersedes the setup list above**, which said to create collections
+named "Pre-order Wigs" / "Ready to Ship" / "Accessories". Do **not** create
+them — `/collections/pre-order` already exists and creating a new one would
+yield `/collections/pre-order-wigs` and 404 the indexed URL. Reuse the existing
+records; change only their display headings if desired.
+
+Before Phase 7, export the full list of live URLs (products included) and treat
+it as the contract. Nothing in it may 404 after cutover.
+
+**International selling.** The goal is orders worldwide. Markets handles
+currency display, but shipping zones, duties/import fees, and tax registrations
+are separate settings and are not yet covered by any phase. Confirm which
+countries are actually being sold to.
+
+**Order-notification templates.** Not part of the theme, so they survive the
+swap untouched — which also means they will not automatically reflect anything
+new. Review at minimum the order confirmation (see Decision #3).
+
+**Analytics.** GA4 and Meta Pixel configured through Shopify's Customer Events
+survive a theme swap. Anything hardcoded into the old `theme.liquid` will not —
+audit the current theme for inline tracking scripts before publishing.
 
 ## Remaining items to confirm
 
-- Acuity Scheduling page URL
-- Actual Wig Authorization Google Form link
+Resolved:
+
+- ~~Acuity Scheduling page URL~~ → `https://nessclusive.as.me/schedule/6f74a017`
+- ~~Instagram: app, proxy, or static?~~ → serverless proxy (Decision #10)
+- ~~Instagram account type~~ → confirmed Business/Creator + Facebook Page
+- ~~Second product-page button~~ → kept as "Buy Now" (Decision #7)
+- ~~Wig Authorization Form~~ → to-do, not a blocker (Decision #3)
+
+Still open:
+
+- **Current Wig Authorization Form location** — the URL the theme setting points
+  at until the Google Form exists
+- **Where the Instagram Worker lives** — which Cloudflare account owns it, and
+  who gets the failure alert. Small, but it is production infrastructure with an
+  owner
 - Confirm Shopify Email (vs. Klaviyo/Mailchimp) once known
+- Countries sold to, for shipping zones and duties
