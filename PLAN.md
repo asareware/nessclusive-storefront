@@ -281,7 +281,9 @@ replacements** (Decision #9):
 
 ## Phases
 
-- [ ] **Phase 0 — Setup:** CLI + Git + store access; scaffold theme from Dawn; strip to skeleton; wire design tokens, fonts, base styles
+- [x] **Phase 0a — Scaffold:** Shopify CLI installed; Dawn copied in wholesale as a reviewable baseline; design tokens, self-hosted WOFF2 fonts, and base styles wired into `layout/theme.liquid`; `shopify theme check` passes with no errors
+- [ ] **Phase 0b — Store access:** owner runs `shopify theme dev --store nessclusive-llc.myshopify.com` to create the development theme. **Blocked on owner login — cannot be automated.**
+- [ ] **Phase 0c — Strip to skeleton:** delete Dawn's unused sections, snippets, and CSS. **Deliberately deferred until after 0b.** Stripping before the theme can be previewed means breakage with no way to detect which deletion caused it. Dawn was committed intact so this lands as one reviewable diff
 - [ ] **Phase 1 — Global chrome:** announcement marquee, header (sticky, responsive ≤1180px hamburger behavior), mobile menu drawer, footer, toast utility
 - [ ] **Phase 2 — Homepage:** hero, collection cards, booking banner, bestsellers, about, testimonials, FAQ, contact, Instagram strip (renders from the metafield, with the five prototype images as fallback)
 - [ ] **Phase 2b — Instagram worker:** Meta app + long-lived token, Cloudflare Worker with hourly cron, image re-hosting to Shopify Files, metafield write, token auto-refresh, failure alert. Independent of the theme work and can run in parallel

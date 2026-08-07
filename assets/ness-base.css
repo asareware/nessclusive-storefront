@@ -1,0 +1,199 @@
+/* ==========================================================================
+   Nessclusive — base styles
+   Element defaults and the type scale from the Figma Style Guide. Section
+   styling lives with each section; this file only sets the baseline.
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--ness-background);
+  color: var(--ness-ink);
+  font-family: var(--ness-font-text);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  line-height: 100%;
+  margin: 0;
+  text-wrap: balance;
+}
+
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: inherit;
+}
+
+img,
+svg,
+video {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}
+
+/* Visible focus for keyboard users only — the design has no focus treatment,
+   so this supplies one without affecting mouse interaction. */
+:focus-visible {
+  outline: 2px solid var(--ness-primary-deep);
+  outline-offset: 2px;
+}
+
+/* --- Layout shell ------------------------------------------------------ */
+
+.ness-shell {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding-inline: var(--ness-shell-pad);
+}
+
+/* --- Type scale — transcribed from the Style Guide frame --------------- */
+
+.ness-h1 {
+  font: 600 clamp(48px, 8vw, 120px) / 100% var(--ness-font-display);
+  letter-spacing: -0.04em;
+}
+.ness-h2 {
+  font: 600 clamp(30px, 4.2vw, 64px) / 100% var(--ness-font-display);
+  letter-spacing: -0.04em;
+}
+.ness-h3 {
+  font: 600 clamp(30px, 3.4vw, 48px) / 100% var(--ness-font-display);
+  letter-spacing: -0.04em;
+}
+.ness-h4 {
+  font: 600 clamp(26px, 2.6vw, 36px) / 100% var(--ness-font-display);
+  letter-spacing: -0.04em;
+}
+.ness-h5 {
+  font: 600 32px/100% var(--ness-font-text);
+}
+.ness-h6 {
+  font: 600 20px/100% var(--ness-font-text);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ness-body-1 {
+  font: 400 24px/100% var(--ness-font-text);
+}
+.ness-body-1-medium {
+  font: 500 24px/100% var(--ness-font-text);
+}
+.ness-body-2 {
+  font: 500 20px/60px var(--ness-font-text);
+  letter-spacing: -0.02em;
+}
+.ness-body-2-medium {
+  font: 500 20px/100% var(--ness-font-text);
+  letter-spacing: -0.01em;
+}
+.ness-body-3 {
+  font: 400 18px/28px var(--ness-font-text);
+}
+.ness-body-4 {
+  font: 400 16px/100% var(--ness-font-text);
+}
+.ness-body-4-medium {
+  font: 500 16px/100% var(--ness-font-text);
+}
+.ness-body-5 {
+  font: 400 15px/22px var(--ness-font-text);
+}
+.ness-body-6 {
+  font: 400 10px/100% var(--ness-font-text);
+}
+
+.ness-card-cta {
+  font: 500 24px/100% var(--ness-font-text);
+  letter-spacing: -0.01em;
+}
+.ness-card-title-2 {
+  font: 600 22px/100% var(--ness-font-text);
+}
+.ness-card-title-1 {
+  font: 400 20px/100% var(--ness-font-text);
+  text-transform: uppercase;
+}
+.ness-price-1 {
+  font: 600 20px/100% var(--ness-font-text);
+  letter-spacing: -0.04em;
+}
+.ness-price-2 {
+  font: 600 18px/100% var(--ness-font-text);
+  letter-spacing: -0.04em;
+}
+.ness-price-3 {
+  font: 600 15px/100% var(--ness-font-text);
+  letter-spacing: -0.04em;
+}
+.ness-cta-mobile {
+  font: 500 15px/100% var(--ness-font-text);
+  letter-spacing: -0.01em;
+}
+
+/* --- Media ------------------------------------------------------------- */
+
+/* Every editable image slot crops rather than distorts, so a merchant upload
+   of any aspect ratio still holds the design. See PLAN.md, Editability. */
+.ness-media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* --- Motion ------------------------------------------------------------ */
+
+@keyframes ness-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

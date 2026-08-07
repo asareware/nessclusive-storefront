@@ -1,0 +1,46 @@
+{%- comment -%}
+  Nessclusive — self-hosted variable fonts.
+
+  Bricolage Grotesque (display) and Inter Tight (body), served from the Shopify
+  CDN rather than Google Fonts so there is no third-party request in the
+  critical path.
+
+  Both are variable fonts, so a single file covers every weight the design uses.
+  The italic cut is deliberately not shipped — the prototype uses no italics
+  anywhere, and it would add ~240KB. If italics are ever needed the browser
+  synthesises them; add InterTight-Italic-VariableFont_wght as woff2 to restore
+  the real cut.
+
+  @font-face lives here rather than in a .css asset so the font URLs can go
+  through asset_url and pick up Shopify's cache-busting version string.
+{%- endcomment -%}
+
+{{
+  'ness-inter-tight-var.woff2'
+  | asset_url
+  | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous'
+}}
+{{
+  'ness-bricolage-grotesque-var.woff2'
+  | asset_url
+  | preload_tag: as: 'font', type: 'font/woff2', crossorigin: 'anonymous'
+}}
+
+{% style %}
+  @font-face {
+    font-family: 'Inter Tight';
+    src: url({{ 'ness-inter-tight-var.woff2' | asset_url }}) format('woff2-variations');
+    font-weight: 100 900;
+    font-style: normal;
+    font-display: swap;
+  }
+
+  @font-face {
+    font-family: 'Bricolage Grotesque';
+    src: url({{ 'ness-bricolage-grotesque-var.woff2' | asset_url }}) format('woff2-variations');
+    font-weight: 200 800;
+    font-stretch: 75% 100%;
+    font-style: normal;
+    font-display: swap;
+  }
+{% endstyle %}

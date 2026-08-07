@@ -1,0 +1,13 @@
+# Files that live in the repo but must never be uploaded to the store.
+# Shopify only recognises the standard theme directories, but being explicit
+# keeps `shopify theme push` output clean and avoids surprises.
+
+PLAN.md
+README.md
+LICENSE.md
+project/
+.github/
+.vscode/
+.idea/
+*.md
+!templates/**/*.md

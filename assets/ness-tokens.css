@@ -1,0 +1,53 @@
+/* ==========================================================================
+   Nessclusive — design tokens
+   Source of truth: project/styles.css (extracted from the Figma file).
+   Values here must match the prototype exactly. Do not add theme settings
+   that override any of them — see the Editability policy in PLAN.md.
+   ========================================================================== */
+
+:root {
+  /* --- Colour -------------------------------------------------------- */
+  --ness-ink: #15001a; /* body text, headings */
+  --ness-primary: #621e69; /* deep purple */
+  --ness-primary-deep: #6b0d83; /* primary CTA purple */
+  --ness-secondary: #fef1d5; /* cream */
+  --ness-background: #fffdf8; /* page background */
+
+  --ness-card-1: #f7e8f1; /* pink surface */
+  --ness-card-cta: #ecd6e3; /* deeper pink surface */
+  --ness-card-2: #f4e8e8;
+  --ness-card-3: #fdf9f0;
+
+  --ness-border: #e3d2e6;
+  --ness-muted: #5f5462; /* secondary text */
+  --ness-muted-2: #828282;
+  --ness-placeholder: #9b9b9b;
+  --ness-gold: #d8c08e; /* accent marks */
+  --ness-on-primary: #fef1d5; /* text on purple */
+  --ness-hero-body: #ffe6d1; /* body copy over hero imagery */
+
+  /* --- Type ---------------------------------------------------------- */
+  --ness-font-display: 'Bricolage Grotesque', sans-serif;
+  --ness-font-text:
+    'Inter Tight', -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+
+  /* --- Radii --------------------------------------------------------- */
+  --ness-radius-card: 20px; /* cards, hero panels */
+  --ness-radius-media: 10px; /* images, buttons */
+  --ness-radius-cta: 10px;
+  --ness-radius-pill: 41px; /* option chips, filter pills */
+  --ness-radius-input: 6px;
+  --ness-radius-band: 8px;
+  --ness-radius-panel: 14px;
+
+  /* --- Layout -------------------------------------------------------- */
+  /* The prototype centres content in a 1770px shell with fluid side padding. */
+  --ness-shell-max: 1770px;
+  --ness-shell-pad: clamp(20px, 4vw, 150px);
+  --ness-section-gap: clamp(64px, 7vw, 120px);
+  --ness-cta-height: 55px;
+  --ness-chip-height: 50px;
+
+  /* Breakpoint at which the header collapses to a hamburger. */
+  --ness-nav-collapse: 1180px;
+}
