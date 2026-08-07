@@ -330,22 +330,33 @@ replacements** (Decision #9):
 - Search & Discovery app configured for availability + price filters
 - **Newsletter:** footer signup uses Shopify's native customer form, which feeds the store's customer list; campaigns sent via **Shopify Email** (assumed until confirmed). Note: the domain's Google MX records (Google Workspace mailboxes) are unaffected — Shopify Email sends campaigns via its own infrastructure and only needs sender-domain verification (SPF/DKIM CNAMEs), not MX changes.
 
-## Phases
+## Phases — execution checklist
 
-- [x] **Phase 0a — Scaffold:** Shopify CLI installed; Dawn copied in wholesale as a reviewable baseline; design tokens, self-hosted WOFF2 fonts, and base styles wired into `layout/theme.liquid`; `shopify theme check` passes with no errors
-- [ ] **Phase 0b — Store access:** owner runs `shopify theme dev --store nessclusive-llc.myshopify.com` to create the development theme. **Blocked on owner login — cannot be automated.**
-- [ ] **Phase 0c — Strip to skeleton:** delete Dawn's unused sections, snippets, and CSS. **Deliberately deferred until after 0b.** Stripping before the theme can be previewed means breakage with no way to detect which deletion caused it. Dawn was committed intact so this lands as one reviewable diff
-- [ ] **Phase 1 — Global chrome:** announcement marquee, header (sticky, responsive ≤1180px hamburger behavior), mobile menu drawer, footer, toast utility
-- [ ] **Phase 2 — Homepage:** hero, collection cards, booking banner, bestsellers, about, testimonials, FAQ, contact, Instagram strip (renders from the metafield, with the five prototype images as fallback)
-- [ ] **Phase 2b — Instagram worker:** Meta app + long-lived token, Cloudflare Worker with hourly cron, image re-hosting to Shopify Files, metafield write, token auto-refresh, failure alert. Independent of the theme work and can run in parallel
-- [ ] **Phase 3 — Shop:** collection template with chips/filters/sort, product card snippet, pagination
-- [ ] **Phase 4 — Product page:** gallery + thumbs, variant/option pickers, qty, add-to-cart (no express button — Decision #7), installments line, authorization callout, recommendations
-- [ ] **Phase 5 — Cart & search:** AJAX cart drawer, predictive search overlay
-- [ ] **Phase 6 — Booking page:** redesigned page with Acuity redirect CTA (hero, steps, policy cards)
-- [ ] **Phase 7 — Content & data:** collections, products, pages, menus, Markets, policies, shipping zones/duties. **Reuse existing collection and page handles** — do not create duplicates (see Amendments)
-- [ ] **Phase 8 — QA:** cross-device/browser pass vs. prototype, Lighthouse/a11y (focus states, aria labels, reduced-motion), 404/gift-card/account templates styled
-- [ ] **Phase 8b — Live order test:** place a real paid order and refund it. Verify Processing Time and Pickup Option appear on the order, that the confirmation email carries the **real** Google Form link (not the placeholder), and that international currency/shipping behave. This is the only step that proves the store actually works
-- [ ] **Phase 9 — Cutover:** push final theme, owner review in customizer, publish; keep old theme as rollback; verify domains, analytics, and app embeds
+> **How this document is organised.** Everything above this point is
+> **reference**: decisions, specs, and design mapping, organised by topic.
+> This section is the **tracker** — the actual units of work, in order.
+> A phase number never corresponds to a heading above; when a phase needs
+> detail, it links to the reference section that holds it.
+
+**Legend** — ✅ done · 🔜 next · ⬜ not started · 👤 owner action, cannot be
+automated
+
+- [x] ✅ **Phase 0a — Scaffold.** Shopify CLI 4.6.0 installed; Dawn copied in wholesale as a reviewable baseline; design tokens, self-hosted WOFF2 fonts, and base styles wired into `layout/theme.liquid`; `shopify theme check` passes with 0 errors. *(commit `4b38e46`)*
+- [x] ✅ 👤 **Phase 0b — Store access.** Development theme `#159626559687` created and running on `127.0.0.1:9292`; CLI session cached. Live theme is `Champion #133414355143`, retained as the rollback
+- [x] ✅ **Phase 0d — Live-store audit.** Catalog option shapes audited (see [Product options](#product-options----corrected-against-live-catalog-data-phase-0)); live theme pulled and inspected for app embeds and inline tracking. Found the `Cap Szie` typo, the seven option shapes across Ready to Ship, and that no analytics are hardcoded *(commits `993de0d`, `74a5617`)*
+- [ ] 🔜 **Phase 0c — Strip to skeleton.** Delete Dawn's unused sections, snippets, and CSS. Deferred until after 0b so every deletion can be verified against the running preview; Dawn was committed intact so this lands as one reviewable diff
+- [ ] ⬜ 👤 **Phase 0e — Catalog cleanup.** Normalise product option names to `Length`, `Cap Size`, `Part` across all 29 products. Admin work, not theme work. Worth doing regardless — `Cap Szie` is live today
+- [ ] ⬜ **Phase 1 — Global chrome.** Announcement marquee, header (sticky, hamburger below `--ness-nav-collapse` 1180px), mobile menu drawer, footer, toast utility
+- [ ] ⬜ **Phase 2 — Homepage.** Hero, collection cards, booking banner, bestsellers, about, testimonials, FAQ, contact, Instagram strip (renders from the metafield, with the five prototype images as fallback)
+- [ ] ⬜ **Phase 2b — Instagram worker.** Meta app + long-lived token, Cloudflare Worker with hourly cron, image re-hosting to Shopify Files, metafield write, token auto-refresh, failure alert. Independent of the theme work and can run in parallel
+- [ ] ⬜ **Phase 3 — Shop.** Collection template with chips/filters/sort, product card snippet, pagination
+- [ ] ⬜ **Phase 4 — Product page.** Gallery + thumbs, **dynamic** option pickers rendered from `options_with_values` (never hardcoded — see Product options), qty, add-to-cart and Buy Now (no express button, Decision #7), installments line, authorization callout, recommendations
+- [ ] ⬜ **Phase 5 — Cart & search.** AJAX cart drawer, predictive search overlay
+- [ ] ⬜ **Phase 6 — Booking page.** Redesigned page with Acuity redirect CTA (hero, steps, policy cards)
+- [ ] ⬜ 👤 **Phase 7 — Content & data.** Menus, Markets, policies, shipping zones/duties. **Reuse existing collection and page handles** — do not create duplicates (Decision #9)
+- [ ] ⬜ **Phase 8 — QA.** Cross-device/browser pass vs. prototype, Lighthouse/a11y (focus states, aria labels, reduced-motion), 404/gift-card/account templates styled
+- [ ] ⬜ 👤 **Phase 8b — Live order test.** Place a real paid order and refund it. Verify Processing Time and Pickup Option appear on the order, that the confirmation email carries the **real** Google Form link, and that international currency/shipping behave. The only step that proves the store actually works
+- [ ] ⬜ 👤 **Phase 9 — Cutover.** Push final theme, owner review in customizer, publish; keep `Champion` as rollback; verify domains and re-enable nothing (all apps being removed — Decision #6)
 
 ## Decisions log (answered 2026-08-06)
 
@@ -355,19 +366,27 @@ replacements** (Decision #9):
 4. **Store access** → store address is **`nessclusive-llc.myshopify.com`** (confirmed from Shopify admin → Settings → Domains; `nessclusive.myshopify.com` is an older alias). Live site runs on the custom domain **www.nessclusive.com** (Primary, Online Store channel). Owner (Vanessa Amoako / info@nessclusive.com) is on the store; development runs via the owner's login with Shopify CLI.
    - ⚠️ **Oxygen environments exist** on the store: "nessclusive (Production)" and "nessclusive (staging)" with `*.o2.myshopify.dev` domains — remnants of a Hydrogen (headless) storefront setup. They don't hold the custom domain, so they don't affect this build; at cutover, verify www.nessclusive.com remains targeted at the Online Store channel where the new theme is published.
 5. **Newsletter** → assume **Shopify Email**; Google MX records for mailbox email are unaffected.
-6. **Installed apps** → ⚠️ **"clean slate" was wrong — corrected in Phase 0.**
-   Inspecting the live theme and storefront shows apps that do touch the
-   presentation layer:
+6. **Installed apps** → **clean slate, confirmed by removal.** The owner is
+   deleting every installed app from the admin, so nothing needs to survive the
+   theme swap and nothing needs re-enabling at cutover.
 
-   | App | How it attaches | Action needed |
-   |---|---|---|
-   | **Shopify Inbox** (chat) | Active app embed on the live theme (`shopify://apps/inbox/blocks/chat/…`) | App embeds do **not** transfer between themes. Must be re-enabled on the new theme before publish, or live chat silently disappears |
-   | **Elfsight** (`static.elfsight.com`, app `1e24767f-…`) | Client-side script | Almost certainly the current Instagram feed — it injects client-side, which is why "instagram" appears nowhere in the page source. This is exactly the locked-widget pattern rejected in #10. Drop it once the Worker ships, and cancel the subscription |
-   | **Hextom: Sales Boost** | Theme app extension | Confirm what it actually renders. Theme-extension apps need re-adding per theme |
-   | **Translate & Adapt** | Content layer, not theme | Survives the swap, but any static string in the new theme must use `| t` filters or it will not be translatable |
-   | **Udesly Nexus** | Headless converter | Leftover from the Hydrogen experiment. Not theme-relevant; safe to remove |
+   For the record, Phase 0 found these attached to the live storefront:
+   **Shopify Inbox** (chat, active app embed), **Elfsight** (client-side widget,
+   almost certainly the current Instagram feed — which is why "instagram"
+   appears nowhere in the page source), **Hextom: Sales Boost** (theme app
+   extension), **Translate & Adapt**, and **Udesly Nexus** (leftover from the
+   Hydrogen experiment).
 
-   Search & Discovery also remains, for collection filtering.
+   Two consequences of removing them, both accepted:
+   - **Live chat goes away.** Shopify Inbox is the only customer-contact channel
+     on the current site besides the contact form. The new site's contact
+     section replaces it.
+   - **Existing translations go away** with Translate & Adapt. Only matters if
+     the store currently serves more than one language — worth a glance in
+     admin before deleting, since translated content is not recoverable
+     afterwards.
+
+   Search & Discovery is Shopify's own and stays, for collection filtering.
 7. **Checkout path** → **no express button on the product page.** Both prototype
    buttons stay: **Add to Cart**, and **Buy Now** which adds to cart then
    redirects to `/checkout`. Shopify offers Shop Pay / Apple Pay / Google Pay at
