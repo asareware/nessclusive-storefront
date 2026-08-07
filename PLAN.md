@@ -91,6 +91,77 @@ Extract from prototype into `config/settings_schema.json` + CSS custom propertie
 - Radii: 20px cards, 10px buttons/images, 41–42px pills; 55px button height
 - Keyframes: marquee, rise, slide-in, fade
 
+## Editability policy — DECIDED
+
+**Principle: structure is locked, content is editable, and every editable field
+is constrained rather than open.** The owner can run the store day to day —
+swap photos, reword headings, add an FAQ — without any ability to break the
+design.
+
+### The mechanism that makes "locked" real
+
+Use **`templates/index.liquid` with static `{% section %}` tags**, not
+`templates/index.json`.
+
+This matters more than any individual setting. A JSON template lets the merchant
+**reorder, remove, and duplicate sections** in the customizer — which would let
+someone delete the hero or push testimonials above the fold. A `.liquid`
+template with static sections still exposes every section's *settings* for
+editing, but the running order is fixed in code and cannot be changed from the
+admin.
+
+Same approach for the product, collection, and booking templates.
+
+### What is never exposed
+
+No setting is created for any of these, in any section:
+
+- Colors, fonts, font sizes, letter spacing, line heights
+- Padding, margins, gaps, border radii, container widths
+- Section order, section removal, section duplication
+- Anything in the design-token set
+
+### Per-section settings
+
+| Section | Editable | Locked |
+|---|---|---|
+| **Announcement marquee** | On/off toggle; message text (blocks, max 4) | Speed, colors, height |
+| **Header nav** | Label text per item (e.g. "Booking" → "Book Me"); destination via closed dropdown | 6 slots exactly, order, typography, sticky behaviour, logo |
+| **Hero** | Headline, subcopy, CTA label, CTA destination (dropdown), the arched images | Layout, arch shapes, overlay gradient |
+| **Explore Collection cards** | Per card: image, title, destination (dropdown) | Exactly 3 cards, grid layout, card radius |
+| **Booking banner** | Heading, body copy, CTA label | Background treatment; CTA always goes to the Acuity URL theme setting |
+| **Bestsellers** | Section heading; which collection feeds it | Card design, grid, product count per row |
+| **About** | Heading, body copy, the 3 photos | Layout, image arrangement |
+| **Testimonials** | Quote + author name per block (max 6) | Carousel behaviour, card styling |
+| **FAQ** | Question + answer per block (max 10) | Accordion behaviour, typography |
+| **Contact** | Heading, body copy | Form fields, `{% form 'contact' %}` wiring |
+| **Instagram strip** | Section heading, profile URL | Images — they come live from the metafield (Decision #10), not from settings |
+| **Footer** | Column headings, link labels + destinations (dropdowns), social URLs, newsletter copy | Column count, layout |
+| **Shop / collection** | Nothing — pure skeleton | Everything. Products, prices, availability, filters all come from Shopify |
+| **Product page** | Nothing — pure skeleton | Everything. Title, price, variants, images, inventory, sold-out state all come from Shopify |
+| **Cart / search overlays** | Nothing | Everything |
+
+### Two implementation notes
+
+**Destinations are dropdowns, not URL fields.** Each nav and card link uses a
+`select` listing the site's real destinations (Ready to Ship, Pre-Order,
+Accessories, Booking, FAQ anchor, Contact anchor). The owner can relabel freely
+and re-point among valid targets, but cannot type a URL and cannot create a
+broken link.
+
+*Slight widening of the brief, flagged for veto:* the owner asked for
+destinations to be entirely fixed. A closed dropdown is marginally more open —
+it allows re-pointing among real pages — but removes the need for a developer if
+the nav ever needs rearranging, and it is still impossible to produce a 404.
+Say the word and these become hardcoded per slot instead.
+
+**Image constraints are enforced by CSS, not by the picker.** Shopify's
+`image_picker` cannot reject an upload for being the wrong shape. The design
+holds regardless because every image slot has a fixed `aspect-ratio` with
+`object-fit: cover`, so any upload is cropped to fit rather than distorting the
+layout. Schema `info` text states the recommended dimensions so the crop lands
+where intended.
+
 ## Booking flow — DECIDED: redirect to existing Acuity page
 
 The studio already has an **Acuity Scheduling** page set up. The theme's booking page will be redesigned per the prototype's look (hero banner, "Plan your Perfect Style" steps, Booking Policy / Custom Wig & Drop-off cards) but instead of the 3-step wizard, the primary CTA — and every "Book a Session" button site-wide — links out to the Acuity page. The Acuity URL is a theme setting so the owner can change it without a developer.
@@ -254,6 +325,14 @@ replacements** (Decision #9):
     on a cron pulls the 5 most recent posts, re-hosts the images to Shopify
     Files, and writes them to a metafield the theme renders server-side. Keeps
     the prototype's markup exactly. Account confirmed Business/Creator + Page.
+11. **Stack** → **Liquid theme confirmed, not Hydrogen.** Both stacks can hit
+    the design pixel-for-pixel, so fidelity was not the deciding factor.
+    Hydrogen has no theme customizer at all — every copy or image change would
+    be a code change and a deploy. The owner wants day-to-day editing, so Liquid
+    wins outright.
+12. **Editability** → structure locked, content editable, all editable fields
+    constrained. Static `{% section %}` tags in `.liquid` templates so sections
+    cannot be reordered or deleted. Full policy in the Editability section above.
 
 ## Amendments — carried over from review, still open
 
