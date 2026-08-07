@@ -1,13 +1,12 @@
 # Files that live in the repo but must never be uploaded to the store.
 # Shopify only recognises the standard theme directories, but being explicit
 # keeps `shopify theme push` output clean and avoids surprises.
+#
+# Directory entries need a glob — a bare "project/" is matched loosely and the
+# CLI warns that the pattern may be misleading.
 
-PLAN.md
-README.md
-LICENSE.md
-project/
-.github/
-.vscode/
-.idea/
 *.md
-!templates/**/*.md
+project/*
+.github/*
+.vscode/*
+.idea/*

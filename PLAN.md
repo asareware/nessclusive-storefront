@@ -44,10 +44,61 @@ The prototype is a single-file mock with 4 screens plus global overlays. Mapping
 | Sign in | Native customer accounts |
 | Toasts | Small JS utility (`assets/toast.js`) |
 
-### Product options
-Prototype product page offers: Size, Part, Cap Size, Processing Time, Pickup Option.
-- **Variants (max 3 options):** Size, Part, Cap Size — these can affect price/inventory.
-- **Line item properties:** Processing Time, Pickup Option — informational choices carried on the order.
+### Product options — ⚠️ corrected against live catalog data (Phase 0)
+
+The prototype hardcodes five option groups: Size, Part, Cap Size, Processing
+Time, Pickup Option. **Auditing the real catalog through the dev theme shows
+this matches almost no actual product.**
+
+Live catalog, 29 products:
+
+| Collection | Products | Option shapes found |
+|---|---|---|
+| Pre-order | 17 | 12× `Length, Cap Size, Part` — plus 5 one-off variations |
+| Ready to Ship | 9 | **7 different shapes across 9 products** |
+| Accessories | 3 | 2× `Title` (no real options), 1× `Band type` |
+
+Two problems fall out of this.
+
+**1. The real option is `Length`, not "Size".** Values are `12"`–`22"+`. The
+prototype's "Select Size" label is wrong; the design's own fine print
+("Model is wearing Length 18\"") confirms Length is the real dimension.
+
+**2. Naming is inconsistent, including a typo that is live right now:**
+
+```
+Cap Size   Cap size   Cap Szie   ← typo, currently visible to customers
+Part       Parts
+Size       size       Length
+```
+
+Option *order* varies too — one product is `Cap Size, Part, Length`.
+
+### Consequences for the build
+
+- **The product template must render options dynamically** from
+  `product.options_with_values`. It cannot hardcode five labelled groups, or
+  Ready to Ship products (many of which have one option) and Accessories (which
+  have none) will render broken.
+- **No styling may key off option name.** "Render Length as pills, Cap Size as
+  a dropdown" breaks the moment it meets `Cap Szie`. Style by position or by
+  value count instead — or normalise the data first.
+- **Visual option order will vary by product** unless the catalog is normalised.
+
+### 🚩 Data cleanup task (owner, before Phase 4)
+
+Normalise option names across all 29 products to exactly `Length`, `Cap Size`,
+`Part`, in that order. This is admin work, not theme work, and it is worth doing
+regardless of this project — the `Cap Szie` typo is on the live store today.
+
+Once normalised, the theme can style options by name safely and the product page
+gains consistent ordering for free.
+
+### Line item properties
+
+- **Processing Time, Pickup Option** — not product options on any live product,
+  so they become line item properties as planned, carried on the order.
+  Confirm whether they should appear on Accessories at all, or only on wigs.
 - **Wig Authorization Form callout:** link block on the product template pointing to the
   Google Form (see Decisions log #3).
 
