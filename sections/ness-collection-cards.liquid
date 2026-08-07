@@ -47,10 +47,46 @@
                   loading: 'lazy'
               }}
             {%- else -%}
-              {{
-                'image'
-                | placeholder_svg_tag: 'ness-collection-cards__image ness-collection-cards__image--placeholder'
-              }}
+              {%- comment -%}
+                Bundled prototype photography as the default — see the note in
+                ness-hero.liquid. Alt is empty because the card's own title
+                already names the collection to a screen reader.
+              {%- endcomment -%}
+              {%- if forloop.index <= 3 -%}
+                {%- comment -%}
+                  Intrinsic dimensions differ per file, and width/height are
+                  needed so the browser reserves the right box before the image
+                  arrives. The card's own aspect-ratio still governs the final
+                  rendered shape.
+                {%- endcomment -%}
+                {%- liquid
+                  case forloop.index
+                    when 1
+                      assign fb_w = 800
+                      assign fb_h = 967
+                    when 2
+                      assign fb_w = 798
+                      assign fb_h = 1000
+                    else
+                      assign fb_w = 395
+                      assign fb_h = 480
+                  endcase
+                -%}
+                {%- capture fallback -%}ness-collection-{{ forloop.index }}.jpg{%- endcapture -%}
+                <img
+                  class="ness-collection-cards__image"
+                  src="{{ fallback | asset_url }}"
+                  alt=""
+                  width="{{ fb_w }}"
+                  height="{{ fb_h }}"
+                  loading="lazy"
+                >
+              {%- else -%}
+                {{
+                  'image'
+                  | placeholder_svg_tag: 'ness-collection-cards__image ness-collection-cards__image--placeholder'
+                }}
+              {%- endif -%}
             {%- endif -%}
           </div>
 

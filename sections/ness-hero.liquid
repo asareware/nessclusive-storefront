@@ -50,7 +50,38 @@
                 loading: 'eager'
             }}
           {%- else -%}
-            {{ 'image' | placeholder_svg_tag: 'ness-hero__placeholder' }}
+            {%- comment -%}
+              Falls back to the prototype's own photography, bundled with the
+              theme, so a fresh install looks like the design rather than a row
+              of grey placeholders. A photo chosen in the customizer still
+              wins. Theme assets are served at a fixed size — Shopify's
+              responsive resizing only applies to Files — so these ship
+              pre-sized at roughly 2x their largest rendered box.
+              Beyond three arches there is no bundled image, so the grey
+              placeholder remains the honest answer.
+            {%- endcomment -%}
+            {%- if forloop.index <= 3 -%}
+              {%- liquid
+                case forloop.index
+                  when 1
+                    assign fb_h = 534
+                  when 2
+                    assign fb_h = 533
+                  else
+                    assign fb_h = 527
+                endcase
+              -%}
+              {%- capture fallback -%}ness-hero-{{ forloop.index }}.jpg{%- endcapture -%}
+              <img
+                src="{{ fallback | asset_url }}"
+                alt=""
+                width="800"
+                height="{{ fb_h }}"
+                loading="eager"
+              >
+            {%- else -%}
+              {{ 'image' | placeholder_svg_tag: 'ness-hero__placeholder' }}
+            {%- endif -%}
           {%- endif -%}
         </div>
       {%- endfor -%}

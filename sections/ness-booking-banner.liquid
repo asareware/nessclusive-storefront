@@ -58,7 +58,18 @@
               loading: 'lazy'
           }}
         {%- else -%}
-          {{ 'image' | placeholder_svg_tag: 'ness-booking-banner__image' }}
+          {%- comment -%}
+            Bundled prototype artwork as the default — see ness-hero.liquid.
+            Decorative: the heading beside it carries the meaning.
+          {%- endcomment -%}
+          <img
+            class="ness-booking-banner__image"
+            src="{{ 'ness-booking-bg.jpg' | asset_url }}"
+            alt=""
+            width="1600"
+            height="1507"
+            loading="lazy"
+          >
         {%- endif -%}
       </div>
 

@@ -37,7 +37,17 @@
                 loading: 'lazy'
             }}
           {%- else -%}
-            {{ 'image' | placeholder_svg_tag: 'ness-about__placeholder' }}
+            {%- comment -%}
+              Bundled prototype photography as the default — see the note in
+              ness-hero.liquid. A photo chosen in the customizer still wins.
+            {%- endcomment -%}
+            <img
+              src="{{ 'ness-about-1.jpg' | asset_url }}"
+              alt=""
+              width="800"
+              height="534"
+              loading="lazy"
+            >
           {%- endif -%}
         </div>
 
@@ -70,7 +80,13 @@
               loading: 'lazy'
           }}
         {%- else -%}
-          {{ 'image' | placeholder_svg_tag: 'ness-about__placeholder' }}
+          <img
+              src="{{ 'ness-about-2.jpg' | asset_url }}"
+              alt=""
+              width="800"
+              height="534"
+              loading="lazy"
+            >
         {%- endif -%}
       </div>
 
@@ -87,7 +103,13 @@
                 loading: 'lazy'
             }}
           {%- else -%}
-            {{ 'image' | placeholder_svg_tag: 'ness-about__placeholder' }}
+            <img
+              src="{{ 'ness-about-3.jpg' | asset_url }}"
+              alt=""
+              width="667"
+              height="1000"
+              loading="lazy"
+            >
           {%- endif -%}
         </div>
 
