@@ -8,6 +8,12 @@
 .ness-booking-banner {
   /* Clears the fixed header when scrolled to from the hero links. */
   scroll-margin-top: 90px;
+  /* The section owns the gap above the frame as well as below it (design line
+     190). Without the top value the Luxury Looks strip above sits about twice
+     as close as the design draws it. The literal clamp rather than
+     --ness-section-gap because that is the value the design gives this
+     section, matching ness-services.css and ness-instagram.css. */
+  padding-top: clamp(72px, 8vw, 120px);
   padding-bottom: var(--ness-section-gap);
 }
 

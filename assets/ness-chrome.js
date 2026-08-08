@@ -16,7 +16,12 @@ class NessDrawer extends HTMLElement {
     this.opener?.addEventListener('click', this.open);
     this.overlay?.addEventListener('click', this.close);
     this.querySelectorAll('[data-drawer-close]').forEach((el) =>
-      el.addEventListener('click', this.close),
+      el.addEventListener('click', () =>
+        /* A link that only scrolls hands focus to its target itself; anything
+           else (the close button, the overlay) should send it back to the
+           opener. */
+        this.close({ restoreFocus: !el.matches('[data-smooth]') }),
+      ),
     );
   }
 
@@ -29,12 +34,18 @@ class NessDrawer extends HTMLElement {
     this.panel?.querySelector('a, button')?.focus();
   }
 
-  close() {
+  /* restoreFocus is false when the drawer is closing because a link inside it
+     is about to move focus somewhere better. Two of its links now scroll to a
+     homepage section rather than navigating, and ness-motion.js focuses that
+     section when the scroll finishes — up to 1.7s later. Without this the
+     sequence was: focus jumps to the Menu button, is announced as "Menu", and
+     is then yanked to the FAQ mid-read. */
+  close({ restoreFocus = true } = {}) {
     this.hidden = true;
     document.body.style.overflow = '';
     this.opener?.setAttribute('aria-expanded', 'false');
     document.removeEventListener('keydown', this.onKeydown);
-    this.opener?.focus();
+    if (restoreFocus) this.opener?.focus();
   }
 
   onKeydown(event) {

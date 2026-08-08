@@ -1,28 +1,29 @@
 {{ 'ness-booking-banner.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  The two `default` filters below mean an emptied field cannot break the
-  banner: an empty href would silently link to the current page, and an empty
-  label would render an invisible button.
+  The `default` filter below means an emptied field cannot break the banner: an
+  empty label would render an invisible button.
 
-  The booking URL is the one link on the site that is typed rather than picked
-  from the destination dropdown, because Acuity is an outside service
-  (PLAN.md, Booking flow).
+  This card does NOT link to Acuity. In the design its button is labelled
+  "Booking" and calls goBooking, which opens the Booking screen (design line
+  198); the Acuity link — "Book a Reservation" — lives on that page, one step
+  later (design line 771). So the studio's booking policy and drop-off terms
+  are on screen before anyone reaches the scheduler, and the external URL is
+  configured in exactly one place.
+
+  The destination therefore comes from the closed dropdown like every other
+  internal link, rather than being typed.
 {%- endcomment -%}
 
 {%- liquid
   assign heading_id = 'ness-booking-banner-heading-' | append: section.id
   assign banner_image = section.settings.background_image
-  comment
-    Booking URL, most specific first: a per-section override, then the
-    site-wide theme setting (PLAN.md specifies a theme setting so every
-    "Book a Session" control reads one value), then the known Acuity link as a
-    last resort so the button is never dead. Kept on one line because inside a
-    liquid tag every newline starts a new statement.
-  endcomment
-  assign booking_url = section.settings.booking_url | default: settings.acuity_url | default: 'https://nessclusive.as.me/schedule/6f74a017'
-  assign cta_label = section.settings.cta_label | default: 'Book a Session'
+  assign cta_label = section.settings.cta_label | default: 'Booking'
 -%}
+
+{%- capture cta_url -%}
+  {%- render 'ness-nav-url', destination: section.settings.cta_destination -%}
+{%- endcapture -%}
 
 {%- comment -%}
   aria-labelledby is only emitted when the heading actually exists. Pointing it
@@ -91,7 +92,18 @@
           <p class="ness-booking-banner__body">{{ section.settings.body }}</p>
         {%- endif -%}
 
-        <a class="ness-booking-banner__cta" href="{{ booking_url }}">{{ cta_label }}</a>
+        {%- comment -%}
+          data-smooth only when the chosen destination is a homepage section —
+          this banner sits on the homepage, so ness-motion.js can glide to it
+          instead of reloading. Every other destination is a plain link.
+        {%- endcomment -%}
+        <a
+          class="ness-booking-banner__cta"
+          href="{{ cta_url }}"
+          {% assign cta_url_first = cta_url | slice: 0 %}{% if cta_url_first == '#' %}data-smooth{% endif %}
+        >
+          {{- cta_label | escape -}}
+        </a>
       </div>
     </div>
   </div>
@@ -104,6 +116,10 @@
     {
       "type": "paragraph",
       "content": "The wording, the button label, and the photo are yours to change. The layout, the dark overlay, and the button styling are fixed by the design."
+    },
+    {
+      "type": "paragraph",
+      "content": "The button opens the Booking page, where visitors read the booking policy before the “Book a Reservation” button hands them to Acuity. The Acuity link itself is set once, in Theme settings → Nessclusive."
     },
     {
       "type": "image_picker",
@@ -120,12 +136,22 @@
       "info": "Around 200 characters is what the design was drawn for. Much longer and the banner grows taller than the rest of the page expects."
     },
     { "type": "header", "content": "Button" },
-    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Book a Session" },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Booking" },
     {
-      "type": "url",
-      "id": "booking_url",
-      "label": "Booking link (optional override)",
-      "info": "Leave empty to use the site-wide Acuity link from Theme settings → Nessclusive. Only set this to send THIS banner somewhere different."
+      "type": "select",
+      "id": "cta_destination",
+      "label": "Button goes to",
+      "default": "booking",
+      "info": "Chosen from real pages on this store, so the button can never 404.",
+      "options": [
+        { "value": "booking", "label": "Booking page" },
+        { "value": "all_products", "label": "All products" },
+        { "value": "ready_to_ship", "label": "Ready to Ship" },
+        { "value": "pre_order", "label": "Pre-Order" },
+        { "value": "accessories", "label": "Accessories" },
+        { "value": "contact_anchor", "label": "Contact (on the home page)" },
+        { "value": "contact", "label": "Contact page" }
+      ]
     }
   ]
 }

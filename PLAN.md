@@ -180,7 +180,7 @@ No setting is created for any of these, in any section:
 | **Header nav** | Label text per item (e.g. "Booking" → "Book Me"); destination via closed dropdown | 6 slots exactly, order, typography, sticky behaviour, logo |
 | **Hero** | Headline, subcopy, CTA label, CTA destination (dropdown), the arched images | Layout, arch shapes, overlay gradient |
 | **Explore Collection cards** | Per card: image, title, destination (dropdown) | Exactly 3 cards, grid layout, card radius |
-| **Booking banner** | Heading, body copy, CTA label | Background treatment; CTA always goes to the Acuity URL theme setting |
+| **Booking banner** | Heading, body copy, CTA label, CTA destination (dropdown) | Background treatment |
 | **Bestsellers** | Section heading; which collection feeds it | Card design, grid, product count per row |
 | **About** | Heading, body copy, the 3 photos | Layout, image arrangement |
 | **Testimonials** | Quote + author name per block (max 6) | Carousel behaviour, card styling |
@@ -215,7 +215,14 @@ where intended.
 
 ## Booking flow — DECIDED: redirect to existing Acuity page
 
-The studio already has an **Acuity Scheduling** page set up. The theme's booking page will be redesigned per the prototype's look (hero banner, "Plan your Perfect Style" steps, Booking Policy / Custom Wig & Drop-off cards) but instead of the 3-step wizard, the primary CTA — and every "Book a Session" button site-wide — links out to the Acuity page. The Acuity URL is a theme setting so the owner can change it without a developer.
+The studio already has an **Acuity Scheduling** page set up. The theme's booking page will be redesigned per the prototype's look (hero banner, "Plan your Perfect Style" steps, Booking Policy / Custom Wig & Drop-off cards) but instead of the 3-step wizard, the booking page's primary CTA ("Book a Reservation") links out to the Acuity page.
+
+**Corrected 2026-08-08.** This originally read "every 'Book a Session' button
+site-wide". The design routes the homepage booking card to the *booking page*
+(`goBooking`), not to the scheduler — so the journey is card → booking page →
+Acuity, and Acuity is linked from exactly one place. The banner's destination
+also became a dropdown, which moves it from Locked to editable in the
+Editability policy above. The Acuity URL is a theme setting so the owner can change it without a developer.
 
 *Optional enhancement to evaluate later:* Acuity supports an inline embed (iframe), so the scheduler could live inside the booking page instead of redirecting. Start with the redirect; embedding is a one-line change if the owner prefers it.
 
@@ -363,7 +370,7 @@ automated
 - [x] ✅ **Phase 3 — Shop.** `templates/collection.liquid` + `ness-collection` section: chips, Shopify-native filters and sort in one no-JS form, shared product card snippet, pagination from `paginate.parts`. Quick-add adds to cart only for unambiguous single-variant products and links to the product page otherwise — a 90-variant wig cannot be added blind. Verified across all four collections *(commit `7da03fe`)*
 - [x] ✅ **Phase 4 — Product page.** Gallery, dynamic option pickers, line item properties, Add to Cart + Buy Now, installments via `payment_terms`, authorization callout, recommendations. The picker never reads an option's *name* — presentation is chosen by value count, because the catalog carries `Cap Szie` / `Cap size` / `Parts` / `size` and any name-based rule fails on exactly those products. Verified against all three real shapes *(commit `5d0248a`)*
 - [x] ✅ **Phase 5 — Cart & search.** AJAX cart drawer via the Section Rendering API, predictive search overlay, styled search results page. Both adversarially reviewed; five findings fixed including a CRITICAL where Buy Now was intercepted by the drawer and never reached checkout *(commit `7d687ff`)*
-- [x] ✅ **Phase 6 — Booking page.** `templates/page.booking.liquid` with the prototype's hero, steps and policy cards; every CTA resolves to the site-wide Acuity theme setting. Passed review clean *(commit `7d687ff`)*
+- [x] ✅ **Phase 6 — Booking page.** `templates/page.booking.liquid` with the prototype's hero, steps and policy cards; the page's own CTA resolves to the site-wide Acuity theme setting. Rebuilt against the current design 2026-08-08 — Studio Info / Booking Policy / Custom Wig cards, contact tiles including TikTok, "Book a Reservation" → Acuity. Passed review clean both times
 - [ ] 🔜 👤 **Phase 7 — Content & data.** Menus, Markets, policies, shipping zones/duties. **Reuse existing collection and page handles** — do not create duplicates (Decision #9)
 - [ ] ⬜ **Phase 8 — QA.** Cross-device/browser pass vs. prototype, Lighthouse/a11y (focus states, aria labels, reduced-motion), 404/gift-card/account templates styled
 - [ ] ⬜ 👤 **Phase 8b — Live order test.** Place a real paid order and refund it. Verify Processing Time and Pickup Option appear on the order, that the confirmation email carries the **real** Google Form link, and that international currency/shipping behave. The only step that proves the store actually works

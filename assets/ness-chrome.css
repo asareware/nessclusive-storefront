@@ -374,6 +374,14 @@ ness-drawer[hidden] {
   margin-inline: auto;
 }
 
+/* The signup panel is a card with 34px of side padding and a 129px button, so
+   an equal 1fr share of five columns leaves its email field around 100px wide.
+   The panel is therefore given more than one track (below); the floor stays at
+   the design's 200px, which is NOT arbitrary — it is paired with the brand
+   column's own min-width of 196px, and 200 >= 196 is what stops that box
+   exceeding its track. Lowering the floor to 160 broke that pair and put 4px
+   of hard overlap between the wordmark and the "Shop" column at any width just
+   above an auto-fit step. */
 .ness-footer__grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
@@ -442,6 +450,28 @@ ness-drawer[hidden] {
   background: var(--ness-secondary);
   padding: 40px 34px;
   min-width: 300px;
+}
+
+/* The panel needs more width than an equal share. How much depends on how many
+   tracks auto-fit produced, which CSS cannot ask — so this is deliberately NOT
+   computed from the track arithmetic. An earlier attempt did exactly that and
+   was wrong by 8px: it assumed two tracks began at 400px when they actually
+   begin at 392px, and in that band the panel sat 300px wide inside a 353px
+   footer, flush left, with its email field NARROWER than before the fix. 393px
+   is an iPhone 14/15/16 Pro.
+
+   So: full width until there is comfortably room for three or more tracks,
+   two tracks after that. Full width can never be narrower than a single track,
+   which makes the narrow case a regression-proof floor rather than a
+   calculation to get right. */
+.ness-footer__signup {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 750px) {
+  .ness-footer__signup {
+    grid-column: span 2;
+  }
 }
 
 .ness-footer__signup-title {

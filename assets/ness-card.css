@@ -1,7 +1,10 @@
 /* ==========================================================================
    Nessclusive — product card
    Shared by the collection grid, search, and recommendations.
-   Values transcribed from project/Nessclusive Storefront.dc.html:380-396.
+   Values transcribed from project/Nessclusive Storefront.dc.html:411-424
+   (the All Products card; the "You may also Like" card at 545-558 is
+   identical, declaration for declaration). Re-checked against both ranges
+   2026-08-08.
    ========================================================================== */
 
 .ness-card {

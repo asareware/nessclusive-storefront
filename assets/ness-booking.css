@@ -1,21 +1,35 @@
 /* ==========================================================================
    Nessclusive — booking page
-   Values transcribed from project/Nessclusive Storefront.dc.html:538-680
+   Values transcribed from project/Nessclusive Storefront.dc.html:567-778
    (data-screen-label="Booking").
 
    The prototype's 3-step wizard is not built — PLAN.md Decision #1 replaced it
-   with a redirect to the studio's Acuity Scheduling page. The wizard's card
-   shell (20px radius, --ness-border hairline, --ness-card-3 fill) and its
-   confirmation-state typography are reused for the booking call to action, so
-   the page keeps the drawn rhythm with one panel instead of four states.
+   with a redirect to the studio's Acuity Scheduling page, and the current
+   design agrees: it ends on two links. What the design does draw, and what is
+   built here, is the hero band, the numbered preparation cards, three
+   information cards (Studio Info, Booking Policy, Custom Wig / Drop off), and
+   the closing button row.
 
    Horizontal shell (max-width + fluid side padding) comes from .ness-shell in
    ness-base.css; only the per-band top padding lives here.
+
+   Motion: the only transition on this page is the buttons' hover fill, and
+   ness-base.css already collapses every transition under
+   prefers-reduced-motion, so nothing here needs to repeat that.
    ========================================================================== */
 
 .ness-booking {
   /* The prototype closes the screen with a spacer div of this height. */
-  padding-bottom: clamp(48px, 5vw, 80px);
+  padding-bottom: clamp(56px, 6vw, 96px);
+
+  /* Two design values with no token behind them, kept as local custom
+     properties so they are written once rather than at each of the dozen
+     places the design repeats them:
+     — the hairline under every list row, which is --ness-primary at 14%;
+     — the quiet grey the design uses for a closed day and for the small
+       labels above each contact value. */
+  --ness-booking-hairline: rgba(98, 30, 105, 0.14);
+  --ness-booking-quiet: #9a8e9c;
 }
 
 /* --- Hero banner --------------------------------------------------------- */
@@ -82,14 +96,42 @@ svg.ness-booking__hero-image {
 /* --- Plan your Perfect Style --------------------------------------------- */
 
 .ness-booking__steps {
-  padding-top: clamp(48px, 5vw, 80px);
+  padding-top: clamp(64px, 7vw, 104px);
+}
+
+/* Eyebrow, heading and rule are one group; the gap replaces per-child margins
+   so a cleared eyebrow leaves no orphan space. */
+.ness-booking__steps-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+  margin-bottom: clamp(30px, 3.4vw, 54px);
+}
+
+.ness-booking__eyebrow {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ness-primary);
 }
 
 .ness-booking__steps-heading {
-  margin: 0 0 clamp(28px, 3vw, 48px);
+  margin: 0;
   font-size: clamp(32px, 4.4vw, 64px);
   color: var(--ness-ink);
-  text-align: center;
+}
+
+/* Decorative rule under the heading group. */
+.ness-booking__rule {
+  display: block;
+  width: 64px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ness-primary);
 }
 
 /* A real <ol>: the steps are a numbered sequence, so the order is carried in
@@ -97,7 +139,7 @@ svg.ness-booking__hero-image {
    because the circle *is* the marker. */
 .ness-booking__steps-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
   gap: clamp(16px, 1.6vw, 24px);
   margin: 0;
   padding: 0;
@@ -107,17 +149,17 @@ svg.ness-booking__hero-image {
 .ness-booking__step {
   border-radius: var(--ness-radius-card);
   background: var(--ness-card-1);
-  padding: clamp(28px, 3vw, 54px) clamp(20px, 2vw, 32px);
+  padding: clamp(28px, 3vw, 46px) clamp(20px, 2vw, 28px);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: 22px;
   text-align: center;
 }
 
 .ness-booking__step-number {
-  width: 118px;
-  height: 118px;
+  width: 104px;
+  height: 104px;
   flex-shrink: 0;
   border-radius: 50%;
   background: var(--ness-primary);
@@ -126,87 +168,337 @@ svg.ness-booking__hero-image {
   align-items: center;
   justify-content: center;
   font-family: var(--ness-font-display);
-  font-size: 48px;
+  font-size: 44px;
   font-weight: 600;
 }
 
 .ness-booking__step-label {
   margin: 0;
-  font-size: clamp(19px, 1.5vw, 24px);
+  font-size: clamp(18px, 1.4vw, 22px);
   font-weight: 500;
+  line-height: 140%;
   letter-spacing: -0.01em;
   color: var(--ness-primary);
   text-wrap: balance;
 }
 
-/* --- Booking panel ------------------------------------------------------- */
+/* --- Information cards ---------------------------------------------------
+   Studio Info, Booking Policy and Custom Wig / Drop off share one shell and
+   differ only in fill, exactly as the design draws them. */
 
-.ness-booking__book {
-  padding-top: clamp(40px, 4vw, 64px);
+.ness-booking__band {
+  padding-top: clamp(56px, 6vw, 88px);
 }
 
-/* The wizard's outer card, kept verbatim. */
-.ness-booking__panel {
+.ness-booking__card {
   border-radius: var(--ness-radius-card);
-  border: 1px solid var(--ness-border);
-  background: var(--ness-card-3);
   padding: clamp(24px, 3vw, 48px);
 }
 
-.ness-booking__panel-inner {
-  text-align: center;
-  padding: clamp(24px, 4vw, 56px) 0;
+.ness-booking__card--studio {
+  background: var(--ness-secondary);
 }
 
-/* The prototype's confirmation badge, at the same 88px, holding a calendar
-   rather than a tick — there is no longer a confirmed state to report. */
-.ness-booking__badge {
-  width: 88px;
-  height: 88px;
-  border-radius: 50%;
-  background: var(--ness-primary);
-  color: var(--ness-secondary);
-  margin: 0 auto 28px;
+.ness-booking__card--policy {
+  background: var(--ness-card-2);
+}
+
+.ness-booking__card--dropoff {
+  background: var(--ness-card-1);
+}
+
+.ness-booking__card-head {
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: clamp(24px, 2.6vw, 36px);
 }
 
-.ness-booking__panel-heading {
-  margin: 0 0 14px;
-  font-size: clamp(26px, 2.6vw, 36px);
+/* Marked up as h2 — the hero is the page's h1 and these are its top-level
+   regions — and sized here to the h3 the design draws. */
+.ness-booking__card-heading {
+  margin: 0;
+  font-size: clamp(24px, 2.4vw, 36px);
+  line-height: 110%;
   color: var(--ness-ink);
 }
 
-.ness-booking__panel-body {
-  margin: 0 auto 28px;
-  max-width: 520px;
-  font-size: 18px;
+.ness-booking__card-intro {
+  margin: 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ness-muted);
+}
+
+.ness-booking__card-rule {
+  display: block;
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ness-primary);
+}
+
+/* Label above a list or a tile's copy. */
+.ness-booking__group-label {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ness-primary);
+}
+
+/* The one that introduces the second row of policy tiles sits further from
+   its list than the ones inside Studio Info. */
+.ness-booking__group-label--spaced {
+  margin-bottom: 18px;
+}
+
+/* --- Studio Info --------------------------------------------------------- */
+
+.ness-booking__studio-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(24px, 3vw, 56px);
+}
+
+.ness-booking__contact {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(24px, 2.4vw, 34px);
+}
+
+/* Shared by the opening-hours rows and the late drop-off charges: a term on
+   the left, its value on the right, on a hairline. Baseline alignment keeps
+   the two sides sitting on one line even when they differ in size. */
+.ness-booking__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--ness-booking-hairline);
+}
+
+.ness-booking__row-key {
+  font-size: 17px;
+  color: var(--ness-ink);
+}
+
+.ness-booking__row-key--strong {
+  font-weight: 500;
+}
+
+.ness-booking__row-value {
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ness-primary);
+}
+
+/* A closed day is drawn quiet rather than in the open-hours purple, so the
+   week reads at a glance. */
+.ness-booking__row-value--closed {
+  font-weight: 400;
+  color: var(--ness-booking-quiet);
+}
+
+.ness-booking__row-amount {
+  font-size: 17px;
+  font-weight: 600;
+  color: var(--ness-primary);
+  white-space: nowrap;
+}
+
+.ness-booking__tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--ness-booking-hairline);
+  color: inherit;
+  text-decoration: none;
+}
+
+.ness-booking__tile:hover {
+  opacity: 0.75;
+  text-decoration: none;
+}
+
+.ness-booking__tile-icon {
+  display: flex;
+  flex-shrink: 0;
+  color: var(--ness-primary);
+}
+
+/* The location pin sits beside a two-line block, so it aligns to the first
+   line rather than to the centre of the pair. */
+.ness-booking__tile-icon--top {
+  align-self: flex-start;
+  margin-top: 3px;
+}
+
+.ness-booking__tile-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  /* Not in the design, which was drawn around a short address: a long email
+     would otherwise push the tile wider than its column. */
+  min-width: 0;
+}
+
+.ness-booking__tile-label {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--ness-booking-quiet);
+}
+
+.ness-booking__tile-value {
+  font-size: 17px;
+  color: var(--ness-ink);
+  overflow-wrap: anywhere;
+}
+
+.ness-booking__location {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 13px 0;
+}
+
+.ness-booking__location-address {
+  margin: 0 0 6px;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--ness-ink);
+}
+
+.ness-booking__location-note {
+  margin: 0;
+  font-size: 15px;
+  line-height: 23px;
+  color: var(--ness-muted);
+}
+
+/* --- Booking Policy ------------------------------------------------------ */
+
+.ness-booking__notes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+  gap: clamp(14px, 1.4vw, 20px);
+  margin-bottom: clamp(28px, 3vw, 40px);
+}
+
+/* With no policy tiles and no agreement line under it there is nothing for
+   that margin to separate, so the card would close on a gap the design never
+   draws — same guard as .ness-services__intro-head. */
+.ness-booking__notes:last-child {
+  margin-bottom: 0;
+}
+
+.ness-booking__rules {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: clamp(14px, 1.4vw, 20px);
+}
+
+.ness-booking__note,
+.ness-booking__policy {
+  border-radius: var(--ness-radius-panel);
+  padding: clamp(20px, 2vw, 28px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.ness-booking__note {
+  background: var(--ness-background);
+}
+
+.ness-booking__policy {
+  background: var(--ness-secondary);
+}
+
+/* Icons paint with currentColor so the token drives them rather than a hex
+   baked into each path. */
+.ness-booking__note-icon {
+  display: flex;
+  color: var(--ness-primary);
+}
+
+.ness-booking__note-label {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--ness-primary);
+}
+
+.ness-booking__note-text {
+  margin: 0;
+  font-size: 16px;
+  line-height: 25px;
+  color: var(--ness-ink);
+}
+
+.ness-booking__footnote {
+  margin: clamp(24px, 2.6vw, 34px) 0 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--ness-primary);
+}
+
+/* --- Custom Wig, Coloring & Drop off ------------------------------------- */
+
+.ness-booking__dropoff-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  gap: clamp(20px, 2vw, 32px);
+}
+
+.ness-booking__drop {
+  border-radius: var(--ness-radius-panel);
+  background: var(--ness-background);
+  padding: clamp(22px, 2.4vw, 34px);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ness-booking__drop-text {
+  margin: 0;
+  font-size: 17px;
+  line-height: 27px;
+  color: var(--ness-ink);
+}
+
+.ness-booking__drop-note {
+  margin: 0;
+  font-size: 17px;
   line-height: 27px;
   color: var(--ness-muted);
 }
 
-.ness-booking__panel-note {
-  margin: 0 auto 28px;
-  max-width: 560px;
-  font-size: 16px;
-  line-height: 26px;
-  color: var(--ness-muted);
-}
+/* --- Closing buttons ----------------------------------------------------- */
 
 .ness-booking__actions {
+  padding-top: clamp(48px, 5vw, 72px);
   display: flex;
-  gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
+  gap: 14px;
 }
 
-/* The wizard's "Continue" button. */
+/* 60px, not the site-wide --ness-cta-height of 55px: the design draws this
+   pair taller than the buttons in the page bands above. */
 .ness-booking__cta {
   display: inline-flex;
   align-items: center;
-  height: var(--ness-cta-height);
-  padding: 0 28px;
+  height: 60px;
+  padding: 0 32px;
   border-radius: var(--ness-radius-cta);
   border: none;
   background: var(--ness-primary-deep);
@@ -214,6 +506,7 @@ svg.ness-booking__hero-image {
   font-size: 18px;
   font-weight: 500;
   text-decoration: none;
+  transition: background 0.4s ease;
 }
 
 .ness-booking__cta:hover {
@@ -222,60 +515,13 @@ svg.ness-booking__hero-image {
   text-decoration: none;
 }
 
-/* The wizard's "Back" / "Book another service" button. */
 .ness-booking__cta--secondary {
-  padding: 0 24px;
-  border: 1px solid var(--ness-ink);
+  border: 1px solid var(--ness-primary);
   background: transparent;
-  color: var(--ness-ink);
+  color: var(--ness-primary);
 }
 
 .ness-booking__cta--secondary:hover {
-  background: var(--ness-ink);
-  color: var(--ness-background);
-}
-
-/* --- Policy / drop-off cards --------------------------------------------- */
-
-.ness-booking__info {
-  padding-top: clamp(48px, 5vw, 80px);
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
-  gap: clamp(24px, 3vw, 48px);
-}
-
-.ness-booking__card {
-  border-radius: var(--ness-radius-card);
-  padding: clamp(24px, 3vw, 40px);
-}
-
-.ness-booking__card--policy {
-  background: var(--ness-secondary);
-}
-
-.ness-booking__card--dropoff {
-  background: var(--ness-card-2);
-}
-
-.ness-booking__card-heading {
-  margin: 0 0 24px;
-  font-size: clamp(24px, 2.4vw, 36px);
-  color: var(--ness-ink);
-}
-
-.ness-booking__lines {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* pre-line is what makes the studio's line breaks survive: the policy is
-   written as short stacked clauses, not prose, and reflowing it into
-   paragraphs would change what it says. */
-.ness-booking__line {
-  margin: 0;
-  font-size: 15px;
-  line-height: 24px;
-  color: var(--ness-ink);
-  white-space: pre-line;
+  background: var(--ness-primary);
+  color: var(--ness-secondary);
 }

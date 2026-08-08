@@ -109,6 +109,18 @@
   {%- endif -%}
 </section>
 
+{%- comment -%}
+  The intro default deliberately drops the prototype's "Three ways": panels are
+  editable up to five, so a merchant who adds a fourth would be left with a
+  sentence contradicting the page below it. No default may name a count.
+
+  Its help text no longer offers "one or two lines" either. The field is a
+  textarea for typing room, but the lede renders as a single escaped paragraph,
+  so any line break the merchant types is silently dropped. Newlines are not
+  converted deliberately — a hard break in a lede the design lets wrap fluidly
+  is exactly the kind of layout decision the editability policy keeps out of
+  the customizer.
+{%- endcomment -%}
 {% schema %}
 {
   "name": "Services",
@@ -123,8 +135,8 @@
       "type": "textarea",
       "id": "intro",
       "label": "Intro paragraph",
-      "default": "Three ways we look after your hair, in studio and in your chair.",
-      "info": "One or two lines under the heading. Leave empty to hide it."
+      "default": "How we look after your hair, in studio and in your chair.",
+      "info": "A single sentence under the heading, about 60 characters. Leave empty to hide it."
     }
   ],
   "max_blocks": 5,

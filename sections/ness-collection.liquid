@@ -175,23 +175,54 @@
 
                 {%- when 'price_range' -%}
                   {%- comment -%}
+                    The design draws this as a single-handle range slider with
+                    a live "$1.00 to $700" readout (design line 391). Kept as
+                    two number fields on purpose: a native range input renders
+                    no value of its own, so with JavaScript off the shopper
+                    drags blind, and one handle can only express a maximum —
+                    Shopify's price_range filter carries both bounds, and
+                    dropping the minimum would take "over $300" away from the
+                    store. The readout is the part that needs script, and that
+                    script lives in ness-collection.js. Revisit together.
+
                     Shopify's price filter works in the shop's currency with
                     decimals; the inputs speak whole units and are converted on
                     the way in and out. Without dividing by 100 the max would
                     read as 70000.
+
+                    range_max, min_value.value and max_value.value are all
+                    Money — the conversion is needed on every one of them, not
+                    only on the bound. Converting the bound alone was the
+                    original bug: a shopper who filtered to $300 reopened the
+                    panel to "300.00" in the placeholder but "30000" in the
+                    field, and pressing Apply a second time widened their own
+                    filter to $30,000 without saying so.
+
+                    step="any" because these values carry cents. The default
+                    step of 1 makes 699.99 invalid, and since sort shares this
+                    form, one invalid price field would block sorting too.
                   {%- endcomment -%}
                   {%- assign price_max = filter.range_max | money_without_currency | replace: ',', '' -%}
+                  {%- assign price_from = '' -%}
+                  {%- assign price_to = '' -%}
+                  {%- if filter.min_value.value -%}
+                    {%- assign price_from = filter.min_value.value | money_without_currency | replace: ',', '' -%}
+                  {%- endif -%}
+                  {%- if filter.max_value.value -%}
+                    {%- assign price_to = filter.max_value.value | money_without_currency | replace: ',', '' -%}
+                  {%- endif -%}
                   <div class="ness-collection__price">
                     <label class="ness-collection__price-field">
                       <span>From</span>
                       <input
                         type="number"
                         name="{{ filter.min_value.param_name }}"
-                        value="{{ filter.min_value.value | default: '' }}"
+                        value="{{ price_from }}"
                         min="0"
                         max="{{ price_max }}"
+                        step="any"
                         placeholder="0"
-                        inputmode="numeric"
+                        inputmode="decimal"
                       >
                     </label>
                     <label class="ness-collection__price-field">
@@ -199,11 +230,12 @@
                       <input
                         type="number"
                         name="{{ filter.max_value.param_name }}"
-                        value="{{ filter.max_value.value | default: '' }}"
+                        value="{{ price_to }}"
                         min="0"
                         max="{{ price_max }}"
+                        step="any"
                         placeholder="{{ price_max }}"
-                        inputmode="numeric"
+                        inputmode="decimal"
                       >
                     </label>
                   </div>

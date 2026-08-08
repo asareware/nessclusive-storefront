@@ -1,0 +1,27 @@
+{%- comment -%}
+  FAQ page.
+
+  The design's nav sends FAQ to a homepage anchor rather than here, but the
+  page itself stays: /pages/faqs is indexed and its handle is fixed by
+  Decision #9. Deleting it would throw away long-tail search traffic — the FAQ
+  answers real queries ("how long do pre-order wigs take") that a homepage
+  section cannot rank for on its own, because a URL fragment is not indexed
+  separately from the page it sits on.
+
+  So this renders the same section the homepage does. One set of answers,
+  edited once, appearing in both places — the section's settings are stored per
+  section name, so there is no second copy to keep in sync.
+
+  Assign this template to the FAQs page in Shopify admin:
+    Content -> Pages -> FAQs -> Theme template -> "faqs"
+
+  The hidden <h1> carries the page's own title so the document has exactly one
+  first-level heading. The section's visible heading is an <h2>, which without
+  this would be the topmost heading on the page — a hierarchy that starts at
+  level 2. The page title and the section heading differ ("FAQs" against
+  "Frequently Asked Questions"), so nothing is announced twice.
+{%- endcomment -%}
+
+<h1 class="visually-hidden">{{ page.title | escape }}</h1>
+
+{% section 'ness-faq' %}

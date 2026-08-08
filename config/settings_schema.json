@@ -16,7 +16,7 @@
       },
       {
         "type": "paragraph",
-        "content": "Every “Book a Session” button on the site sends visitors here."
+        "content": "The booking page’s “Book a Reservation” button sends visitors here. The homepage booking card links to the booking page itself, not straight to the scheduler."
       },
       {
         "type": "url",

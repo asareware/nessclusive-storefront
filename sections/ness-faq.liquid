@@ -6,13 +6,20 @@
   assign group_name = 'ness-faq-' | append: section.id
 -%}
 
+{%- comment -%}
+  id="faq" is a fixed anchor, not a setting — the header, footer and hero all
+  scroll here by that name, and letting it be edited would break them silently.
+  scroll-margin-top (in the stylesheet) clears the floating header.
+
+  The section element and its id render UNCONDITIONALLY, outside the "are there
+  any questions" guard. Questions are the FAQ's editable surface, so an owner
+  can legitimately delete the last one — and when the id lived inside the guard
+  that turned every FAQ link in the theme into a silent no-op: ness-motion.js
+  finds no element, returns before preventDefault, and the browser declines to
+  scroll to a fragment that matches nothing. No error, no movement, nothing.
+{%- endcomment -%}
+<section class="ness-faq" id="faq" {% if faqs.size > 0 %}aria-labelledby="{{ heading_id }}"{% endif %}>
 {%- if faqs.size > 0 -%}
-  {%- comment -%}
-    id="faq" is a fixed anchor, not a setting — the hero's quick links scroll
-    here by that name, and letting it be edited would break them silently.
-    scroll-margin-top (in the stylesheet) clears the floating header.
-  {%- endcomment -%}
-  <section class="ness-faq" id="faq" aria-labelledby="{{ heading_id }}">
     {%- comment -%}
       Eyebrow, heading and rule are one centred group. All three are fixed
       copy, not settings: the FAQ's editable surface is the questions and
@@ -74,8 +81,8 @@
         </details>
       {%- endfor -%}
     </div>
-  </section>
 {%- endif -%}
+</section>
 
 {% schema %}
 {

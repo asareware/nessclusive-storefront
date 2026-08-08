@@ -1,6 +1,7 @@
 /* ==========================================================================
    Nessclusive — product page
-   Values transcribed from project/Nessclusive Storefront.dc.html:409-532.
+   Values transcribed from project/Nessclusive Storefront.dc.html:438-563
+   ("Single Product"). Re-checked against that range 2026-08-08.
    ========================================================================== */
 
 .ness-product {
@@ -259,10 +260,15 @@
   height: 0;
 }
 
+/* The design gives each option group its own min-width (74/88/96px, lines 473,
+   481, 489) because the prototype knows its three option lists by name. This
+   file cannot — see ness-variant-picker.liquid — so it takes the smallest of
+   them as the floor and lets longer values grow on the 20px padding the design
+   states for the pills that carry no min-width (lines 497, 505). */
 .ness-variants__pill {
   min-width: 74px;
   height: var(--ness-chip-height);
-  padding: 0 18px;
+  padding: 0 20px;
   border-radius: var(--ness-radius-pill);
   border: 1px solid var(--ness-border);
   background: transparent;
@@ -325,6 +331,31 @@
 
 .ness-variants__select:focus {
   outline: none;
+}
+
+/* The <noscript> "Update selection" submit in ness-variant-picker.liquid. The
+   design has no such control — it exists only on the no-JavaScript path — but
+   it was carrying no styling at all, so the one audience that ever sees it got
+   a raw browser button in the middle of the design. Dressed as the secondary
+   CTA the design does draw (line 524) so it reads as part of the page. */
+.ness-product__submit-options {
+  height: var(--ness-cta-height);
+  padding: 0 22px;
+  border-radius: var(--ness-radius-cta);
+  border: 1px solid var(--ness-ink);
+  background: transparent;
+  color: var(--ness-ink);
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.ness-product__submit-options:hover {
+  background: var(--ness-ink);
+  color: var(--ness-background);
 }
 
 /* --- Quantity ------------------------------------------------------------ */

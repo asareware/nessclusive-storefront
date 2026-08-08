@@ -1,20 +1,23 @@
 {{ 'ness-booking.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  Booking page.
+  Booking page. Transcribed from project/Nessclusive Storefront.dc.html:567-778
+  (data-screen-label="Booking").
 
-  The prototype draws a three-step wizard here. It is deliberately not built:
-  PLAN.md Decision #1 replaced it with a redirect to the studio's existing
-  Acuity Scheduling page, so there is exactly one calendar to keep and no
-  half-captured requests sitting in a theme with no backend.
+  The prototype's three-step wizard is still deliberately not built: PLAN.md
+  Decision #1 replaced it with a redirect to the studio's existing Acuity
+  Scheduling page, so there is exactly one calendar to keep and no
+  half-captured requests sitting in a theme with no backend. The revised design
+  agrees — it now ends on a pair of links rather than a form, so this page and
+  the design finish in the same place.
 
-  Everything else from the design survives — hero banner, "Plan your Perfect
-  Style" steps, and the Booking Policy / Custom Wig & Drop-off cards. The
-  wizard's card shell and its confirmation-state typography are reused for the
-  panel that sends people to Acuity.
+  The design's order, top to bottom: hero banner, "Plan your Perfect Style",
+  then the Studio Info / Booking Policy / Custom Wig cards, then the two
+  buttons. The standalone booking panel the earlier revision drew between the
+  steps and the cards is gone; its heading/body/note settings went with it.
 
   No JavaScript: every control on this page is a link, so the page is complete
-  the moment the HTML arrives.
+  the moment the HTML arrives, and nothing here needs scripting to be readable.
 {%- endcomment -%}
 
 {%- liquid
@@ -28,19 +31,42 @@
     Kept on one line: inside a liquid tag every newline starts a new statement.
   endcomment
   assign booking_url = section.settings.booking_url | default: settings.acuity_url | default: 'https://nessclusive.as.me/schedule/6f74a017'
-  assign cta_label = section.settings.cta_label | default: 'Book a Session'
+  assign cta_label = section.settings.cta_label | default: 'Book a Reservation'
   comment
     Falling back to the page's own title means the page can never render
     without an h1, whatever the merchant clears.
   endcomment
   assign hero_heading = section.settings.hero_heading | default: page.title | default: 'Book Nessclusive'
   assign steps = section.blocks | where: 'type', 'step'
-  assign policy_lines = section.blocks | where: 'type', 'policy_line'
-  assign dropoff_lines = section.blocks | where: 'type', 'dropoff_line'
+  assign hours = section.blocks | where: 'type', 'hours_row'
+  assign notes = section.blocks | where: 'type', 'policy_note'
+  assign rules = section.blocks | where: 'type', 'policy_rule'
+  assign fees = section.blocks | where: 'type', 'fee_row'
   assign steps_id = 'ness-booking-steps-' | append: section.id
-  assign panel_id = 'ness-booking-panel-' | append: section.id
+  assign studio_id = 'ness-booking-studio-' | append: section.id
   assign policy_id = 'ness-booking-policy-' | append: section.id
   assign dropoff_id = 'ness-booking-dropoff-' | append: section.id
+  comment
+    tel: wants the digits only, but the merchant types the number the way it is
+    printed. The separators are stripped here rather than asking for the number
+    twice; a leading + survives, which is what an international number needs.
+  endcomment
+  assign phone_digits = section.settings.phone | remove: ' ' | remove: '-' | remove: '(' | remove: ')' | remove: '.'
+  comment
+    Social tiles are authored as handles, not URLs: the host is fixed in the
+    markup so the tile cannot be pointed anywhere but the real profile, and a
+    handle still has a sensible default where a `url` setting cannot have one.
+    The @ is optional in the field and stripped before it reaches the path.
+  endcomment
+  assign instagram_handle = section.settings.instagram_handle | remove: '@'
+  assign tiktok_handle = section.settings.tiktok_handle | remove: '@'
+  comment
+    Presence tests, same idea as the social row in ness-contact: a card is
+    dropped entirely rather than painting a coloured panel with a heading and
+    nothing under it.
+  endcomment
+  assign studio_any = section.settings.phone | append: section.settings.email | append: instagram_handle | append: tiktok_handle | append: section.settings.address | append: section.settings.address_note
+  assign dropoff_any = section.settings.dropoff_body | append: section.settings.dropoff_note
 -%}
 
 <div class="ness-booking">
@@ -89,11 +115,11 @@
   </div>
 
   {%- comment -%}
-    The three steps. Wording is the prototype's, and it still describes the
-    real flow — Acuity asks for a service, then a date and time, then
-    confirmation. Every circle is filled: in the prototype the second and third
-    were greyed to show wizard progress, and with no wizard a permanently grey
-    step would read as unavailable.
+    "Plan your Perfect Style". The wording still describes the real flow —
+    Acuity asks for a service, then a date and time, then confirmation. Every
+    circle is filled: in the prototype the second and third were greyed to show
+    wizard progress, and with no wizard a permanently grey step would read as
+    unavailable.
   {%- endcomment -%}
   {%- comment -%}
     Throughout this section, aria-labelledby is emitted only when the heading
@@ -101,151 +127,404 @@
     output leaves the region with an empty accessible name, which is worse
     than having none — same reasoning as ness-booking-banner.
   {%- endcomment -%}
-  {%- if steps.size > 0 -%}
+  {%- if steps.size > 0 or section.settings.steps_heading != blank or section.settings.steps_eyebrow != blank -%}
     <section
       class="ness-booking__steps ness-shell"
       {% if section.settings.steps_heading != blank %}aria-labelledby="{{ steps_id }}"{% endif %}
     >
-      {%- if section.settings.steps_heading != blank -%}
-        <h2 class="ness-booking__steps-heading" id="{{ steps_id }}">
-          {{- section.settings.steps_heading | escape -}}
-        </h2>
+      {%- if section.settings.steps_heading != blank or section.settings.steps_eyebrow != blank -%}
+        {%- comment -%}
+          Eyebrow, heading and rule are one flex group so a cleared eyebrow
+          leaves no orphan space, exactly as in ness-services.
+        {%- endcomment -%}
+        <div class="ness-booking__steps-head">
+          {%- if section.settings.steps_eyebrow != blank -%}
+            <p class="ness-booking__eyebrow">{{ section.settings.steps_eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.steps_heading != blank -%}
+            <h2 class="ness-booking__steps-heading" id="{{ steps_id }}">
+              {{- section.settings.steps_heading | escape -}}
+            </h2>
+          {%- endif -%}
+          {%- comment -%}
+            Decorative rule: no meaning the heading does not already carry, so
+            it is hidden rather than announced as an empty element.
+          {%- endcomment -%}
+          <span class="ness-booking__rule" aria-hidden="true"></span>
+        </div>
       {%- endif -%}
 
-      {%- comment -%}
-        role="list" is not redundant: Safari drops list semantics from an <ol>
-        whose list-style is none, which is exactly what the drawn circles
-        require.
-      {%- endcomment -%}
-      <ol class="ness-booking__steps-list" role="list">
-        {%- for block in steps -%}
-          <li class="ness-booking__step" {{ block.shopify_attributes }}>
-            {%- comment -%}
-              The circle is decoration — the <ol> already tells assistive tech
-              this is step N of three, and announcing the digit twice is noise.
-            {%- endcomment -%}
-            <span class="ness-booking__step-number" aria-hidden="true">{{ forloop.index }}</span>
-            <p class="ness-booking__step-label">{{ block.settings.label | escape }}</p>
-          </li>
-        {%- endfor -%}
-      </ol>
+      {%- if steps.size > 0 -%}
+        {%- comment -%}
+          role="list" is not redundant: Safari drops list semantics from an <ol>
+          whose list-style is none, which is exactly what the drawn circles
+          require.
+        {%- endcomment -%}
+        <ol class="ness-booking__steps-list" role="list">
+          {%- for block in steps -%}
+            <li class="ness-booking__step" {{ block.shopify_attributes }}>
+              {%- comment -%}
+                The circle is decoration — the <ol> already tells assistive tech
+                which step this is and how many there are, and announcing the
+                digit twice is noise.
+              {%- endcomment -%}
+              <span class="ness-booking__step-number" aria-hidden="true">{{ forloop.index }}</span>
+              <p class="ness-booking__step-label">{{ block.settings.label | escape }}</p>
+            </li>
+          {%- endfor -%}
+        </ol>
+      {%- endif -%}
     </section>
   {%- endif -%}
 
   {%- comment -%}
-    The booking call to action, standing where the wizard stood.
-
-    The link is a plain same-tab navigation, matching ness-booking-banner. It
-    is not forced into a new tab: a forced tab has to be announced to be
-    accessible, and leaving that choice to the visitor is the behaviour the
-    rest of the site already has.
+    Studio Info — opening hours on the left, the contact tiles and the location
+    on the right. The four contact tiles are the design's row: phone, email,
+    Instagram and TikTok. Each is dropped individually when its field is
+    cleared, so a studio without TikTok simply has three.
   {%- endcomment -%}
-  <section
-    class="ness-booking__book ness-shell"
-    {% if section.settings.panel_heading != blank %}aria-labelledby="{{ panel_id }}"{% endif %}
-  >
-    <div class="ness-booking__panel">
-      <div class="ness-booking__panel-inner">
-        <span class="ness-booking__badge">
-          <svg
-            width="38"
-            height="38"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.7"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            aria-hidden="true"
-            focusable="false"
-          >
-            <rect x="3" y="5" width="18" height="16" rx="3"/>
-            <path d="M3 10.5h18M8 3v4M16 3v4M7.5 14.5h3M7.5 17.5h6"/>
-          </svg>
-        </span>
-
-        {%- if section.settings.panel_heading != blank -%}
-          <h2 class="ness-booking__panel-heading" id="{{ panel_id }}">
-            {{- section.settings.panel_heading | escape -}}
-          </h2>
+  {%- if hours.size > 0 or studio_any != blank -%}
+    <section
+      class="ness-booking__band ness-shell"
+      {% if section.settings.studio_heading != blank %}aria-labelledby="{{ studio_id }}"{% endif %}
+    >
+      <div class="ness-booking__card ness-booking__card--studio">
+        {%- if section.settings.studio_heading != blank or section.settings.studio_intro != blank -%}
+          <div class="ness-booking__card-head">
+            {%- comment -%}
+              h2, not the design's h3: the hero is this page's h1 and these
+              cards are its top-level regions, so h2 keeps the outline honest.
+              The drawn size comes from CSS, which is where size belongs.
+            {%- endcomment -%}
+            {%- if section.settings.studio_heading != blank -%}
+              <h2 class="ness-booking__card-heading" id="{{ studio_id }}">
+                {{- section.settings.studio_heading | escape -}}
+              </h2>
+            {%- endif -%}
+            {%- if section.settings.studio_intro != blank -%}
+              <p class="ness-booking__card-intro">{{ section.settings.studio_intro | escape }}</p>
+            {%- endif -%}
+            <span class="ness-booking__card-rule" aria-hidden="true"></span>
+          </div>
         {%- endif -%}
 
-        {%- if section.settings.panel_body != blank -%}
-          <p class="ness-booking__panel-body">{{ section.settings.panel_body | escape }}</p>
-        {%- endif -%}
+        <div class="ness-booking__studio-grid">
+          {%- if hours.size > 0 -%}
+            {%- comment -%}
+              Plain wrappers here and in the contact column: the grid places
+              them, so they need no styling of their own.
+            {%- endcomment -%}
+            <div>
+              {%- if section.settings.hours_label != blank -%}
+                <p class="ness-booking__group-label">{{ section.settings.hours_label | escape }}</p>
+              {%- endif -%}
+              {%- for block in hours -%}
+                {%- liquid
+                  assign row_value = block.settings.value
+                  if block.settings.closed and row_value == blank
+                    assign row_value = 'Closed'
+                  endif
+                -%}
+                {%- comment -%}
+                  A row with neither a day nor an opening time would draw a bare
+                  hairline, so it is skipped rather than rendered empty.
+                {%- endcomment -%}
+                {%- if block.settings.day != blank or row_value != blank -%}
+                  <div class="ness-booking__row" {{ block.shopify_attributes }}>
+                    <span class="ness-booking__row-key ness-booking__row-key--strong">
+                      {{- block.settings.day | escape -}}
+                    </span>
+                    <span
+                      class="ness-booking__row-value{% if block.settings.closed %} ness-booking__row-value--closed{% endif %}"
+                    >
+                      {{- row_value | escape -}}
+                    </span>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            </div>
+          {%- endif -%}
 
-        {%- if section.settings.panel_note != blank -%}
-          <p class="ness-booking__panel-note">{{ section.settings.panel_note | escape }}</p>
-        {%- endif -%}
+          {%- if studio_any != blank -%}
+            <div class="ness-booking__contact">
+              {%- if section.settings.phone != blank or section.settings.email != blank or instagram_handle != blank or tiktok_handle != blank -%}
+                <div>
+                  {%- if section.settings.contact_label != blank -%}
+                    <p class="ness-booking__group-label">{{ section.settings.contact_label | escape }}</p>
+                  {%- endif -%}
 
-        <div class="ness-booking__actions">
-          <a class="ness-booking__cta" href="{{ booking_url | escape }}">{{ cta_label | escape }}</a>
+                  {%- comment -%}
+                    Tile labels (Phone, Email, Instagram, TikTok) are fixed by
+                    the design in the same way the contact form's field labels
+                    are — see the note in ness-contact.liquid. What the studio
+                    changes is the number, the address and the handles.
+                  {%- endcomment -%}
+                  {%- if section.settings.phone != blank -%}
+                    <a class="ness-booking__tile" href="tel:{{ phone_digits | escape }}">
+                      <span class="ness-booking__tile-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+                      </span>
+                      <span class="ness-booking__tile-text">
+                        <span class="ness-booking__tile-label">Phone</span>
+                        <span class="ness-booking__tile-value">{{ section.settings.phone | escape }}</span>
+                      </span>
+                    </a>
+                  {%- endif -%}
 
-          {%- if section.settings.secondary_label != blank -%}
-            {%- capture secondary_url -%}
-              {%- render 'ness-nav-url', destination: section.settings.secondary_destination -%}
-            {%- endcapture -%}
-            <a class="ness-booking__cta ness-booking__cta--secondary" href="{{ secondary_url }}">
-              {{- section.settings.secondary_label | escape -}}
-            </a>
+                  {%- if section.settings.email != blank -%}
+                    <a class="ness-booking__tile" href="mailto:{{ section.settings.email | escape }}">
+                      <span class="ness-booking__tile-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2" y="4" width="20" height="16" rx="2.5"/><path d="m3 6.5 9 6 9-6"/></svg>
+                      </span>
+                      <span class="ness-booking__tile-text">
+                        <span class="ness-booking__tile-label">Email</span>
+                        <span class="ness-booking__tile-value">{{ section.settings.email | escape }}</span>
+                      </span>
+                    </a>
+                  {%- endif -%}
+
+                  {%- if instagram_handle != blank -%}
+                    <a class="ness-booking__tile" href="https://instagram.com/{{ instagram_handle | escape }}">
+                      <span class="ness-booking__tile-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5"/><circle cx="12" cy="12" r="4.4"/><circle cx="17.6" cy="6.4" r="1.1" fill="currentColor" stroke="none"/></svg>
+                      </span>
+                      <span class="ness-booking__tile-text">
+                        <span class="ness-booking__tile-label">Instagram</span>
+                        <span class="ness-booking__tile-value">@{{ instagram_handle | escape }}</span>
+                      </span>
+                    </a>
+                  {%- endif -%}
+
+                  {%- if tiktok_handle != blank -%}
+                    <a class="ness-booking__tile" href="https://tiktok.com/@{{ tiktok_handle | escape }}">
+                      <span class="ness-booking__tile-icon">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 3.5c.6 2.7 2.3 4.4 5 4.7v3.2c-1.9.1-3.6-.5-5-1.6v5.7a5.9 5.9 0 1 1-5.1-5.9v3.3a2.7 2.7 0 1 0 1.9 2.6V3.5Z"/></svg>
+                      </span>
+                      <span class="ness-booking__tile-text">
+                        <span class="ness-booking__tile-label">TikTok</span>
+                        <span class="ness-booking__tile-value">@{{ tiktok_handle | escape }}</span>
+                      </span>
+                    </a>
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+
+              {%- if section.settings.address != blank or section.settings.address_note != blank -%}
+                <div>
+                  {%- if section.settings.location_label != blank -%}
+                    <p class="ness-booking__group-label">{{ section.settings.location_label | escape }}</p>
+                  {%- endif -%}
+                  <div class="ness-booking__location">
+                    <span class="ness-booking__tile-icon ness-booking__tile-icon--top">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M20 10.5c0 6-8 12.5-8 12.5s-8-6.5-8-12.5a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10.3" r="3"/></svg>
+                    </span>
+                    <div>
+                      {%- if section.settings.address != blank -%}
+                        <p class="ness-booking__location-address">{{ section.settings.address | escape }}</p>
+                      {%- endif -%}
+                      {%- if section.settings.address_note != blank -%}
+                        <p class="ness-booking__location-note">{{ section.settings.address_note | escape }}</p>
+                      {%- endif -%}
+                    </div>
+                  </div>
+                </div>
+              {%- endif -%}
+            </div>
           {%- endif -%}
         </div>
       </div>
-    </div>
-  </section>
+    </section>
+  {%- endif -%}
 
   {%- comment -%}
-    Booking Policy and Custom Wig / Drop-off. Each card is dropped entirely
-    when it has no lines, rather than leaving a coloured panel with a heading
-    and nothing under it.
-
-    Lines are textareas rendered with `white-space: pre-line`, because the
-    studio's policy is written as stacked clauses and reflowing it into a
-    paragraph would change what it says.
+    Booking Policy. Two rows of tiles: the three "before you come" notes on the
+    page background, then the numbered policies on cream, then the agreement
+    line. Each tile's icon is chosen by the merchant from a short closed list
+    so that reordering or rewording a tile cannot leave a clock beside a
+    cancellation rule — the alternative, keying the icon off the tile's
+    position, breaks silently the first time a tile is moved.
   {%- endcomment -%}
-  {%- if policy_lines.size > 0 or dropoff_lines.size > 0 -%}
-    <div class="ness-booking__info ness-shell">
-      {%- if policy_lines.size > 0 -%}
-        <section
-          class="ness-booking__card ness-booking__card--policy"
-          {% if section.settings.policy_heading != blank %}aria-labelledby="{{ policy_id }}"{% endif %}
-        >
-          {%- if section.settings.policy_heading != blank -%}
-            <h2 class="ness-booking__card-heading" id="{{ policy_id }}">
-              {{- section.settings.policy_heading | escape -}}
-            </h2>
-          {%- endif -%}
-          <div class="ness-booking__lines">
-            {%- for block in policy_lines -%}
-              <p class="ness-booking__line" {{ block.shopify_attributes }}>
-                {{- block.settings.text | escape -}}
-              </p>
-            {%- endfor -%}
+  {%- if notes.size > 0 or rules.size > 0 or section.settings.policy_footnote != blank -%}
+    <section
+      class="ness-booking__band ness-shell"
+      {% if section.settings.policy_heading != blank %}aria-labelledby="{{ policy_id }}"{% endif %}
+    >
+      <div class="ness-booking__card ness-booking__card--policy">
+        {%- if section.settings.policy_heading != blank or section.settings.policy_intro != blank -%}
+          <div class="ness-booking__card-head">
+            {%- if section.settings.policy_heading != blank -%}
+              <h2 class="ness-booking__card-heading" id="{{ policy_id }}">
+                {{- section.settings.policy_heading | escape -}}
+              </h2>
+            {%- endif -%}
+            {%- if section.settings.policy_intro != blank -%}
+              <p class="ness-booking__card-intro">{{ section.settings.policy_intro | escape }}</p>
+            {%- endif -%}
+            <span class="ness-booking__card-rule" aria-hidden="true"></span>
           </div>
-        </section>
-      {%- endif -%}
+        {%- endif -%}
 
-      {%- if dropoff_lines.size > 0 -%}
-        <section
-          class="ness-booking__card ness-booking__card--dropoff"
-          {% if section.settings.dropoff_heading != blank %}aria-labelledby="{{ dropoff_id }}"{% endif %}
-        >
-          {%- if section.settings.dropoff_heading != blank -%}
-            <h2 class="ness-booking__card-heading" id="{{ dropoff_id }}">
-              {{- section.settings.dropoff_heading | escape -}}
-            </h2>
-          {%- endif -%}
-          <div class="ness-booking__lines">
-            {%- for block in dropoff_lines -%}
-              <p class="ness-booking__line" {{ block.shopify_attributes }}>
-                {{- block.settings.text | escape -}}
-              </p>
+        {%- if notes.size > 0 -%}
+          <div class="ness-booking__notes">
+            {%- for block in notes -%}
+              <div class="ness-booking__note" {{ block.shopify_attributes }}>
+                <span class="ness-booking__note-icon">
+                  {%- case block.settings.icon -%}
+                    {%- when 'health' -%}
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M14 25s-9-5.6-9-12.4A5 5 0 0 1 14 9.4 5 5 0 0 1 23 12.6C23 19.4 14 25 14 25Z"/></svg>
+                    {%- when 'guests' -%}
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="14" cy="9" r="4"/><path d="M6 24c1-4.3 4.2-6.5 8-6.5s7 2.2 8 6.5"/><circle cx="23.4" cy="10.6" r="2.6"/><circle cx="4.6" cy="10.6" r="2.6"/></svg>
+                    {%- when 'deposit' -%}
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="3" y="7" width="22" height="14" rx="2.5"/><circle cx="14" cy="14" r="3.4"/><path d="M7 11.5v5M21 11.5v5"/></svg>
+                  {%- endcase -%}
+                </span>
+                {%- if block.settings.label != blank -%}
+                  <p class="ness-booking__note-label">{{ block.settings.label | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <p class="ness-booking__note-text">{{ block.settings.text | escape }}</p>
+                {%- endif -%}
+              </div>
             {%- endfor -%}
           </div>
-        </section>
-      {%- endif -%}
-    </div>
+        {%- endif -%}
+
+        {%- if rules.size > 0 -%}
+          {%- if section.settings.policy_rules_label != blank -%}
+            <p class="ness-booking__group-label ness-booking__group-label--spaced">
+              {{- section.settings.policy_rules_label | escape -}}
+            </p>
+          {%- endif -%}
+          <div class="ness-booking__rules">
+            {%- for block in rules -%}
+              <div class="ness-booking__policy" {{ block.shopify_attributes }}>
+                <span class="ness-booking__note-icon">
+                  {%- case block.settings.icon -%}
+                    {%- when 'schedule' -%}
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="6" width="20" height="18" rx="2.5"/><path d="M4 11h20M9.5 3.5v5M18.5 3.5v5"/></svg>
+                    {%- when 'cancellation' -%}
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="14" cy="14" r="10.5"/><path d="M10.4 10.4l7.2 7.2M17.6 10.4l-7.2 7.2"/></svg>
+                    {%- when 'reschedule' -%}
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="4" y="6" width="20" height="18" rx="2.5"/><path d="M4 11h20M9.5 3.5v5M18.5 3.5v5M10 18h6.5a2.5 2.5 0 0 0 0-5H13"/><path d="M14.6 10.6L12.4 13l2.2 2.4"/></svg>
+                    {%- when 'lateness' -%}
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="14" cy="14" r="10.5"/><path d="M14 8v6.4l4 2.4"/></svg>
+                  {%- endcase -%}
+                </span>
+                {%- if block.settings.label != blank -%}
+                  <p class="ness-booking__note-label">{{ block.settings.label | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.text != blank -%}
+                  <p class="ness-booking__note-text">{{ block.settings.text | escape }}</p>
+                {%- endif -%}
+              </div>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+
+        {%- if section.settings.policy_footnote != blank -%}
+          <p class="ness-booking__footnote">{{ section.settings.policy_footnote | escape }}</p>
+        {%- endif -%}
+      </div>
+    </section>
   {%- endif -%}
+
+  {%- comment -%}
+    Custom Wig, Coloring & Drop off — the drop-off rules beside the late
+    drop-off charges. The charges are a term/amount list rather than free text
+    so the two columns stay aligned however the fees are edited.
+  {%- endcomment -%}
+  {%- if dropoff_any != blank or fees.size > 0 -%}
+    <section
+      class="ness-booking__band ness-shell"
+      {% if section.settings.dropoff_heading != blank %}aria-labelledby="{{ dropoff_id }}"{% endif %}
+    >
+      <div class="ness-booking__card ness-booking__card--dropoff">
+        {%- if section.settings.dropoff_heading != blank or section.settings.dropoff_intro != blank -%}
+          <div class="ness-booking__card-head">
+            {%- if section.settings.dropoff_heading != blank -%}
+              <h2 class="ness-booking__card-heading" id="{{ dropoff_id }}">
+                {{- section.settings.dropoff_heading | escape -}}
+              </h2>
+            {%- endif -%}
+            {%- if section.settings.dropoff_intro != blank -%}
+              <p class="ness-booking__card-intro">{{ section.settings.dropoff_intro | escape }}</p>
+            {%- endif -%}
+            <span class="ness-booking__card-rule" aria-hidden="true"></span>
+          </div>
+        {%- endif -%}
+
+        <div class="ness-booking__dropoff-grid">
+          {%- if dropoff_any != blank -%}
+            <div class="ness-booking__drop">
+              <span class="ness-booking__note-icon">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M4 10.5 14 5l10 5.5v9L14 25 4 19.5Z"/><path d="M4 10.5 14 16l10-5.5M14 16v9"/></svg>
+              </span>
+              {%- if section.settings.dropoff_label != blank -%}
+                <p class="ness-booking__note-label">{{ section.settings.dropoff_label | escape }}</p>
+              {%- endif -%}
+              {%- if section.settings.dropoff_body != blank -%}
+                <p class="ness-booking__drop-text">{{ section.settings.dropoff_body | escape }}</p>
+              {%- endif -%}
+              {%- if section.settings.dropoff_note != blank -%}
+                <p class="ness-booking__drop-note">{{ section.settings.dropoff_note | escape }}</p>
+              {%- endif -%}
+            </div>
+          {%- endif -%}
+
+          {%- if fees.size > 0 -%}
+            <div class="ness-booking__drop">
+              <span class="ness-booking__note-icon">
+                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><circle cx="14" cy="14" r="10.5"/><path d="M14 8.5v11M17 11.2c-.7-.9-1.8-1.4-3-1.4-1.8 0-3.2 1-3.2 2.5 0 3.2 6.4 1.7 6.4 4.9 0 1.6-1.4 2.6-3.2 2.6-1.3 0-2.5-.5-3.2-1.5"/></svg>
+              </span>
+              {%- if section.settings.fees_label != blank -%}
+                <p class="ness-booking__note-label">{{ section.settings.fees_label | escape }}</p>
+              {%- endif -%}
+              <div>
+                {%- for block in fees -%}
+                  {%- if block.settings.term != blank or block.settings.amount != blank -%}
+                    <div class="ness-booking__row" {{ block.shopify_attributes }}>
+                      <span class="ness-booking__row-key">{{ block.settings.term | escape }}</span>
+                      <span class="ness-booking__row-amount">{{ block.settings.amount | escape }}</span>
+                    </div>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+        </div>
+      </div>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%}
+    The two buttons the design closes on.
+
+    The Acuity link is a plain same-tab navigation, matching
+    ness-booking-banner. The design draws target="_blank" here; it is not
+    carried over because a forced tab has to be announced to be accessible, and
+    because the site's other "Book a Session" control navigates in place — two
+    buttons to the same scheduler behaving differently is worse than either
+    behaviour on its own.
+
+    "Ask question" goes through ness-nav-url like every other internal link, so
+    it cannot be pointed at a URL that does not exist.
+  {%- endcomment -%}
+  <div class="ness-booking__actions ness-shell">
+    {%- comment -%}
+      The booking button is not conditional: cta_label falls back above, so an
+      emptied field cannot leave this page without a way to book.
+    {%- endcomment -%}
+    <a class="ness-booking__cta" href="{{ booking_url | escape }}">{{ cta_label | escape }}</a>
+
+    {%- if section.settings.secondary_label != blank -%}
+      {%- capture secondary_url -%}
+        {%- render 'ness-nav-url', destination: section.settings.secondary_destination -%}
+      {%- endcapture -%}
+      <a class="ness-booking__cta ness-booking__cta--secondary" href="{{ secondary_url }}">
+        {{- section.settings.secondary_label | escape -}}
+      </a>
+    {%- endif -%}
+  </div>
 </div>
 
 {% schema %}
@@ -254,7 +533,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Appointments are taken on Acuity, not on this page — every button here sends visitors to the Acuity link in Theme settings → Nessclusive. The wording, the banner photo, the three steps, and both policy cards are yours to edit. Layout, colours, and type are fixed by the design."
+      "content": "Appointments are taken on Acuity, not on this page — the booking button sends visitors to the Acuity link in Theme settings → Nessclusive. All of the wording, the banner photo, the opening hours, and every card below are yours to edit. Layout, colours, and type are fixed by the design."
     },
     {
       "type": "paragraph",
@@ -274,35 +553,133 @@
       "default": "Book Nessclusive",
       "info": "This is the page's main heading. Leave it empty and the page name is used instead."
     },
-    { "type": "header", "content": "Steps" },
+    { "type": "header", "content": "Plan your Perfect Style" },
+    {
+      "type": "text",
+      "id": "steps_eyebrow",
+      "label": "Small heading above",
+      "default": "Before you arrive"
+    },
     {
       "type": "text",
       "id": "steps_heading",
       "label": "Heading",
       "default": "Plan your Perfect Style"
     },
-    { "type": "header", "content": "Booking button" },
+    { "type": "header", "content": "Studio info" },
+    { "type": "text", "id": "studio_heading", "label": "Heading", "default": "Studio Info" },
     {
       "type": "text",
-      "id": "panel_heading",
+      "id": "studio_intro",
+      "label": "Line under the heading",
+      "default": "Hours, contact and where to find us."
+    },
+    { "type": "text", "id": "hours_label", "label": "Opening hours label", "default": "Office Hours" },
+    { "type": "text", "id": "contact_label", "label": "Contact label", "default": "Contact" },
+    {
+      "type": "text",
+      "id": "phone",
+      "label": "Phone number",
+      "default": "917-587-8962",
+      "info": "Shown as you type it and dialled with the spaces and dashes removed. Leave empty to hide the phone tile."
+    },
+    {
+      "type": "text",
+      "id": "email",
+      "label": "Email address",
+      "default": "info@nessclusive.com",
+      "info": "Leave empty to hide the email tile."
+    },
+    {
+      "type": "text",
+      "id": "instagram_handle",
+      "label": "Instagram handle",
+      "default": "@nessclusive",
+      "info": "Just the handle — the instagram.com address is added for you. Leave empty to hide the tile."
+    },
+    {
+      "type": "text",
+      "id": "tiktok_handle",
+      "label": "TikTok handle",
+      "default": "@nessclusive_",
+      "info": "Just the handle — the tiktok.com address is added for you. Leave empty to hide the tile."
+    },
+    { "type": "text", "id": "location_label", "label": "Location label", "default": "Location" },
+    {
+      "type": "text",
+      "id": "address",
+      "label": "Address",
+      "default": "E 169 St, Bronx, NY 10456"
+    },
+    {
+      "type": "textarea",
+      "id": "address_note",
+      "label": "Note under the address",
+      "default": "Exact address is sent in a reminder email 24 hours before your appointment.",
+      "info": "Leave empty to hide it."
+    },
+    { "type": "header", "content": "Booking policy" },
+    { "type": "text", "id": "policy_heading", "label": "Heading", "default": "Booking Policy" },
+    {
+      "type": "text",
+      "id": "policy_intro",
+      "label": "Line under the heading",
+      "default": "Important — please read before booking."
+    },
+    {
+      "type": "text",
+      "id": "policy_rules_label",
+      "label": "Label above the second row of tiles",
+      "default": "Booking Policies"
+    },
+    {
+      "type": "textarea",
+      "id": "policy_footnote",
+      "label": "Agreement line",
+      "default": "By booking you have accepted and agreed to the terms of this policy.",
+      "info": "The last line of the card. Leave empty to hide it."
+    },
+    { "type": "header", "content": "Custom wig, coloring & drop off" },
+    {
+      "type": "text",
+      "id": "dropoff_heading",
       "label": "Heading",
-      "default": "Book your appointment"
+      "default": "Custom Wig, Coloring & Drop off"
+    },
+    {
+      "type": "text",
+      "id": "dropoff_intro",
+      "label": "Line under the heading",
+      "default": "Text 917-587-8962 or email info@nessclusive.com for all wig orders."
+    },
+    {
+      "type": "text",
+      "id": "dropoff_label",
+      "label": "First tile label",
+      "default": "Wig / Hair Drop Off"
     },
     {
       "type": "textarea",
-      "id": "panel_body",
-      "label": "Body copy",
-      "default": "Appointments are managed through our scheduler. Choose your service, pick a time that works for you, and confirm — it takes about a minute.",
-      "info": "Around 150 characters is what the design was drawn for."
+      "id": "dropoff_body",
+      "label": "First tile text",
+      "default": "All frontals, closures and wigs must be dropped off 4–5 days in advance or a fee will be charged."
     },
     {
       "type": "textarea",
-      "id": "panel_note",
-      "label": "Small print",
-      "default": "Your slot is held once the non-refundable deposit is paid. Please read the booking policy below before you book.",
-      "info": "The quieter line under the body copy. Leave empty to hide it."
+      "id": "dropoff_note",
+      "label": "First tile second line",
+      "default": "Contact me for the address. Please do not come to the shop without prior knowledge.",
+      "info": "The quieter line under the drop-off rule. Leave empty to hide it."
     },
-    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Book a Session" },
+    {
+      "type": "text",
+      "id": "fees_label",
+      "label": "Second tile label",
+      "default": "Late Drop Off Charge",
+      "info": "Sits above the list of late drop-off charges."
+    },
+    { "type": "header", "content": "Buttons" },
+    { "type": "text", "id": "cta_label", "label": "Booking button label", "default": "Book a Reservation" },
     {
       "type": "url",
       "id": "booking_url",
@@ -313,15 +690,16 @@
       "type": "text",
       "id": "secondary_label",
       "label": "Second button label",
-      "default": "Ask a question first",
+      "default": "Ask question",
       "info": "Leave empty to show the booking button on its own."
     },
     {
       "type": "select",
       "id": "secondary_destination",
       "label": "Second button goes to",
-      "default": "contact",
+      "default": "contact_anchor",
       "options": [
+        { "value": "contact_anchor", "label": "Contact section on the home page" },
         { "value": "contact", "label": "Contact page" },
         { "value": "faqs", "label": "FAQs page" },
         { "value": "all_products", "label": "All products" },
@@ -330,26 +708,13 @@
         { "value": "accessories", "label": "Accessories" },
         { "value": "home", "label": "Home page" }
       ]
-    },
-    { "type": "header", "content": "Policy cards" },
-    {
-      "type": "text",
-      "id": "policy_heading",
-      "label": "First card heading",
-      "default": "Booking Policy"
-    },
-    {
-      "type": "text",
-      "id": "dropoff_heading",
-      "label": "Second card heading",
-      "default": "Custom Wig , Coloring & Drop off"
     }
   ],
-  "max_blocks": 24,
+  "max_blocks": 30,
   "blocks": [
     {
       "type": "step",
-      "name": "Step",
+      "name": "Preparation step",
       "limit": 4,
       "settings": [
         {
@@ -357,34 +722,92 @@
           "id": "label",
           "label": "What happens at this step",
           "default": "Select Your Desired Service",
-          "info": "The number is added automatically from the order of the steps. The design was drawn for three."
+          "info": "The number is added automatically from the order of the steps. The design was drawn for three or four."
         }
       ]
     },
     {
-      "type": "policy_line",
-      "name": "Booking policy line",
+      "type": "hours_row",
+      "name": "Opening hours row",
+      "limit": 7,
       "settings": [
+        { "type": "text", "id": "day", "label": "Day", "default": "Monday" },
         {
-          "type": "textarea",
-          "id": "text",
-          "label": "Text",
-          "default": "Deposit : ALL APPOINTMENTS REQUIRE A NON REFUNDABLE\nDEPOSIT TO SECURE YOUR SPOT.",
-          "info": "Line breaks are kept exactly as you type them, so the policy stacks the way it is written."
+          "type": "text",
+          "id": "value",
+          "label": "Hours",
+          "default": "10:30am – 7pm",
+          "info": "For example 10:30am – 7pm."
+        },
+        {
+          "type": "checkbox",
+          "id": "closed",
+          "label": "Closed this day",
+          "default": false,
+          "info": "Greys the row the way the design draws a closed day. If you leave the hours empty it reads “Closed”."
         }
       ]
     },
     {
-      "type": "dropoff_line",
-      "name": "Drop-off line",
+      "type": "policy_note",
+      "name": "Policy note",
+      "limit": 3,
       "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Symbol",
+          "default": "health",
+          "options": [
+            { "value": "health", "label": "Heart (health)" },
+            { "value": "guests", "label": "People (guests)" },
+            { "value": "deposit", "label": "Card (deposit)" }
+          ]
+        },
+        { "type": "text", "id": "label", "label": "Label", "default": "Health" },
         {
           "type": "textarea",
           "id": "text",
           "label": "Text",
-          "default": "ALL FRONTALS, CLOSURES AND WIGS\nMUST BE DROPPED OFF 4-5 DAYS IN ADVANCE\nOR A FEE WILL BE CHARGED!",
-          "info": "Line breaks are kept exactly as you type them."
+          "default": "Please stay safe. Cancel 24hrs if you are feeling sick.",
+          "info": "Around 100 characters is what the design was drawn for."
         }
+      ]
+    },
+    {
+      "type": "policy_rule",
+      "name": "Booking policy",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Symbol",
+          "default": "schedule",
+          "options": [
+            { "value": "schedule", "label": "Calendar (scheduling)" },
+            { "value": "cancellation", "label": "Cross (cancellation)" },
+            { "value": "reschedule", "label": "Calendar with arrow (reschedule)" },
+            { "value": "lateness", "label": "Clock (lateness)" }
+          ]
+        },
+        { "type": "text", "id": "label", "label": "Label", "default": "Schedule" },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Book at least 5 days ahead, that way you can prevent extra costs.",
+          "info": "Around 140 characters is what the design was drawn for."
+        }
+      ]
+    },
+    {
+      "type": "fee_row",
+      "name": "Late drop-off charge",
+      "limit": 6,
+      "settings": [
+        { "type": "text", "id": "term", "label": "How late", "default": "3 days" },
+        { "type": "text", "id": "amount", "label": "Charge", "default": "$15 fee" }
       ]
     }
   ],
@@ -393,53 +816,73 @@
       { "type": "step", "settings": { "label": "Select Your Desired Service" } },
       { "type": "step", "settings": { "label": "Select your preferable Time & date" } },
       { "type": "step", "settings": { "label": "Confirm and Get Ready" } },
+      { "type": "hours_row", "settings": { "day": "Monday", "value": "Closed", "closed": true } },
+      { "type": "hours_row", "settings": { "day": "Tuesday", "value": "10:30am – 7pm" } },
+      { "type": "hours_row", "settings": { "day": "Wednesday", "value": "10:30am – 7pm" } },
+      { "type": "hours_row", "settings": { "day": "Thursday", "value": "10:30am – 7pm" } },
+      { "type": "hours_row", "settings": { "day": "Friday", "value": "10:30am – 7pm" } },
+      { "type": "hours_row", "settings": { "day": "Saturday", "value": "10:30am – 7pm" } },
+      { "type": "hours_row", "settings": { "day": "Sunday", "value": "Closed", "closed": true } },
       {
-        "type": "policy_line",
+        "type": "policy_note",
         "settings": {
-          "text": "Deposit : ALL APPOINTMENTS REQUIRE A NON REFUNDABLE\nDEPOSIT TO SECURE YOUR SPOT.\nREMAINING BALANCE MUST BE PAID IN CASH OR ZELLE\nON THE DAY OF YOUR APPOINTMENT."
+          "icon": "health",
+          "label": "Health",
+          "text": "Please stay safe. Cancel 24hrs if you are feeling sick."
         }
       },
       {
-        "type": "policy_line",
+        "type": "policy_note",
         "settings": {
-          "text": "Reschedule : YOU CAN RESCHEDULE ONCE WITH YOUR DEPOSIT\nIN THE SAME MONTH RESCHEDULE UPTO 3 DAYS\nBEFORE YOUR ORIGINAL APPOINTMENT. NO EXCEPTIONS!"
+          "icon": "guests",
+          "label": "Guests",
+          "text": "No extra guests — limited space and private client experiences only."
         }
       },
       {
-        "type": "policy_line",
+        "type": "policy_note",
         "settings": {
-          "text": "Lateness : AFTER 10 MIN, YOU WILL BE CHARGED A $20 FEE.\nAFTER 20 MINS APPOINTMENT WILL BE CANCELLED"
+          "icon": "deposit",
+          "label": "Deposit",
+          "text": "A non-refundable $40 deposit secures your booking. Remaining balance must be paid in cash or Zelle only."
         }
       },
       {
-        "type": "policy_line",
-        "settings": { "text": "Same day cancelation : DEPOSIT LOST AND 50% OF SERVICE CHARGED." }
-      },
-      {
-        "type": "policy_line",
-        "settings": { "text": "No call, No show : DEPOSIT LOST AND 50% OF SERVICE CHARGED." }
-      },
-      {
-        "type": "policy_line",
-        "settings": { "text": "** BY BOOKING YOU HAVE ACCEPTED AND AGREED TO THE TERM OF MY POLICY**" }
-      },
-      {
-        "type": "dropoff_line",
+        "type": "policy_rule",
         "settings": {
-          "text": "For Order : TEXT 917-587-8962\nOR EMAIL INFO@NESSCLUSIVE.COM FOR ALL WIG ORDERS"
+          "icon": "schedule",
+          "label": "Schedule",
+          "text": "Book at least 5 days ahead, that way you can prevent extra costs."
         }
       },
       {
-        "type": "dropoff_line",
+        "type": "policy_rule",
         "settings": {
-          "text": "ALL FRONTALS, CLOSURES AND WIGS\nMUST BE DROPPED OFF 4-5 DAYS IN ADVANCE\nOR A FEE WILL BE CHARGED!"
+          "icon": "cancellation",
+          "label": "Cancellation",
+          "text": "Same day — deposit lost and 50% of service charged."
         }
       },
-      { "type": "dropoff_line", "settings": { "text": "For Late Drop Off Policy:" } },
-      { "type": "dropoff_line", "settings": { "text": "3 Days - $15 FEE," } },
-      { "type": "dropoff_line", "settings": { "text": "2 Days - $25 FEE," } },
-      { "type": "dropoff_line", "settings": { "text": "No 1 Day Drop off" } },
-      { "type": "dropoff_line", "settings": { "text": "$40 FEE CHARGED FOR SAME DAY CUSTOMIZATION." } }
+      {
+        "type": "policy_rule",
+        "settings": {
+          "icon": "reschedule",
+          "label": "Reschedule",
+          "text": "You can reschedule once with your deposit in the same month. Reschedule up to 3 days before your original appointment. No exceptions!"
+        }
+      },
+      {
+        "type": "policy_rule",
+        "settings": {
+          "icon": "lateness",
+          "label": "Lateness",
+          "text": "You have a 10 min grace period. After 10 min you will be charged a $20 fee. After 20 mins the appointment will be cancelled."
+        }
+      },
+      { "type": "fee_row", "settings": { "term": "3 days", "amount": "$15 fee" } },
+      { "type": "fee_row", "settings": { "term": "2 days", "amount": "$25 fee" } },
+      { "type": "fee_row", "settings": { "term": "1 day", "amount": "Not accepted" } },
+      { "type": "fee_row", "settings": { "term": "Same day customization", "amount": "$40 fee" } }
     ]
   }
 }

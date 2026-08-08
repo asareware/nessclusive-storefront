@@ -1,6 +1,7 @@
 /* ==========================================================================
    Nessclusive — collection / shop page
-   Values transcribed from project/Nessclusive Storefront.dc.html:305-403.
+   Values transcribed from project/Nessclusive Storefront.dc.html:334-434
+   ("All Products"). Re-checked against that range 2026-08-08.
    ========================================================================== */
 
 .ness-collection {
@@ -98,7 +99,17 @@
   margin-bottom: clamp(24px, 3vw, 40px);
 }
 
-.ness-collection__filter-toggle {
+/* The design's toolbar pills are wider and more open than the header's shared
+   .ness-pill: padding 0 20px against 15px, gap 10px against 8px (design lines
+   351 and 356).
+
+   The compound selector is not decoration. ness-chrome.css is emitted by both
+   the header and the footer section, so a second copy of it lands *after* this
+   stylesheet in the document and wins every (0,1,0) tie — which is how the gap
+   below had silently reverted to the header's 8px. (0,2,0) settles it whatever
+   the emission order. */
+.ness-pill.ness-collection__filter-toggle {
+  padding: 0 20px;
   gap: 10px;
 }
 
@@ -111,6 +122,7 @@
    thing is the hit target, with the chevron drawn alongside. */
 .ness-collection__sort .ness-pill {
   position: relative;
+  padding: 0 20px;
   gap: 12px;
   cursor: pointer;
 }

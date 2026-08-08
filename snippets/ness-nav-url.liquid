@@ -24,14 +24,27 @@
   {%- when 'contact' -%}/pages/contact-us
   {%- when 'search' -%}{{ routes.search_url }}
   {%- comment -%}
-    In-page anchors. The FAQ section's "Contact Us" button jumps to the contact
-    panel on the same page rather than navigating away — that is what the
-    prototype does (design line 239), and the contact section already carries
-    the matching id and scroll-margin-top. From anywhere other than the
-    homepage the anchor still resolves, because it is prefixed with the root
-    URL rather than left bare.
+    In-page anchors. FAQ and Contact Us are homepage sections in the design,
+    not pages: the nav's FAQ entry runs jumpHome('faq') and Contact Us scrolls
+    to #contact (design lines 1218-1219), and the FAQ section's own "Contact
+    Us" button jumps to the contact panel on the same page (design line 239).
+    Both sections already carry the matching id and scroll-margin-top, and
+    templates/index.liquid guarantees they are on the homepage.
+
+    Two forms, because one URL cannot serve both cases well:
+      * On the homepage the anchor is emitted bare, so ness-motion.js can
+        smooth-scroll it — that script only intercepts hrefs beginning with
+        '#'. A prefixed one would reload the page to reach a section already
+        on screen.
+      * Anywhere else it is prefixed with the root URL, so the link navigates
+        home and the browser lands on the section.
+    Neither form needs script: with JS off the bare anchor still jumps and the
+    prefixed one still navigates.
   {%- endcomment -%}
-  {%- when 'contact_anchor' -%}{{ routes.root_url }}#contact
+  {%- when 'faq_anchor' -%}
+    {%- if request.page_type == 'index' -%}#faq{%- else -%}{{ routes.root_url }}#faq{%- endif -%}
+  {%- when 'contact_anchor' -%}
+    {%- if request.page_type == 'index' -%}#contact{%- else -%}{{ routes.root_url }}#contact{%- endif -%}
   {%- comment -%}
     Policy URLs come from the shop object rather than being hardcoded, so they
     stay correct if a policy is renamed in admin.

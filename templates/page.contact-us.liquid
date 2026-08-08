@@ -1,0 +1,22 @@
+{%- comment -%}
+  Contact page.
+
+  Same reasoning as the FAQ page: the nav points at the homepage anchor, but
+  /pages/contact-us is indexed and its handle is fixed by Decision #9, so the
+  page stays and simply renders the designed section instead of the stock Dawn
+  form it used to.
+
+  Assign this template to the Contact Us page in Shopify admin:
+    Content -> Pages -> Contact Us -> Theme template -> "contact-us"
+
+  Note this replaces templates/page.contact.json, Dawn's unstyled contact
+  template — which is exactly the "blank or off-design page" problem that
+  prompted keeping these pages properly rather than deleting them.
+
+  The hidden <h1> is the page's own title, so the document has one first-level
+  heading above the section's <h2>. See page.faqs.liquid for the full reasoning.
+{%- endcomment -%}
+
+<h1 class="visually-hidden">{{ page.title | escape }}</h1>
+
+{% section 'ness-contact' %}

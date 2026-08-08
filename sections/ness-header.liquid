@@ -51,13 +51,22 @@
           {%- capture nav_url -%}
             {%- render 'ness-nav-url', destination: block.settings.destination -%}
           {%- endcapture -%}
+          {%- comment -%}
+            data-smooth on the anchor destinations only — FAQ and Contact Us
+            are sections of the homepage, not pages. ness-motion.js upgrades a
+            same-page hash into a smooth scroll; from any other page the href
+            carries the root URL, so it is an ordinary navigation and the
+            browser handles the hash on arrival. Either way the link works
+            with scripting disabled.
+          {%- endcomment -%}
           <a
             href="{{ nav_url }}"
             class="ness-header__link"
+            {% assign nav_url_first = nav_url | slice: 0 %}{% if nav_url_first == '#' %}data-smooth{% endif %}
             {% if request.path == nav_url %}aria-current="page"{% endif %}
             {{ block.shopify_attributes }}
           >
-            {{- block.settings.label -}}
+            {{- block.settings.label | escape -}}
           </a>
         {%- endfor -%}
       </nav>
@@ -200,7 +209,7 @@
           "id": "destination",
           "label": "Goes to",
           "default": "ready_to_ship",
-          "info": "Chosen from real pages on this store, so a link can never 404.",
+          "info": "Chosen from real pages on this store, so a link can never 404. The two “on the home page” choices scroll to a section of the home page instead of opening a separate page.",
           "options": [
             { "value": "home", "label": "Home" },
             { "value": "ready_to_ship", "label": "Ready to Ship" },
@@ -209,7 +218,9 @@
             { "value": "all_products", "label": "All products" },
             { "value": "collections", "label": "All collections" },
             { "value": "booking", "label": "Booking page" },
+            { "value": "faq_anchor", "label": "FAQ (on the home page)" },
             { "value": "faqs", "label": "FAQs page" },
+            { "value": "contact_anchor", "label": "Contact (on the home page)" },
             { "value": "contact", "label": "Contact page" },
             { "value": "search", "label": "Search" }
           ]
@@ -223,8 +234,8 @@
       { "type": "link", "settings": { "label": "Pre-Order", "destination": "pre_order" } },
       { "type": "link", "settings": { "label": "Accessories", "destination": "accessories" } },
       { "type": "link", "settings": { "label": "Booking", "destination": "booking" } },
-      { "type": "link", "settings": { "label": "FAQs", "destination": "faqs" } },
-      { "type": "link", "settings": { "label": "Contact Us", "destination": "contact" } }
+      { "type": "link", "settings": { "label": "FAQ", "destination": "faq_anchor" } },
+      { "type": "link", "settings": { "label": "Contact Us", "destination": "contact_anchor" } }
     ]
   }
 }

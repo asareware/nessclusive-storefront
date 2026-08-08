@@ -234,10 +234,17 @@
    :has() is the only way to reach a parent from its content. Where :has() is
    unsupported the card simply keeps its form padding and sizes to the panel:
    the panel is unaffected and nothing is hidden, only the breathing room
-   differs. */
+   differs.
+
+   The fade belongs here too, on the card rather than on the panel inside it
+   (design line 301), so the pink surface arrives with its contents instead of
+   sitting there while the panel fades in on top of it. Where :has() is
+   unsupported there is simply no fade — the card is painted, complete, from
+   the first frame. */
 .ness-contact__form:has(.ness-contact__success) {
   padding: clamp(32px, 3vw, 48px);
   min-height: 420px;
+  animation: ness-fade 0.35s ease both;
 }
 
 .ness-contact__success {
@@ -249,7 +256,6 @@
   justify-content: center;
   text-align: center;
   gap: 20px;
-  animation: ness-fade 0.35s ease both;
 }
 
 /* Focused on arrival, like the error notice — same ring, for the same reason:
@@ -406,7 +412,7 @@
 
 /* The prototype's ness-pop, ness-check, and ness-spark, namespaced and kept
    local so no shared stylesheet has to be touched. ness-fade, used by the
-   panel itself, already lives in ness-base.css. */
+   success card, already lives in ness-base.css. */
 @keyframes ness-contact-pop {
   from {
     transform: scale(0.4);
@@ -447,7 +453,7 @@
    is simply complete on arrival. The burst is pure decoration (the stage is
    aria-hidden), so it is dropped rather than frozen mid-flight. */
 @media (prefers-reduced-motion: reduce) {
-  .ness-contact__success,
+  .ness-contact__form:has(.ness-contact__success),
   .ness-contact__seal-disc,
   .ness-contact__tick {
     animation: none;

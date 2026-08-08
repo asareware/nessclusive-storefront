@@ -40,11 +40,29 @@
       </button>
     </div>
 
+    {%- comment -%}
+      FAQ and Contact Us are sections of the homepage, not pages, so those two
+      links resolve to a hash. A link that only scrolls does not unload the
+      page — which means the drawer would stay open over the section it just
+      scrolled to, with body scrolling still locked, and the tap would look
+      like it did nothing. data-drawer-close is the existing close hook in
+      ness-chrome.js: it fires on the panel before ness-motion.js reads the
+      target's position, so the lock is lifted by the time the scroll starts.
+      Links that navigate away are left alone, so the drawer stays put while
+      the next page loads rather than flickering shut.
+    {%- endcomment -%}
     {%- for block in nav_items -%}
       {%- capture nav_url -%}
         {%- render 'ness-nav-url', destination: block.settings.destination -%}
       {%- endcapture -%}
-      <a href="{{ nav_url }}" class="ness-drawer__link">{{ block.settings.label }}</a>
+      {%- assign nav_first = nav_url | slice: 0 -%}
+      <a
+        href="{{ nav_url }}"
+        class="ness-drawer__link"
+        {% if nav_first == '#' %}data-drawer-close data-smooth{% endif %}
+      >
+        {{- block.settings.label | escape -}}
+      </a>
     {%- endfor -%}
 
     {%- comment -%}
