@@ -107,56 +107,6 @@
   color: var(--ness-primary-deep);
 }
 
-/* --- Contact prompt ----------------------------------------------------- */
-
-.ness-faq__prompt {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  margin-top: clamp(32px, 4vw, 60px);
-  padding: clamp(24px, 3vw, 43px) clamp(20px, 2vw, 37px);
-  border-radius: var(--ness-radius-band);
-  background: var(--ness-card-1);
-}
-
-.ness-faq__prompt-title {
-  margin: 0 0 6px;
-  font-family: var(--ness-font-text);
-  font-size: clamp(21px, 1.7vw, 26px);
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  line-height: 1.5;
-  color: var(--ness-primary);
-}
-
-.ness-faq__prompt-body {
-  font-size: 16px;
-  font-weight: 500;
-  letter-spacing: -0.03em;
-  color: var(--ness-primary);
-}
-
-.ness-faq__prompt-cta {
-  display: flex;
-  align-items: center;
-  height: var(--ness-cta-height);
-  padding: 0 24px;
-  border-radius: var(--ness-radius-cta);
-  background: var(--ness-secondary);
-  color: var(--ness-primary-deep);
-  font-size: 18px;
-  font-weight: 500;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.ness-faq__prompt-cta:hover {
-  background: var(--ness-background);
-  text-decoration: none;
-}
-
 /* --- Motion ------------------------------------------------------------- */
 
 /* The prototype's ness-rise, namespaced and kept local so no shared

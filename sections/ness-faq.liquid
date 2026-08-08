@@ -6,33 +6,10 @@
   assign group_name = 'ness-faq-' | append: section.id
 -%}
 
-{%- capture prompt_url -%}
-  {%- render 'ness-nav-url', destination: section.settings.cta_destination -%}
-{%- endcapture -%}
-
-{%- comment -%}
-  The section renders when there are questions OR when the contact prompt has
-  content. The prompt is independent content with its own guard below — tying
-  it to the block list meant deleting every question silently deleted the
-  "Do You Have Any Question?" call to action too, and rendered zero bytes,
-  which also makes the section unselectable in the theme editor.
-{%- endcomment -%}
-{%- comment -%}
-  The condition is on one line: inside a liquid tag every newline begins a new
-  statement, so a wrapped `or` is parsed as an unknown tag.
-{%- endcomment -%}
-{%- liquid
-  assign has_prompt = false
-  if section.settings.prompt_title != blank or section.settings.prompt_body != blank or section.settings.cta_label != blank
-    assign has_prompt = true
-  endif
--%}
-
-{%- if faqs.size > 0 or has_prompt -%}
+{%- if faqs.size > 0 -%}
   <section class="ness-faq" aria-labelledby="{{ heading_id }}">
     <h2 class="ness-faq__heading" id="{{ heading_id }}">Frequently Asked Questions</h2>
 
-    {%- if faqs.size > 0 -%}
     <div class="ness-faq__list">
       {%- for block in faqs -%}
         {%- comment -%}
@@ -81,30 +58,6 @@
         </details>
       {%- endfor -%}
     </div>
-    {%- endif -%}
-
-    {%- comment -%}
-      The prompt is drawn only when there is something to say in it, so an
-      emptied field never leaves a coloured band with nothing inside.
-    {%- endcomment -%}
-    {%- if has_prompt -%}
-      <div class="ness-faq__prompt">
-        <div class="ness-faq__prompt-copy">
-          {%- if section.settings.prompt_title != blank -%}
-            <h3 class="ness-faq__prompt-title">{{ section.settings.prompt_title | escape }}</h3>
-          {%- endif -%}
-          {%- if section.settings.prompt_body != blank -%}
-            <p class="ness-faq__prompt-body">{{ section.settings.prompt_body | escape }}</p>
-          {%- endif -%}
-        </div>
-
-        {%- if section.settings.cta_label != blank -%}
-          <a href="{{ prompt_url }}" class="ness-faq__prompt-cta">
-            {{- section.settings.cta_label | escape -}}
-          </a>
-        {%- endif -%}
-      </div>
-    {%- endif -%}
   </section>
 {%- endif -%}
 
@@ -114,26 +67,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "The heading, the accordion behaviour, and all typography are fixed by the design. You can edit each question and answer, add or remove entries up to ten, and reword the contact prompt underneath."
-    },
-    { "type": "header", "content": "Contact prompt" },
-    { "type": "text", "id": "prompt_title", "label": "Prompt heading", "default": "Do You Have Any Question ?", "info": "One short line — it sits opposite the button." },
-    { "type": "textarea", "id": "prompt_body", "label": "Prompt text", "default": "If you have any question about delivery, return or refund policy, please feel free to contact", "info": "A line or two. Longer copy drops the button onto its own row on narrow screens." },
-    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Contact Us" },
-    {
-      "type": "select",
-      "id": "cta_destination",
-      "label": "Button goes to",
-      "default": "contact_anchor",
-      "info": "Chosen from real destinations on this store, so the button cannot be pointed somewhere broken.",
-      "options": [
-        { "value": "contact_anchor", "label": "Contact section on this page" },
-        { "value": "contact", "label": "Contact page" },
-        { "value": "booking", "label": "Booking page" },
-        { "value": "faqs", "label": "FAQs page" },
-        { "value": "shipping", "label": "Shipping policy" },
-        { "value": "refund", "label": "Refund policy" }
-      ]
+      "content": "The heading, the accordion behaviour, and all typography are fixed by the design. You can edit each question and answer, add or remove entries up to ten."
     }
   ],
   "max_blocks": 10,
@@ -142,8 +76,20 @@
       "type": "question",
       "name": "Question",
       "settings": [
-        { "type": "text", "id": "question", "label": "Question", "default": "What is the processing time for Pre-Orders wigs?", "info": "Keep it to one line where possible — it sits beside the open/close arrow." },
-        { "type": "richtext", "id": "answer", "label": "Answer", "default": "<p>Pre-order units are built to order. Construction takes 7–10 business days before the unit ships, and you will get a tracking email the moment it leaves the studio.</p>", "info": "One to three sentences reads best. Bold, italics, links, and lists are available." }
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "What is the processing time for Pre-Orders wigs?",
+          "info": "Keep it to one line where possible — it sits beside the open/close arrow."
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>Pre-order units are built to order. Construction takes 7–10 business days before the unit ships, and you will get a tracking email the moment it leaves the studio.</p>",
+          "info": "One to three sentences reads best. Bold, italics, links, and lists are available."
+        }
       ]
     }
   ],
