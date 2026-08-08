@@ -289,6 +289,12 @@
     {% render 'ness-fonts' %}
     {{ 'ness-tokens.css' | asset_url | stylesheet_tag }}
     {{ 'ness-base.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}
+      Smooth scrolling, reveal-on-scroll, and the header pill's scrolled state.
+      Deferred: every one of those is an enhancement, and the page is complete
+      without it.
+    {%- endcomment -%}
+    <script src="{{ 'ness-motion.js' | asset_url }}" defer="defer"></script>
 
     {%- if settings.cart_type == 'drawer' -%}
       {{ 'component-cart-drawer.css' | asset_url | stylesheet_tag }}
@@ -346,7 +352,6 @@
       order in code. That is the mechanism behind the Editability policy —
       see PLAN.md, Decision #12.
     {%- endcomment -%}
-    {% section 'ness-announcement-marquee' %}
     {% section 'ness-header' %}
 
     <main

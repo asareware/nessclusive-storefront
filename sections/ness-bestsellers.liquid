@@ -26,7 +26,11 @@
   assign view_all_url = feed.url | default: routes.all_products_collection_url
 -%}
 
-<section class="ness-bestsellers" aria-labelledby="{{ heading_id }}">
+<section
+  class="ness-bestsellers"
+  id="bestsellers"
+  aria-labelledby="{{ heading_id }}"
+>
   <div class="ness-bestsellers__head">
     <h2 class="ness-bestsellers__heading" id="{{ heading_id }}">
       {{- section.settings.heading -}}

@@ -226,6 +226,44 @@ h6 {
   }
 }
 
+@keyframes ness-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Reveal-on-scroll.
+
+   The hidden state is scoped to .ness-reveal-ready, a class ness-motion.js
+   only adds once it has confirmed it can observe and reveal. So if the script
+   is blocked, fails, or the browser lacks IntersectionObserver, [data-reveal]
+   elements simply stay visible — content is never left permanently hidden by
+   a script that did not run. */
+.ness-reveal-ready [data-reveal] {
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 0.75s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.75s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.ness-reveal-ready [data-reveal].ness-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+/* A revealed element receives focus after a smooth scroll; it is a scroll
+   destination, not a control, so the ring would be noise. */
+[data-reveal]:focus,
+[id]:focus:not(:focus-visible) {
+  outline: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

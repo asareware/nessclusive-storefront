@@ -6,8 +6,14 @@
   assign cart_count = cart.item_count
 -%}
 
+{%- comment -%}
+  The spacer reserves the fixed header's height for every template. The
+  homepage cancels it so the hero can run underneath — see ness-hero.css.
+{%- endcomment -%}
+<div class="ness-header-spacer" aria-hidden="true"></div>
+
 <header class="ness-header">
-  <div class="ness-header__inner">
+  <div class="ness-header__inner" data-nav-pill>
     <a
       href="{{ routes.root_url }}"
       class="ness-header__logo"

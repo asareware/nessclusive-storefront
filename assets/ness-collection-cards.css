@@ -19,6 +19,8 @@
    inventing a one-off value, and makes the grouping unambiguous: ~120px above
    the heading against 48px below it. */
 .ness-collection-cards {
+  /* Clears the fixed header when scrolled to from the hero links. */
+  scroll-margin-top: 90px;
   max-width: var(--ness-shell-max);
   margin-inline: auto;
   padding: var(--ness-section-gap) var(--ness-shell-pad);

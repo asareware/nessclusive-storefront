@@ -58,22 +58,61 @@
 
 /* --- Header ------------------------------------------------------------- */
 
+/* The header floats over the page as a translucent pill rather than sitting in
+   the flow as a bar. It is fixed, not sticky — the hero deliberately runs up
+   underneath it (margin-top: -100px on .ness-hero), so there is nothing for a
+   sticky element to stick to at the top of the document. */
 .ness-header {
-  position: sticky;
+  position: fixed;
   top: 0;
+  left: 0;
+  right: 0;
   z-index: 60;
-  background: var(--ness-background);
-  border-bottom: 1px solid var(--ness-border);
+  padding: 14px clamp(12px, 2.5vw, 40px);
+}
+
+/* Reserves the space the fixed header would have occupied, so every template
+   except the homepage starts below it. The homepage cancels this with a
+   negative margin to let the hero run full-bleed to the top. */
+.ness-header-spacer {
+  height: 100px;
 }
 
 .ness-header__inner {
   max-width: var(--ness-shell-max);
   margin-inline: auto;
-  padding: 8px var(--ness-shell-pad);
-  min-height: 81px;
+  padding: 8px clamp(14px, 1.8vw, 26px);
+  min-height: 72px;
   display: flex;
   align-items: center;
   gap: clamp(16px, 2.2vw, 40px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  background: rgba(255, 253, 248, 0.66);
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  box-shadow: 0 6px 24px rgba(21, 0, 26, 0.06);
+  transition:
+    background 0.55s ease,
+    box-shadow 0.55s ease,
+    border-color 0.55s ease;
+}
+
+/* Applied by ness-motion.js past 24px of scroll: the pill turns near-opaque so
+   copy passing beneath it stays readable. */
+.ness-header__pill--scrolled {
+  background: rgba(255, 253, 248, 0.94);
+  border-color: rgba(227, 210, 230, 0.95);
+  box-shadow: 0 12px 36px rgba(21, 0, 26, 0.13);
+}
+
+/* Without backdrop-filter the translucent fill would show whatever is behind
+   it unblurred, which is illegible over the hero photograph. Fall back to a
+   solid pill. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .ness-header__inner {
+    background: rgba(255, 253, 248, 0.96);
+  }
 }
 
 .ness-header__logo {

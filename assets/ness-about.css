@@ -5,6 +5,8 @@
    ========================================================================== */
 
 .ness-about {
+  /* Clears the fixed header when scrolled to from the hero links. */
+  scroll-margin-top: 90px;
   /* No top padding — the section above owns the gap, as in the prototype. */
   padding-bottom: var(--ness-section-gap);
 }

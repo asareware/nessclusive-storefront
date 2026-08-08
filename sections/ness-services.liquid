@@ -1,0 +1,180 @@
+{{ 'ness-services.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign panels = section.blocks | where: 'type', 'service'
+  assign heading_id = 'ness-services-heading-' | append: section.id
+-%}
+
+{%- comment -%}
+  id="services" is a fixed anchor, not a setting — the hero's quick links and
+  the header both scroll here by that name, and letting it be edited would
+  break those silently. scroll-margin-top clears the floating header.
+{%- endcomment -%}
+<section
+  class="ness-services"
+  id="services"
+  {% if section.settings.heading != blank %}aria-labelledby="{{ heading_id }}"{% endif %}
+>
+  {%- if section.settings.heading != blank or section.settings.eyebrow != blank -%}
+    <div class="ness-services__intro" data-reveal="0">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="ness-services__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="ness-services__heading" id="{{ heading_id }}">
+          {{- section.settings.heading | escape -}}
+        </h2>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  {%- if panels.size > 0 -%}
+    <div class="ness-services__stack">
+      {%- for block in panels -%}
+        <div
+          class="ness-services__panel ness-services__panel--{{ forloop.index }}"
+          {{ block.shopify_attributes }}
+        >
+          <div class="ness-services__inner">
+            <div class="ness-services__media" data-reveal="0">
+              {%- if block.settings.image != blank -%}
+                {{
+                  block.settings.image
+                  | image_url: width: 1200
+                  | image_tag:
+                    alt: block.settings.image.alt,
+                    widths: '450, 700, 900, 1200',
+                    sizes: '(min-width: 1180px) 45vw, 92vw',
+                    loading: 'lazy'
+                }}
+              {%- elsif forloop.index <= 3 -%}
+                {%- comment -%}
+                  Bundled prototype photography for the three panels the design
+                  specifies; a fourth or fifth panel gets the grey placeholder,
+                  which is the honest signal that it needs a picture.
+                {%- endcomment -%}
+                {%- capture fallback -%}ness-services-{{ forloop.index }}.jpg{%- endcapture -%}
+                <img
+                  src="{{ fallback | asset_url }}"
+                  alt=""
+                  width="900"
+                  height="600"
+                  loading="lazy"
+                >
+              {%- else -%}
+                {{ 'image' | placeholder_svg_tag: 'placeholder-svg' }}
+              {%- endif -%}
+            </div>
+
+            <div class="ness-services__copy">
+              <span class="ness-services__number" data-reveal="60" aria-hidden="true">
+                {{- forloop.index | prepend: '0' | slice: -2, 2 -}}
+              </span>
+              {%- if block.settings.title != blank -%}
+                <h3 class="ness-services__title" data-reveal="120">
+                  {{- block.settings.title | escape -}}
+                </h3>
+              {%- endif -%}
+              {%- if block.settings.body != blank -%}
+                <p class="ness-services__body" data-reveal="180">
+                  {{- block.settings.body | escape -}}
+                </p>
+              {%- endif -%}
+              {%- if block.settings.cta_label != blank -%}
+                {%- capture cta_url -%}
+                  {%- render 'ness-nav-url', destination: block.settings.cta_destination -%}
+                {%- endcapture -%}
+                <a class="ness-services__cta" href="{{ cta_url }}" data-reveal="240">
+                  {{- block.settings.cta_label | escape -}}
+                </a>
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Services",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Full-height panels that stack over one another as the page scrolls. The stacking, colours, and type are fixed by the design — you can edit each panel's picture and wording, and add or remove panels up to five."
+    },
+    { "type": "text", "id": "eyebrow", "label": "Small heading above", "default": "What we do" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Services" }
+  ],
+  "max_blocks": 5,
+  "blocks": [
+    {
+      "type": "service",
+      "name": "Service panel",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Picture",
+          "info": "Cropped to fit, so any shape works. Landscape of at least 1200px wide looks best."
+        },
+        { "type": "text", "id": "title", "label": "Title", "default": "Luxury" },
+        {
+          "type": "textarea",
+          "id": "body",
+          "label": "Description",
+          "default": "Hand-built units made with premium hair and finished with a natural, pre-plucked hairline. Fitted, cut and styled to you.",
+          "info": "Around 140 characters is what the design was drawn for."
+        },
+        { "type": "text", "id": "cta_label", "label": "Button label", "default": "Explore luxury units", "info": "Leave empty to hide the button." },
+        {
+          "type": "select",
+          "id": "cta_destination",
+          "label": "Button goes to",
+          "default": "all_products",
+          "options": [
+            { "value": "all_products", "label": "All products" },
+            { "value": "ready_to_ship", "label": "Ready to Ship" },
+            { "value": "pre_order", "label": "Pre-Order" },
+            { "value": "accessories", "label": "Accessories" },
+            { "value": "booking", "label": "Booking page" },
+            { "value": "contact", "label": "Contact page" }
+          ]
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      {
+        "type": "service",
+        "settings": {
+          "title": "Luxury",
+          "body": "Hand-built units made with premium hair and finished with a natural, pre-plucked hairline. Fitted, cut and styled to you.",
+          "cta_label": "Explore luxury units",
+          "cta_destination": "all_products"
+        }
+      },
+      {
+        "type": "service",
+        "settings": {
+          "title": "Extension",
+          "body": "Added length, volume and texture, colour-matched to your own hair and installed by our specialists in a single sitting.",
+          "cta_label": "Explore extensions",
+          "cta_destination": "all_products"
+        }
+      },
+      {
+        "type": "service",
+        "settings": {
+          "title": "Services",
+          "body": "Consultations, colouring, revamps and restyling. Book a session at the studio or online, wherever you are.",
+          "cta_label": "Book a session",
+          "cta_destination": "booking"
+        }
+      }
+    ]
+  }
+}
+{% endschema %}
