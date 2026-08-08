@@ -1,0 +1,286 @@
+{{ 'ness-collection.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ness-collection.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign per_page = section.settings.products_per_page | default: 24
+  assign has_filters = false
+  for filter in collection.filters
+    assign has_filters = true
+    break
+  endfor
+-%}
+
+{%- paginate collection.products by per_page -%}
+  <section class="ness-collection">
+    <div class="ness-collection__head">
+      <div>
+        {%- if section.settings.eyebrow != blank -%}
+          <p class="ness-collection__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+        {%- endif -%}
+        <h1 class="ness-collection__title">{{ collection.title | escape }}</h1>
+      </div>
+      {%- comment -%}
+        The count reflects what is being shown after filtering, which is the
+        number a shopper is actually asking about.
+      {%- endcomment -%}
+      {%- if collection.products_count == 1 -%}
+        {%- assign count_label = '1 product' -%}
+      {%- else -%}
+        {%- assign count_label = collection.products_count | append: ' products' -%}
+      {%- endif -%}
+      <span class="ness-collection__count">{{ count_label }}</span>
+    </div>
+
+    {%- comment -%}
+      Collection chips. Built from real collections chosen in the customizer,
+      not from a hardcoded list, so renaming a collection cannot orphan a chip.
+      The current collection is marked with aria-current rather than only a
+      colour change.
+    {%- endcomment -%}
+    {%- assign chips = section.blocks | where: 'type', 'chip' -%}
+
+    {%- if chips.size > 0 -%}
+      <nav class="ness-collection__chips" aria-label="Collections">
+        {%- for block in chips -%}
+          {%- assign chip_collection = collections[block.settings.collection] -%}
+          {%- if chip_collection != blank and chip_collection.handle != blank -%}
+            {%- assign is_current = false -%}
+            {%- if chip_collection.handle == collection.handle -%}
+              {%- assign is_current = true -%}
+            {%- endif -%}
+            <a
+              class="ness-collection__chip{% if is_current %} ness-collection__chip--current{% endif %}"
+              href="{{ chip_collection.url }}"
+              {% if is_current %}aria-current="page"{% endif %}
+              {{ block.shopify_attributes }}
+            >
+              {{- block.settings.label | default: chip_collection.title | escape -}}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+    {%- else -%}
+      {%- comment -%}
+        Fallback when no chips have been configured. Shopify's `collection`
+        setting type accepts no schema default, so a statically rendered
+        section starts with zero blocks and the row would simply be missing —
+        which is worse than a sensible default nobody had to set up.
+
+        The handles are the live ones and are fixed by Decision #9. Adding a
+        chip block in the customizer replaces this list entirely.
+      {%- endcomment -%}
+      {%- assign fallback_handles = 'ready-to-ship,pre-order,accessories' | split: ',' -%}
+      <nav class="ness-collection__chips" aria-label="Collections">
+        <a
+          class="ness-collection__chip{% if collection.handle == 'all' %} ness-collection__chip--current{% endif %}"
+          href="{{ routes.all_products_collection_url }}"
+          {% if collection.handle == 'all' %}aria-current="page"{% endif %}
+        >
+          All
+        </a>
+        {%- for handle in fallback_handles -%}
+          {%- assign chip_collection = collections[handle] -%}
+          {%- if chip_collection.handle != blank -%}
+            {%- assign is_current = false -%}
+            {%- if chip_collection.handle == collection.handle -%}
+              {%- assign is_current = true -%}
+            {%- endif -%}
+            <a
+              class="ness-collection__chip{% if is_current %} ness-collection__chip--current{% endif %}"
+              href="{{ chip_collection.url }}"
+              {% if is_current %}aria-current="page"{% endif %}
+            >
+              {{- chip_collection.title | escape -}}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </nav>
+    {%- endif -%}
+
+    {%- comment -%}
+      Filters and sort share one form, so a no-JavaScript submit carries both
+      and neither can silently drop the other. The design's "Apply" button is
+      that submit. With JavaScript, ness-collection.js submits on change and
+      hides the button, which is the behaviour the prototype shows.
+
+      No hidden inputs are needed here: on a collection the only parameters are
+      sort_by, the filter.* facets, and page — and page *should* reset when the
+      filters change, since page 4 of the old result set is meaningless against
+      the new one.
+    {%- endcomment -%}
+    <form class="ness-collection__controls" id="ness-facets">
+      <div class="ness-collection__toolbar">
+        {%- if has_filters -%}
+          <button
+            type="button"
+            class="ness-pill ness-collection__filter-toggle"
+            aria-expanded="false"
+            aria-controls="ness-filters"
+          >
+            <svg width="16" height="14" viewBox="0 0 16 14" stroke="currentColor" stroke-width="1.4" fill="none" aria-hidden="true" focusable="false">
+              <path d="M1 3h14M3.5 7h9M6 11h4" stroke-linecap="round"/>
+            </svg>
+            Filters
+          </button>
+        {%- else -%}
+          <span></span>
+        {%- endif -%}
+
+        {%- if collection.sort_options.size > 0 -%}
+          {%- assign current_sort = collection.sort_by | default: collection.default_sort_by -%}
+          <div class="ness-collection__sort">
+            <label class="ness-pill" for="ness-sort">
+              <span class="ness-collection__sort-label">Sort By</span>
+              <select id="ness-sort" name="sort_by" class="ness-collection__sort-select">
+                {%- for option in collection.sort_options -%}
+                  <option value="{{ option.value }}" {% if option.value == current_sort %}selected{% endif %}>
+                    {{ option.name }}
+                  </option>
+                {%- endfor -%}
+              </select>
+              <svg width="12" height="9" viewBox="0 0 12.126 8.907" fill="currentColor" aria-hidden="true" focusable="false">
+                <path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z"/>
+              </svg>
+            </label>
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- if has_filters -%}
+        <div class="ness-collection__filters" id="ness-filters" hidden>
+          {%- for filter in collection.filters -%}
+            <div class="ness-collection__filter">
+              <p class="ness-collection__filter-title">{{ filter.label | escape }}</p>
+
+              {%- case filter.type -%}
+                {%- when 'list' -%}
+                  {%- for value in filter.values -%}
+                    <label class="ness-check{% if value.count == 0 and value.active == false %} ness-check--empty{% endif %}">
+                      <input
+                        type="checkbox"
+                        name="{{ value.param_name }}"
+                        value="{{ value.value }}"
+                        {% if value.active %}checked{% endif %}
+                        {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                      >
+                      <span class="ness-check__box" aria-hidden="true">
+                        <svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke="currentColor" stroke-width="2" focusable="false">
+                          <path d="M1 4.4L4.4 7.8L11 1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                      </span>
+                      <span class="ness-check__label">{{ value.label | escape }}</span>
+                      <span class="ness-check__count">{{ value.count }}</span>
+                    </label>
+                  {%- endfor -%}
+
+                {%- when 'price_range' -%}
+                  {%- comment -%}
+                    Shopify's price filter works in the shop's currency with
+                    decimals; the inputs speak whole units and are converted on
+                    the way in and out. Without dividing by 100 the max would
+                    read as 70000.
+                  {%- endcomment -%}
+                  {%- assign price_max = filter.range_max | money_without_currency | replace: ',', '' -%}
+                  <div class="ness-collection__price">
+                    <label class="ness-collection__price-field">
+                      <span>From</span>
+                      <input
+                        type="number"
+                        name="{{ filter.min_value.param_name }}"
+                        value="{{ filter.min_value.value | default: '' }}"
+                        min="0"
+                        max="{{ price_max }}"
+                        placeholder="0"
+                        inputmode="numeric"
+                      >
+                    </label>
+                    <label class="ness-collection__price-field">
+                      <span>To</span>
+                      <input
+                        type="number"
+                        name="{{ filter.max_value.param_name }}"
+                        value="{{ filter.max_value.value | default: '' }}"
+                        min="0"
+                        max="{{ price_max }}"
+                        placeholder="{{ price_max }}"
+                        inputmode="numeric"
+                      >
+                    </label>
+                  </div>
+              {%- endcase -%}
+            </div>
+          {%- endfor -%}
+
+          <div class="ness-collection__filter-actions">
+            <button type="submit" class="ness-collection__apply">Apply</button>
+            <a href="{{ collection.url }}" class="ness-collection__clear">Clear all</a>
+          </div>
+        </div>
+      {%- endif -%}
+    </form>
+
+    {%- if collection.products.size == 0 -%}
+      <div class="ness-collection__empty">
+        <p>
+          {%- if has_filters -%}
+            Nothing here matches those filters. Try widening them, or start again.
+          {%- else -%}
+            There is nothing in this collection just yet.
+          {%- endif -%}
+        </p>
+        <a href="{{ collection.url }}" class="ness-collection__apply">Show all products</a>
+      </div>
+    {%- else -%}
+      <div class="ness-collection__grid">
+        {%- for product in collection.products -%}
+          {%- comment -%}
+            The first row is above the fold on most screens, so those images
+            load eagerly and the rest lazily.
+          {%- endcomment -%}
+          {%- if forloop.index <= 4 -%}
+            {%- render 'ness-product-card', product: product, loading: 'eager' -%}
+          {%- else -%}
+            {%- render 'ness-product-card', product: product -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {%- if paginate.pages > 1 -%}
+        {%- render 'ness-pagination', paginate: paginate -%}
+      {%- endif -%}
+    {%- endif -%}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Collection",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The grid, filters, and sorting all come from Shopify — products, prices, and availability are never edited here. Only the small heading above the title and which collections appear as chips are editable."
+    },
+    { "type": "text", "id": "eyebrow", "label": "Small heading above the title", "default": "Shop by Collections" },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Products per page",
+      "min": 8,
+      "max": 48,
+      "step": 4,
+      "default": 24
+    }
+  ],
+  "max_blocks": 6,
+  "blocks": [
+    {
+      "type": "chip",
+      "name": "Collection chip",
+      "settings": [
+        { "type": "collection", "id": "collection", "label": "Collection" },
+        { "type": "text", "id": "label", "label": "Wording", "info": "Leave empty to use the collection's own name." }
+      ]
+    }
+  ]
+}
+{% endschema %}

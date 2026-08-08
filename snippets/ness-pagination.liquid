@@ -1,0 +1,53 @@
+{%- comment -%}
+  Pagination, drawn as the circles the prototype shows.
+
+  The prototype only ever draws a single "1" because its dataset fits one page,
+  so the real behaviour — previous, next, and how a long run of pages collapses
+  — is not specified by the design. Shopify's `paginate.parts` already windows
+  the page list and emits ellipsis entries, so that is what decides which
+  numbers appear rather than anything invented here.
+
+  Accepts: paginate
+{%- endcomment -%}
+
+<nav class="ness-pagination" role="navigation" aria-label="Pagination">
+  {%- if paginate.previous -%}
+    <a class="ness-pagination__step" href="{{ paginate.previous.url }}" aria-label="Previous page" rel="prev">
+      <svg width="9" height="13" viewBox="0 0 9 13" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false">
+        <path d="M7.5 1L2 6.5L7.5 12" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  {%- endif -%}
+
+  {%- for part in paginate.parts -%}
+    {%- if part.is_link -%}
+      <a class="ness-pagination__page" href="{{ part.url }}" aria-label="Page {{ part.title }}">
+        {{- part.title -}}
+      </a>
+    {%- elsif part.title == hellip -%}
+      <span class="ness-pagination__gap" aria-hidden="true">{{ part.title }}</span>
+    {%- else -%}
+      {%- comment -%}
+        A non-link part is either the current page or an ellipsis. Comparing
+        against the current page number tells them apart, and aria-current is
+        what conveys "you are here" to a screen reader — the filled circle
+        alone conveys it to nobody.
+      {%- endcomment -%}
+      {%- if part.title == paginate.current_page -%}
+        <span class="ness-pagination__page ness-pagination__page--current" aria-current="page">
+          {{- part.title -}}
+        </span>
+      {%- else -%}
+        <span class="ness-pagination__gap" aria-hidden="true">{{ part.title }}</span>
+      {%- endif -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {%- if paginate.next -%}
+    <a class="ness-pagination__step" href="{{ paginate.next.url }}" aria-label="Next page" rel="next">
+      <svg width="9" height="13" viewBox="0 0 9 13" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true" focusable="false">
+        <path d="M1.5 1L7 6.5L1.5 12" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  {%- endif -%}
+</nav>

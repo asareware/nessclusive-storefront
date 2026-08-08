@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Nessclusive — product card
+   Shared by the collection grid, search, and recommendations.
+   Values transcribed from project/Nessclusive Storefront.dc.html:380-396.
+   ========================================================================== */
+
+.ness-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.ness-card__media {
+  position: relative;
+  display: block;
+  border-radius: var(--ness-radius-card);
+  overflow: hidden;
+  background: var(--ness-card-1);
+  aspect-ratio: 390 / 463;
+}
+
+.ness-card__media:hover {
+  text-decoration: none;
+}
+
+.ness-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  transition: transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.ness-card:hover .ness-card__image {
+  transform: scale(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ness-card__image,
+  .ness-card:hover .ness-card__image {
+    transition: none;
+    transform: none;
+  }
+}
+
+.ness-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 6px 12px;
+  border-radius: var(--ness-radius-pill);
+  background: var(--ness-ink);
+  color: var(--ness-secondary);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+}
+
+.ness-card__foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 18px 8px 0;
+}
+
+.ness-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.ness-card__title {
+  font-size: 20px;
+  line-height: 100%;
+  color: rgba(21, 0, 26, 0.83);
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.ness-card__title:hover {
+  color: var(--ness-primary);
+  text-decoration: none;
+}
+
+/* The card's link covers the image as well as the title, so the image is the
+   real hit target and the underline belongs on hover of either. */
+.ness-card__media:hover + .ness-card__foot .ness-card__title {
+  color: var(--ness-primary);
+}
+
+.ness-card__price {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 100%;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-card__add-form {
+  margin: 0;
+  display: flex;
+}
+
+.ness-card__add {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--ness-primary);
+  color: #f1dede;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.ness-card__add:hover {
+  background: var(--ness-primary-deep);
+  color: #f1dede;
+  text-decoration: none;
+}
+
+.ness-card__image--placeholder {
+  background: var(--ness-card-1);
+  fill: rgba(21, 0, 26, 0.14);
+}

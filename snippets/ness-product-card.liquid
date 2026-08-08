@@ -1,0 +1,101 @@
+{%- comment -%}
+  Product card — image, name, price, and a quick-add control.
+
+  Shared by the collection grid, search results, and product recommendations,
+  so every product tile on the site is this one file.
+
+  The quick-add "+" is the part that needs care. The prototype draws it as an
+  add-to-cart on every card, but this catalog cannot support that: a wig has
+  Length, Cap Size and Part, and one product carries 90 variants. There is no
+  honest way to pick one on the buyer's behalf, and silently adding the wrong
+  size is worse than an extra click.
+
+  So the control is add-to-cart only where that is unambiguous — a purchasable
+  product with exactly one variant, which is most Accessories. Everywhere else
+  the same button is a link to the product page. It looks identical either way;
+  only its accessible name differs, so screen reader users are told which they
+  are getting.
+
+  Accepts:
+    product          (required)
+    loading          'lazy' (default) or 'eager' for above-the-fold cards
+    sizes            optional sizes attribute; sensible grid default otherwise
+{%- endcomment -%}
+
+{%- liquid
+  assign card_sizes = sizes | default: '(min-width: 1180px) 24vw, (min-width: 750px) 45vw, 92vw'
+  assign card_loading = loading | default: 'lazy'
+
+  assign single_variant = false
+  if product.variants.size == 1 and product.available
+    assign single_variant = true
+  endif
+-%}
+
+<div class="ness-card">
+  <a class="ness-card__media" href="{{ product.url }}" tabindex="-1" aria-hidden="true">
+    {%- if product.featured_image -%}
+      {{
+        product.featured_image
+        | image_url: width: 900
+        | image_tag:
+          class: 'ness-card__image',
+          alt: '',
+          widths: '260, 390, 520, 780, 900',
+          sizes: card_sizes,
+          loading: card_loading
+      }}
+    {%- else -%}
+      {{ 'product-1' | placeholder_svg_tag: 'ness-card__image ness-card__image--placeholder' }}
+    {%- endif -%}
+
+    {%- comment -%}
+      Sold-out is stated on the card rather than left to the buyer to discover
+      on the product page. Pre-order products are legitimately unavailable-but-
+      buyable, so this keys off `available`, not inventory.
+    {%- endcomment -%}
+    {%- unless product.available -%}
+      <span class="ness-card__badge">Sold out</span>
+    {%- endunless -%}
+  </a>
+
+  <div class="ness-card__foot">
+    <div class="ness-card__text">
+      {%- comment -%}
+        The whole card is reachable from this one link — the media above is
+        aria-hidden and untabbable, so the product appears once in the tab
+        order and once in a screen reader's link list, not three times.
+      {%- endcomment -%}
+      <a class="ness-card__title" href="{{ product.url }}">{{ product.title | escape }}</a>
+      <span class="ness-card__price">
+        {%- if product.price_varies -%}
+          From {{ product.price_min | money }}
+        {%- else -%}
+          {{ product.price | money }}
+        {%- endif -%}
+      </span>
+    </div>
+
+    {%- if single_variant -%}
+      {%- form 'product', product, class: 'ness-card__add-form', id: null -%}
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+        <button
+          type="submit"
+          class="ness-card__add"
+          name="add"
+          aria-label="Add {{ product.title | escape }} to cart"
+        >
+          {%- render 'ness-card-plus' -%}
+        </button>
+      {%- endform -%}
+    {%- else -%}
+      <a
+        class="ness-card__add"
+        href="{{ product.url }}"
+        aria-label="Choose options for {{ product.title | escape }}"
+      >
+        {%- render 'ness-card-plus' -%}
+      </a>
+    {%- endif -%}
+  </div>
+</div>

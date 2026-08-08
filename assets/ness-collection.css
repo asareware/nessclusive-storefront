@@ -1,0 +1,373 @@
+/* ==========================================================================
+   Nessclusive — collection / shop page
+   Values transcribed from project/Nessclusive Storefront.dc.html:305-403.
+   ========================================================================== */
+
+.ness-collection {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: clamp(32px, 4vw, 60px) var(--ness-shell-pad) clamp(64px, 7vw, 110px);
+}
+
+/* --- Head --------------------------------------------------------------- */
+
+.ness-collection__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+
+.ness-collection__eyebrow {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ness-primary);
+}
+
+.ness-collection__title {
+  margin: 0;
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  font-size: clamp(34px, 4.6vw, 64px);
+  line-height: 100%;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-collection__count {
+  font-size: 16px;
+  color: var(--ness-muted);
+}
+
+/* --- Chips -------------------------------------------------------------- */
+
+.ness-collection__chips {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: clamp(20px, 2vw, 28px);
+}
+
+.ness-collection__chip {
+  height: 46px;
+  padding: 0 22px;
+  border-radius: 42px;
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  color: var(--ness-ink);
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.ness-collection__chip:hover {
+  border-color: var(--ness-primary);
+  text-decoration: none;
+}
+
+.ness-collection__chip--current {
+  background: var(--ness-primary);
+  border-color: var(--ness-primary);
+  color: var(--ness-on-primary);
+}
+
+.ness-collection__chip--current:hover {
+  color: var(--ness-on-primary);
+}
+
+/* --- Toolbar ------------------------------------------------------------ */
+
+.ness-collection__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+  border-top: 1px solid var(--ness-border);
+  border-bottom: 1px solid var(--ness-border);
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+
+.ness-collection__filter-toggle {
+  gap: 10px;
+}
+
+.ness-collection__sort-label {
+  color: var(--ness-muted);
+}
+
+/* The pill is the <label>, so clicking anywhere on it focuses the select.
+   The select itself is stripped bare and stretched over the pill so the whole
+   thing is the hit target, with the chevron drawn alongside. */
+.ness-collection__sort .ness-pill {
+  position: relative;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.ness-collection__sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-weight: 500;
+  color: var(--ness-ink);
+  cursor: pointer;
+  padding: 0;
+  /* Room for the chevron that follows it. */
+  padding-right: 4px;
+}
+
+.ness-collection__sort-select:focus {
+  outline: none;
+}
+
+.ness-collection__sort .ness-pill:focus-within {
+  border-color: var(--ness-primary);
+  outline: 2px solid var(--ness-primary-deep);
+  outline-offset: 2px;
+}
+
+/* --- Filters ------------------------------------------------------------ */
+
+/* Hidden only once the script that can reopen it has loaded. Without
+   JavaScript the panel stays visible and Apply still works. */
+.ness-facets-ready .ness-collection__filters[hidden] {
+  display: none;
+}
+
+.ness-collection__filters {
+  border: 1px solid var(--ness-border);
+  border-radius: 12px;
+  padding: clamp(20px, 2.4vw, 32px);
+  margin-bottom: clamp(24px, 3vw, 40px);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: clamp(24px, 3vw, 48px);
+}
+
+.ness-collection__filter-title {
+  margin: 0 0 18px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--ness-ink);
+}
+
+.ness-check {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  cursor: pointer;
+}
+
+.ness-check--empty {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* The real checkbox stays in the layout and stays focusable — it is simply
+   invisible, with the styled box beside it showing its state. Removing it from
+   the accessibility tree with display:none would make the filter unusable by
+   keyboard. */
+.ness-check input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ness-check__box {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: transparent;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.ness-check input:checked + .ness-check__box {
+  background: var(--ness-primary);
+  border-color: var(--ness-primary);
+  color: var(--ness-secondary);
+}
+
+.ness-check input:focus-visible + .ness-check__box {
+  outline: 2px solid var(--ness-primary-deep);
+  outline-offset: 2px;
+}
+
+.ness-check__label {
+  font-size: 16px;
+  color: var(--ness-ink);
+}
+
+.ness-check__count {
+  font-size: 16px;
+  color: var(--ness-muted);
+}
+
+.ness-collection__price {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ness-collection__price-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  color: var(--ness-muted);
+}
+
+.ness-collection__price-field input {
+  width: 96px;
+  height: 46px;
+  padding: 0 12px;
+  border-radius: var(--ness-radius-input);
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  font: inherit;
+  color: var(--ness-ink);
+}
+
+.ness-collection__filter-actions {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.ness-collection__apply {
+  height: var(--ness-cta-height);
+  padding: 0 28px;
+  border-radius: var(--ness-radius-cta);
+  border: none;
+  background: var(--ness-primary-deep);
+  color: #fffcf8;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.ness-collection__apply:hover {
+  background: var(--ness-primary);
+  color: #fffcf8;
+  text-decoration: none;
+}
+
+.ness-collection__clear {
+  height: var(--ness-cta-height);
+  padding: 0 20px;
+  border-radius: var(--ness-radius-cta);
+  border: 1px solid var(--ness-ink);
+  background: transparent;
+  color: var(--ness-ink);
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+}
+
+.ness-collection__clear:hover {
+  background: var(--ness-ink);
+  color: var(--ness-background);
+  text-decoration: none;
+}
+
+/* --- Empty state -------------------------------------------------------- */
+
+.ness-collection__empty {
+  border: 1px solid var(--ness-border);
+  border-radius: var(--ness-radius-card);
+  background: var(--ness-card-3);
+  padding: clamp(40px, 6vw, 88px) clamp(24px, 4vw, 60px);
+  text-align: center;
+}
+
+.ness-collection__empty p {
+  margin: 0 auto 24px;
+  max-width: 480px;
+  font-size: 20px;
+  line-height: 30px;
+  color: var(--ness-muted);
+  text-wrap: pretty;
+}
+
+/* --- Grid --------------------------------------------------------------- */
+
+.ness-collection__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: clamp(20px, 2vw, 32px) clamp(16px, 1.6vw, 24px);
+}
+
+/* --- Pagination --------------------------------------------------------- */
+
+.ness-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: clamp(40px, 4vw, 64px);
+  flex-wrap: wrap;
+}
+
+.ness-pagination__page,
+.ness-pagination__step {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  color: var(--ness-ink);
+  text-decoration: none;
+  border: 1px solid var(--ness-border);
+  transition:
+    border-color 0.3s ease,
+    background 0.3s ease;
+}
+
+.ness-pagination__page:hover,
+.ness-pagination__step:hover {
+  border-color: var(--ness-primary);
+  text-decoration: none;
+}
+
+.ness-pagination__page--current {
+  background: var(--ness-primary);
+  border-color: var(--ness-primary);
+  color: var(--ness-on-primary);
+}
+
+.ness-pagination__gap {
+  color: var(--ness-muted);
+  padding-inline: 4px;
+}
