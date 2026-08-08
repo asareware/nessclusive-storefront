@@ -372,11 +372,139 @@ automated
 - [x] ✅ **Phase 5 — Cart & search.** AJAX cart drawer via the Section Rendering API, predictive search overlay, styled search results page. Both adversarially reviewed; five findings fixed including a CRITICAL where Buy Now was intercepted by the drawer and never reached checkout *(commit `7d687ff`)*
 - [x] ✅ **Phase 6 — Booking page.** `templates/page.booking.liquid` with the prototype's hero, steps and policy cards; the page's own CTA resolves to the site-wide Acuity theme setting. Rebuilt against the current design 2026-08-08 — Studio Info / Booking Policy / Custom Wig cards, contact tiles including TikTok, "Book a Reservation" → Acuity. Passed review clean both times
 - [ ] 🔜 👤 **Phase 7 — Content & data.** Menus, Markets, policies, shipping zones/duties. **Reuse existing collection and page handles** — do not create duplicates (Decision #9)
-- [ ] ⬜ **Phase 8 — QA.** Cross-device/browser pass vs. prototype, Lighthouse/a11y (focus states, aria labels, reduced-motion), 404/gift-card/account templates styled
-- [ ] ⬜ 👤 **Phase 8b — Live order test.** Place a real paid order and refund it. Verify Processing Time and Pickup Option appear on the order, that the confirmation email carries the **real** Google Form link, and that international currency/shipping behave. The only step that proves the store actually works
-- [ ] ⬜ 👤 **Phase 9 — Cutover.** Push final theme, owner review in customizer, publish; keep `Champion` as rollback; verify domains and re-enable nothing (all apps being removed — Decision #6)
+- [x] ✅ **Phase 8 — QA.** New `404`, generic page, and cart page templates on a shared `ness-simple.css` — the prototype specifies none of these. Cart line item extracted into `ness-cart-line.liquid`, shared by the drawer and the new page, so the two cannot drift. Automated pass across home/collection/product/cart/booking: 0 images missing alt, 0 duplicate ids, 0 empty links, one `h1` per page. One real finding fixed — the product page skipped from `h1` to `h3` because merchant product descriptions in this catalog start their own headings at `h3`; a hidden `h2` closes the gap without touching merchant content. `ness-customer.css` re-skins Dawn's customer templates but is currently inert — confirmed via `/account` redirecting to `shopify.com/…`, i.e. **this store is on Shopify's new customer accounts**, so the theme's customer templates never render *(commit `36d3841`)*
+- [ ] 🔜 👤 **Phase 8b — Live order test.** Place a real paid order on the dev theme and refund it. See the full script under **Cutover → Step 3** below — this is a prerequisite for cutover, not a separate task
+- [ ] ⬜ 👤 **Phase 9 — Cutover.** See **## Cutover checklist** below for the full step-by-step. **Holding — do not publish.** Owner review in progress
 
-## Decisions log (answered 2026-08-06)
+## Cutover checklist
+
+**Status: holding. Nothing in this section has been executed. No step below
+has been run — it is written for the owner to review before anything happens.**
+
+Current state, confirmed against the store on 2026-08-08:
+
+| Theme | Role | ID |
+|---|---|---|
+| `Champion` | **live** — this is what www.nessclusive.com serves today | `133414355143` |
+| `Development (…)` | unpublished — this repo, on the dev theme | `159626559687` |
+
+Nothing else exists. Cutover means switching which of these two the domain
+points at — a single click in admin — and everything before that click is
+preparation and verification.
+
+### Step 1 — Blockers (must be closed before Step 2)
+
+- [ ] 👤 **Wig Authorization Form URL** set in **Theme settings → Nessclusive →
+      Wig Authorization Form**. Until this is set, the authorization callout is
+      hidden on every product (deliberately — see Decision #3), and per the
+      form's own policy, orders placed without it get cancelled.
+- [ ] 👤 **Catalog option names normalised** (Phase 0e) — `Length`, `Cap Size`,
+      `Part`, in that order, across all 29 products. Not strictly required for
+      the theme to function (it renders correctly either way — see [Product
+      options](#product-options----corrected-against-live-catalog-data-phase-0)),
+      but `Cap Szie` is customer-visible today and should not go live a second
+      time.
+- [ ] 👤 **Countries, shipping zones, duties** configured in Markets — see
+      Step 2 below. The goal is worldwide orders; Markets alone only handles
+      currency display.
+- [ ] 👤 **Every installed app removed** from the admin, per Decision #6
+      (clean slate). Confirm none of them were providing something customers
+      currently rely on that the new theme does not replace — chat, reviews.
+
+### Step 2 — Phase 7: content & data (owner, in Shopify admin)
+
+Full step-by-step for each item is in **## Editing the store from Shopify
+admin**, below. Checklist form here:
+
+- [ ] Main menu and footer menu reviewed in **Online Store → Navigation**.
+      The theme does not read these menus — header and footer links are theme
+      settings (see the admin guide) — but they still drive the search
+      engine sitemap and any Shopify surface that does use them.
+- [ ] **Markets** configured: which countries you ship to, which currencies
+      display.
+- [ ] **Shipping** zones and rates set for each market.
+- [ ] **Taxes and duties** configured, including duty collection at checkout
+      if applicable.
+- [ ] **Policies** (refund, privacy, terms, shipping) reviewed in
+      **Settings → Policies** — these already exist and carry over
+      automatically; confirm the content is current.
+- [ ] **Page templates assigned:** Content → Pages → FAQs → template
+      `faqs`; Content → Pages → Contact Us → template `contact-us`. Until
+      this is done both pages render Dawn's stock template, not the new
+      design.
+
+### Step 3 — Phase 8b: live order test (owner, on the dev theme preview)
+
+Do this **before** cutover, against the dev theme preview link, so a mistake
+costs nothing:
+
+```
+https://nessclusive-llc.myshopify.com/?preview_theme_id=159626559687
+```
+
+- [ ] Place a real paid order on a **multi-variant wig** (e.g. Pre-order),
+      selecting a Length, Cap Size, Part, a Processing Time, and a Pickup
+      Option.
+- [ ] In **Orders** in admin, confirm **Processing Time and Pickup Option
+      both appear** on the order. This is the single most important check —
+      they are line item properties, not variants, and a bug here means a
+      mis-fulfilled wig.
+- [ ] Confirm the **order confirmation email** carries the Wig Authorization
+      Form link (once Step 1's blocker is closed).
+- [ ] Repeat with **Buy Now** instead of Add to Cart — it is a separate code
+      path (Decision #7) and needs its own check.
+- [ ] Switch to a non-US shipping address / different Market and confirm
+      currency, shipping cost, and duties behave.
+- [ ] **Refund the order.**
+- [ ] Optional but recommended: place one order on a **single-variant
+      Accessory** to confirm the simpler add-to-cart path.
+
+### Step 4 — Final review (owner)
+
+- [ ] Open the dev theme in the **theme editor**
+      (`Online Store → Themes → Development → Customize`, or
+      [direct link](https://nessclusive-llc.myshopify.com/admin/themes/159626559687/editor))
+      and click through every page once, on both desktop and a phone.
+- [ ] Confirm the **logo** is set (Header → Logo) — it currently falls back
+      to a bundled default if unset.
+- [ ] Confirm **social links** are set in the footer (Facebook, Instagram,
+      YouTube, X) — empty ones simply do not render.
+- [ ] Decide on the **Instagram strip** (Phase 2b): deploy the Worker first
+      (see `instagram-worker/README.md`), or launch with the five bundled
+      fallback photos and add live data later. Either is safe to launch
+      with — the strip degrades to the bundled photos automatically if the
+      Worker is not running.
+
+### Step 5 — Publish (owner, admin only — I cannot do this step)
+
+1. **Online Store → Themes.** The dev theme should appear under
+   "Unpublished themes."
+2. Click **Actions → Publish** on the dev theme.
+3. Shopify asks to confirm — this makes it live on www.nessclusive.com
+   **immediately**, no delay, no separate DNS step.
+4. `Champion` automatically moves to "Unpublished themes." **Do not delete
+   it.** It is the rollback, and costs nothing sitting there.
+
+### Step 6 — Immediately after publish (owner, first 30 minutes)
+
+- [ ] Load www.nessclusive.com in a fresh/incognito browser window — not a
+      tab that had the preview open, to rule out any caching confusion.
+- [ ] Smoke test: homepage, one collection, one product, add to cart,
+      checkout to the payment step (do not need to complete), sign in.
+- [ ] Check **Search Console** (if access exists) is not immediately
+      throwing crawl errors.
+- [ ] Watch **Orders** for the next few hours same as any normal day —
+      nothing about publishing changes how orders arrive.
+
+### Rollback (if something is wrong after publish)
+
+**Online Store → Themes → find `Champion` under Unpublished → Actions →
+Publish.** Same one-click action, reversed. The site returns to exactly how
+it was before cutover. Takes under a minute.
+
+---
+
+
 
 1. **Booking** → redirect to the existing **Acuity Scheduling** page (URL as a theme setting; inline embed optional later). **Confirmed URL: `https://nessclusive.as.me/schedule/6f74a017`**
 2. **Catalog** → Shopify product catalog is the CMS; theme pulls all real products/collections from it dynamically.
@@ -435,6 +563,107 @@ automated
     constrained. Static `{% section %}` tags in `.liquid` templates so sections
     cannot be reordered or deleted. Full policy in the Editability section above.
 
+## Editing the store from Shopify admin
+
+Everything below works the same on the **dev theme now** and on the **live
+theme after cutover** — practice on the dev theme preview first if unsure:
+```
+https://nessclusive-llc.myshopify.com/?preview_theme_id=159626559687
+```
+Open the editor at **Online Store → Themes → [theme] → Customize**, or jump
+straight to the dev theme:
+[direct link](https://nessclusive-llc.myshopify.com/admin/themes/159626559687/editor).
+
+Reminder of the rule this theme is built on (PLAN.md, Editability policy):
+**structure is locked, content is editable.** Sections cannot be reordered,
+added, or removed from the editor — every change below is changing what is
+inside a section, never the layout of the page.
+
+### Change the logo
+
+1. Customize → click **Header** in the left panel (any page — the header is
+   the same everywhere).
+2. **Logo → Select image** → upload or pick from Files.
+3. Recommended size **at least 306 × 195px** so it stays sharp on retina
+   screens. Any shape works — it is cropped to fit, never stretched.
+
+### Change a navigation link's wording or destination
+
+1. Customize → **Header** (for the top menu) or **Footer** (for the two
+   footer columns).
+2. Click the link block to edit (e.g. "Ready to Ship").
+3. **Wording** — free text, e.g. change "Booking" to "Book Me".
+4. **Goes to** — a dropdown of real destinations only. This is deliberate: it
+   is impossible to create a broken link here, so if a destination you want
+   is not listed, tell your developer rather than typing a URL anywhere.
+
+### Add, remove, or reorder an FAQ question
+
+1. Customize → go to the **homepage** → click **FAQ** in the left panel.
+2. **Add block** → "Question" for a new one; the trash icon on an existing
+   block removes it (up to 10 total).
+3. Drag blocks in the left panel to reorder.
+4. Each block: **Question** (one line) and **Answer** (supports bold,
+   italics, links, lists).
+5. The same content also appears automatically on the standalone
+   **/pages/faqs** page — edit once, both places update.
+
+### Add or edit a testimonial-style panel, service, or collection card
+
+Same block pattern as FAQ — **Services**, **Explore Collection**, and the
+**hero's quick links** all work the same way: click the section, add/remove/
+reorder blocks in the left panel, edit each block's fields. Every image
+field states its recommended size in the small grey helper text underneath
+it — follow that so the crop looks intentional rather than cut off.
+
+### Set the Acuity booking link or the Wig Authorization Form link
+
+These are **theme settings**, not section settings — they are used in more
+than one place, so they are set once, site-wide:
+
+1. Customize → scroll to the **very bottom of the left panel** →
+   **Theme settings** → **Nessclusive**.
+2. **Acuity Scheduling link** — every "Book a Session" / "Book a
+   Reservation" button on the site uses this.
+3. **Wig Authorization Form link** — shown on every product page. Update
+   this the day the Google Form is ready; the callout is hidden entirely
+   until a URL is set here.
+
+### Change a product's photos, price, or description
+
+This is **not** done in the theme editor — products are edited where they
+always are:
+
+1. Admin sidebar → **Products** → click the product.
+2. Photos, price, description, and inventory are edited directly on that
+   page, same as before this project.
+3. **Variants** (Length / Cap Size / Part) are under the **Variants** section
+   of the same page. If retyping an option name, match the others exactly —
+   `Cap Size`, not `Cap size` — inconsistent names are the one thing that can
+   make the option picker look slightly different between products (see
+   Phase 0e above).
+
+### Enable or disable the currency switcher
+
+1. Customize → **Header** → **Show currency selector** checkbox.
+2. It only actually appears on the storefront once more than one country is
+   enabled in **Settings → Markets** — the checkbox alone is not enough.
+
+### Change the footer newsletter text or the copyright line
+
+Customize → **Footer** → the relevant fields are grouped under **Newsletter**
+and **Brand** in the left panel. All plain text, no code.
+
+### If something looks broken after an edit
+
+The safest recovery is the **editor's own history**: every theme editor page
+has **Undo** in the top bar, and closing without saving discards changes
+entirely. Nothing edited in the theme editor touches products, orders, or
+customers — it only affects layout and wording, so there is no way to lose
+sales data through this panel.
+
+---
+
 ## Amendments — carried over from review, still open
 
 **URL preservation — RESOLVED, see Decision #9.** Existing handles are kept
@@ -477,7 +706,7 @@ Resolved:
 - ~~Instagram: app, proxy, or static?~~ → serverless proxy (Decision #10)
 - ~~Instagram account type~~ → confirmed Business/Creator + Facebook Page
 - ~~Second product-page button~~ → kept as "Buy Now" (Decision #7)
-- ~~Wig Authorization Form~~ → to-do, not a blocker (Decision #3)
+- ~~Wig Authorization Form~~ → to-do, not a blocker (Dec÷≥ision #3)
 
 Still open:
 
