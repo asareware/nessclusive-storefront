@@ -4,10 +4,24 @@
    Values transcribed from project/Nessclusive Storefront.dc.html:118-131.
    ========================================================================== */
 
+/* Deliberate deviation from the prototype, at the owner's request.
+
+   The prototype sets padding-top: 0 here and relies on the hero's
+   padding-bottom for separation. That does not work: .ness-hero__arches is
+   `inset: auto 0 0 0`, so it is positioned against the hero's padding box and
+   the arch strip sits flush with the section's bottom edge, consuming all
+   clamp(56px, 6vw, 104px) of it. The effective gap above this heading was
+   therefore ~0, while the gap below it to the cards is 48px — so "Explore
+   Collection" read as a caption hanging off the hero rather than the title of
+   the cards underneath it.
+
+   Using --ness-section-gap keeps the page's existing rhythm rather than
+   inventing a one-off value, and makes the grouping unambiguous: ~120px above
+   the heading against 48px below it. */
 .ness-collection-cards {
   max-width: var(--ness-shell-max);
   margin-inline: auto;
-  padding: 0 var(--ness-shell-pad) var(--ness-section-gap);
+  padding: var(--ness-section-gap) var(--ness-shell-pad);
 }
 
 .ness-collection-cards__heading {
