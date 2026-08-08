@@ -25,6 +25,10 @@
   @keyframes ness-slide-in { from { transform: translateX(100%); } to { transform: none; } }
   @keyframes ness-fade { from { opacity: 0; } to { opacity: 1; } }
   @keyframes ness-hero-zoom { from { transform: scale(1.09); } to { transform: scale(1); } }
+  @keyframes ness-cine { 0% { opacity: 0; transform: scale(1.03); } 5% { opacity: 1; } 31% { opacity: 1; } 36% { opacity: 0; } 100% { opacity: 0; transform: scale(1.15); } }
+  @keyframes ness-pop { from { transform: scale(.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes ness-check { from { stroke-dashoffset: 62; } to { stroke-dashoffset: 0; } }
+  @keyframes ness-spark { 0% { opacity: 0; transform: translate(-50%, -50%) scale(.6); } 25% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -74px) scale(.5); } }
 </style>
 </helmet>
 
@@ -83,33 +87,52 @@
   <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
   <main data-screen-label="Homepage" style="animation: ness-fade .4s ease both;">
 
-    <section data-comment-anchor="home-hero" style="position: relative; margin-top: -100px; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: #FFFDF8;">
-      <div style="position: absolute; inset: 0; background: url(assets/hero-2.jpg) center 30% / cover no-repeat; animation: ness-hero-zoom 24s cubic-bezier(.22,.61,.36,1) both;"></div>
-      <div style="position: absolute; inset: 0; pointer-events: none; background: linear-gradient(102deg, rgba(255,253,248,0.93) 0%, rgba(253,246,240,0.72) 26%, rgba(254,241,213,0.34) 46%, rgba(240,225,241,0.24) 66%, rgba(246,234,243,0.52) 100%), radial-gradient(58% 46% at 6% 2%, rgba(107,13,131,0.26) 0%, rgba(107,13,131,0) 62%), radial-gradient(62% 48% at 96% 96%, rgba(98,30,105,0.30) 0%, rgba(98,30,105,0) 60%), linear-gradient(180deg, rgba(255,253,248,0.45) 0%, rgba(255,253,248,0) 20%, rgba(255,253,248,0) 70%, rgba(255,253,248,0.97) 100%);"></div>
+    <section data-comment-anchor="home-hero" data-screen-label="Hero" style="position: relative; margin-top: -100px; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; background: #15001A;">
+      <div style="position: absolute; inset: 0; overflow: hidden;">
+        <div style="position: absolute; inset: 0; background: url(assets/hero-2.jpg) center 28% / cover no-repeat; animation: ness-cine 24s linear 0s infinite both; animation-play-state: {{ cineState }};"></div>
+        <div style="position: absolute; inset: 0; background: url(assets/hero-4.jpg) center 26% / cover no-repeat; animation: ness-cine 24s linear -8s infinite both; animation-play-state: {{ cineState }};"></div>
+        <div style="position: absolute; inset: 0; background: url(assets/hero-5.jpg) center 30% / cover no-repeat; animation: ness-cine 24s linear -16s infinite both; animation-play-state: {{ cineState }};"></div>
+      </div>
+      <div style="position: absolute; inset: 0; pointer-events: none; background: rgba(0,0,0,0.5);"></div>
+
+      <button onClick="{{ toggleCine }}" style="position: absolute; z-index: 4; top: clamp(112px, 13vh, 156px); right: clamp(20px, 4vw, 150px); height: 46px; padding: 0 18px; display: flex; align-items: center; gap: 10px; border-radius: 40px; border: 1px solid rgba(255,255,255,0.38); background: rgba(0,0,0,0.34); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); color: #FFFDF8; font-size: 15px; cursor: pointer;" style-hover="background: rgba(0,0,0,0.52);" aria-label="{{ cineLabel }}">
+        <sc-if value="{{ cinePlaying }}" hint-placeholder-val="{{ true }}">
+          <svg width="12" height="14" viewBox="0 0 12 14" fill="#FFFDF8"><rect x="0" y="0" width="4" height="14" rx="1" /><rect x="8" y="0" width="4" height="14" rx="1" /></svg>
+        </sc-if>
+        <sc-if value="{{ cinePaused }}" hint-placeholder-val="{{ false }}">
+          <svg width="12" height="14" viewBox="0 0 12 14" fill="#FFFDF8"><path d="M0 0.8 C0 0.1 0.8 -0.3 1.4 0.1 L11.4 6.3 C11.9 6.6 11.9 7.4 11.4 7.7 L1.4 13.9 C0.8 14.3 0 13.9 0 13.2 Z" /></svg>
+        </sc-if>
+        <span>{{ cineLabel }}</span>
+      </button>
+
       <div style="position: relative; flex: 1; width: 100%; max-width: 1770px; margin: 0 auto; padding: clamp(128px, 15vh, 190px) clamp(20px, 4vw, 150px) clamp(32px, 4vw, 56px); display: flex; flex-direction: column; align-items: flex-start; gap: clamp(18px, 2.2vw, 30px);">
-        <h1 style="margin: 0; max-width: 16ch; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(40px, 6.4vw, 104px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: left; text-wrap: balance; animation: ness-rise 1.05s cubic-bezier(.22,.61,.36,1) .08s both;">Nessclusive, Be Bold, Be Exclusive</h1>
-        <p style="margin: 0; max-width: 520px; font-size: clamp(17px, 1.35vw, 22px); line-height: 1.55; color: #4A3F4D; text-align: left; text-wrap: pretty; animation: ness-rise 1.05s cubic-bezier(.22,.61,.36,1) .26s both;">Let your Wig do the talking with Nessclusive</p>
-        <div style="margin-top: auto; width: 100%; max-width: 880px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 215px), 1fr)); gap: 8px; padding: 8px; border-radius: 18px; background: rgba(255,253,248,0.52); border: 1px solid rgba(255,255,255,0.72); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 20px 52px rgba(21,0,26,0.10); animation: ness-rise 1.05s cubic-bezier(.22,.61,.36,1) .44s both;">
-          <a href="#services" data-smooth="1" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 22px; border-radius: 12px; color: #15001A; font-size: 16px; text-decoration: none; transition: background .4s ease, color .4s ease;" style-hover="background: rgba(255,255,255,0.8); color: #621E69; text-decoration: none;">
-            <span>Our Services</span>
-            <svg width="13" height="9" viewBox="0 0 12.126 8.907" fill="#621E69"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
+        <h1 style="margin: 0; max-width: 15ch; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(40px, 6.4vw, 104px); line-height: 100%; letter-spacing: -0.04em; color: #FFFDF8; text-align: left; text-wrap: balance; animation: ness-rise 1.05s cubic-bezier(.22,.61,.36,1) .08s both;">Nessclusive Hair Company</h1>
+        <p style="margin: 0; max-width: 520px; font-size: clamp(17px, 1.35vw, 22px); line-height: 1.55; color: rgba(255,253,248,0.84); text-align: left; text-wrap: pretty; animation: ness-rise 1.05s cubic-bezier(.22,.61,.36,1) .26s both;">Let your Wig do the talking with Nessclusive</p>
+        <div style="margin-top: auto; width: 100%; max-width: 880px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 215px), 1fr)); gap: 8px; padding: 8px; border-radius: 18px; background: rgba(255,255,255,0.10); border: 1px solid rgba(255,255,255,0.26); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); box-shadow: 0 20px 52px rgba(0,0,0,0.28); animation: ness-rise 1.05s cubic-bezier(.22,.61,.36,1) .44s both;">
+          <a href="#services" data-smooth="1" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 22px; border-radius: 12px; color: #FFFDF8; font-size: 16px; text-decoration: none; transition: background .4s ease;" style-hover="background: rgba(255,255,255,0.16); color: #FFFFFF; text-decoration: none;">
+            <span>Our Service</span>
+            <svg width="13" height="9" viewBox="0 0 12.126 8.907" fill="#FEF1D5"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
           </a>
-          <a href="#book" data-smooth="1" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 22px; border-radius: 12px; color: #15001A; font-size: 16px; text-decoration: none; transition: background .4s ease, color .4s ease;" style-hover="background: rgba(255,255,255,0.8); color: #621E69; text-decoration: none;">
-            <span>Book a Session</span>
-            <svg width="13" height="9" viewBox="0 0 12.126 8.907" fill="#621E69"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
+          <a href="#luxury" data-smooth="1" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 22px; border-radius: 12px; color: #FFFDF8; font-size: 16px; text-decoration: none; transition: background .4s ease;" style-hover="background: rgba(255,255,255,0.16); color: #FFFFFF; text-decoration: none;">
+            <span>Luxury Looks</span>
+            <svg width="13" height="9" viewBox="0 0 12.126 8.907" fill="#FEF1D5"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
           </a>
-          <a href="#about" data-smooth="1" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 22px; border-radius: 12px; color: #15001A; font-size: 16px; text-decoration: none; transition: background .4s ease, color .4s ease;" style-hover="background: rgba(255,255,255,0.8); color: #621E69; text-decoration: none;">
-            <span>A Little About Us</span>
-            <svg width="13" height="9" viewBox="0 0 12.126 8.907" fill="#621E69"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
+          <a href="#book" data-smooth="1" style="display: flex; align-items: center; justify-content: space-between; gap: 12px; height: 64px; padding: 0 22px; border-radius: 12px; color: #FFFDF8; font-size: 16px; text-decoration: none; transition: background .4s ease;" style-hover="background: rgba(255,255,255,0.16); color: #FFFFFF; text-decoration: none;">
+            <span>Booking</span>
+            <svg width="13" height="9" viewBox="0 0 12.126 8.907" fill="#FEF1D5"><path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z" /></svg>
           </a>
         </div>
       </div>
     </section>
 
     <section id="services" data-screen-label="Services" style="position: relative; scroll-margin-top: 90px;">
-      <div data-reveal="0" style="max-width: 1770px; margin: 0 auto; padding: clamp(64px, 7vw, 110px) clamp(20px, 4vw, 150px) clamp(28px, 3vw, 44px);">
-        <p style="margin: 0 0 14px; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">What we do</p>
-        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Services</h2>
+      <div style="max-width: 1770px; margin: 0 auto; padding: clamp(72px, 8vw, 120px) clamp(20px, 4vw, 150px) clamp(28px, 3vw, 44px);">
+      <div data-reveal="0" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: clamp(30px, 3.4vw, 54px);">
+        <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #621E69;">What we do</p>
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-wrap: balance;">Our Services</h2>
+        <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #621E69;"></span>
+      </div>
+        <p data-reveal="80" style="margin: -18px 0 0; max-width: 620px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Three ways we look after your hair, in studio and in your chair.</p>
       </div>
       <div style="position: relative;">
         <div style="position: sticky; top: 0; z-index: 1; min-height: 100vh; display: flex; align-items: center; background: #FFFDF8; border-top: 1px solid #E3D2E6;">
@@ -117,9 +140,9 @@
             <div data-reveal="0" style="border-radius: 14px; height: clamp(220px, 42vh, 580px); background: url(assets/hero-3.jpg) center 22% / cover no-repeat;"></div>
             <div style="display: flex; flex-direction: column; gap: clamp(14px, 1.6vw, 22px);">
               <span data-reveal="60" style="font-size: 15px; font-weight: 600; letter-spacing: 0.16em; color: #621E69;">01</span>
-              <h3 data-reveal="120" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 3.8vw, 56px); line-height: 105%; letter-spacing: -0.04em; color: #15001A;">Luxury</h3>
-              <p data-reveal="180" style="margin: 0; max-width: 540px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Hand-built units made with premium hair and finished with a natural, pre-plucked hairline. Fitted, cut and styled to you.</p>
-              <a data-reveal="240" href="#" onClick="{{ goShop }}" style="align-self: flex-start; margin-top: 6px; height: 55px; display: flex; align-items: center; border-radius: 10px; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; text-decoration: none;">Explore luxury units</a>
+              <h3 data-reveal="120" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 3.8vw, 56px); line-height: 105%; letter-spacing: -0.04em; color: #15001A;">Wig Installation</h3>
+              <p data-reveal="180" style="margin: 0; max-width: 540px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Your unit fitted, melted and styled in studio. Custom lace tint, a natural hairline and a cut shaped to your face.</p>
+              <a data-reveal="240" href="#" onClick="{{ goBooking }}" style="align-self: flex-start; margin-top: 6px; height: 55px; display: flex; align-items: center; border-radius: 10px; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; text-decoration: none;">Book this service</a>
             </div>
           </div>
         </div>
@@ -128,9 +151,9 @@
             <div data-reveal="0" style="border-radius: 14px; height: clamp(220px, 42vh, 580px); background: url(assets/about-1.jpg) 88% 50% / cover no-repeat;"></div>
             <div style="display: flex; flex-direction: column; gap: clamp(14px, 1.6vw, 22px);">
               <span data-reveal="60" style="font-size: 15px; font-weight: 600; letter-spacing: 0.16em; color: #621E69;">02</span>
-              <h3 data-reveal="120" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 3.8vw, 56px); line-height: 105%; letter-spacing: -0.04em; color: #15001A;">Extension</h3>
-              <p data-reveal="180" style="margin: 0; max-width: 540px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Added length, volume and texture, colour-matched to your own hair and installed by our specialists in a single sitting.</p>
-              <a data-reveal="240" href="#" onClick="{{ goShop }}" style="align-self: flex-start; margin-top: 6px; height: 55px; display: flex; align-items: center; border-radius: 10px; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; text-decoration: none;">Explore extensions</a>
+              <h3 data-reveal="120" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 3.8vw, 56px); line-height: 105%; letter-spacing: -0.04em; color: #15001A;">Sew-in Service</h3>
+              <p data-reveal="180" style="margin: 0; max-width: 540px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Braided down, sewn in and blended. A protective install that lays flat, moves freely and holds its shape for weeks.</p>
+              <a data-reveal="240" href="#" onClick="{{ goBooking }}" style="align-self: flex-start; margin-top: 6px; height: 55px; display: flex; align-items: center; border-radius: 10px; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; text-decoration: none;">Book this service</a>
             </div>
           </div>
         </div>
@@ -139,32 +162,50 @@
             <div data-reveal="0" style="border-radius: 14px; height: clamp(220px, 42vh, 580px); background: url(assets/booking-hero.jpg) center 25% / cover no-repeat;"></div>
             <div style="display: flex; flex-direction: column; gap: clamp(14px, 1.6vw, 22px);">
               <span data-reveal="60" style="font-size: 15px; font-weight: 600; letter-spacing: 0.16em; color: #621E69;">03</span>
-              <h3 data-reveal="120" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 3.8vw, 56px); line-height: 105%; letter-spacing: -0.04em; color: #15001A;">Services</h3>
-              <p data-reveal="180" style="margin: 0; max-width: 540px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Consultations, colouring, revamps and restyling. Book a session at the studio or online, wherever you are.</p>
-              <a data-reveal="240" href="#" onClick="{{ goBooking }}" style="align-self: flex-start; margin-top: 6px; height: 55px; display: flex; align-items: center; border-radius: 10px; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; text-decoration: none;">Book a session</a>
+              <h3 data-reveal="120" style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 3.8vw, 56px); line-height: 105%; letter-spacing: -0.04em; color: #15001A;">Natural Hair Care</h3>
+              <p data-reveal="180" style="margin: 0; max-width: 540px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">Wash, deep condition, trim and silk press. Treatments that keep your own hair strong underneath every style.</p>
+              <a data-reveal="240" href="#" onClick="{{ goBooking }}" style="align-self: flex-start; margin-top: 6px; height: 55px; display: flex; align-items: center; border-radius: 10px; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; text-decoration: none;">Book this service</a>
             </div>
           </div>
         </div>
       </div>
     </section>
 
+    <section id="luxury" data-screen-label="Luxury Looks" style="scroll-margin-top: 90px; padding: clamp(72px, 8vw, 120px) 0;">
+      <div style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(30px, 3.4vw, 54px); display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center;" data-reveal="0">
+        <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #621E69;">On Instagram</p>
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Luxury Looks</h2>
+        <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" style="font-size: clamp(18px, 1.5vw, 22px); font-weight: 500; color: #621E69; border-bottom: 1px solid #621E69;">Follow @Nessclusive</a>
+        <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #621E69; margin-top: 4px;"></span>
+      </div>
+      <div style="display: flex; gap: clamp(10px, 1vw, 16px); overflow-x: auto; padding: 0 clamp(14px, 2vw, 40px);">
+        <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-1.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+        <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-2.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+        <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-3.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+        <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-4.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+        <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-5.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+      </div>
+    </section>
 
-
-    <section id="book" data-screen-label="Book" style="scroll-margin-top: 90px; max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
+    <section id="book" data-screen-label="Book" style="scroll-margin-top: 90px; max-width: 1770px; margin: 0 auto; padding: clamp(72px, 8vw, 120px) clamp(20px, 4vw, 150px);">
       <div style="position: relative; border-radius: 20px; overflow: hidden; background: url(assets/hero-bg.jpg) center 25% / cover no-repeat; min-height: clamp(420px, 40vw, 700px); display: flex; align-items: center;">
         <div style="position: absolute; inset: 0; background: linear-gradient(90deg, rgba(21,0,26,0.86) 0%, rgba(21,0,26,0.62) 46%, rgba(21,0,26,0.18) 100%);"></div>
-        <div style="position: relative; padding: clamp(32px, 5vw, 96px); max-width: 800px; display: flex; flex-direction: column; gap: clamp(18px, 2vw, 28px);">
-          <div style="display: flex; gap: 8px; opacity: 0.33;">
-            <svg width="22" height="17" viewBox="0 0 23.001 17.001" fill="#D8C08E"><path d="M 5.5 0 C 8.537 0 11 2.462 11 5.5 C 11 7.744 9.832 9.914 8.089 10.333 C 7.416 10.495 6.881 11.358 6.996 12.343 C 7.15 13.661 8.342 14.993 10.703 16.043 C 11.229 16.277 11.009 17.068 10.438 16.996 C 4.285 16.226 0.02 12.215 0 6.54 C 0 2.637 2.306 0 5.5 0 Z" /><path d="M 17.5 0 C 20.537 0 23 2.462 23 5.5 C 23 7.744 21.832 9.914 20.089 10.333 C 19.416 10.495 18.881 11.358 18.996 12.343 C 19.15 13.661 20.342 14.993 22.703 16.043 C 23.229 16.277 23.009 17.068 22.438 16.996 C 16.285 16.226 12.02 12.215 12 6.54 C 12 2.637 14.306 0 17.5 0 Z" /></svg>
-          </div>
+        <div style="position: relative; padding: clamp(32px, 5vw, 96px); max-width: 800px; display: flex; flex-direction: column; gap: clamp(16px, 1.8vw, 24px);">
+          <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #D8C08E;">Booking</p>
           <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 4.4vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #FFE6D1; text-wrap: balance;">Step Up Your Style, Book Now</h2>
+          <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #D8C08E;"></span>
           <p style="margin: 0; max-width: 569px; font-size: 18px; line-height: 26px; color: #FFE6D1; text-wrap: pretty;">With just a few clicks, you can secure your spot with our skilled wig  specialists. Our team is here to guide you through the process, ensuring you get the personalized attention you deserve.</p>
-          <button onClick="{{ goBooking }}" style="align-self: flex-start; height: 55px; border-radius: 10px; border: none; background: #FEF1D5; color: #6B0D83; font-size: 18px; font-weight: 500; padding: 0 24px; cursor: pointer;" style-hover="background: #FFFDF8;">Book a Session</button>
+          <button onClick="{{ goBooking }}" style="align-self: flex-start; margin-top: 6px; height: 55px; border-radius: 10px; border: none; background: #FEF1D5; color: #6B0D83; font-size: 18px; font-weight: 500; padding: 0 26px; cursor: pointer;" style-hover="background: #FFFDF8;">Booking</button>
         </div>
       </div>
     </section>
-    <section id="about" data-screen-label="About" style="scroll-margin-top: 90px; max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
-      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center;" data-reveal="0">A little about us</h2>
+
+    <section id="about" data-screen-label="About" style="scroll-margin-top: 90px; max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(72px, 8vw, 120px);">
+      <div data-reveal="0" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: clamp(30px, 3.4vw, 54px);">
+        <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #621E69;">Who we are</p>
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-wrap: balance;">A little about us</h2>
+        <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #621E69;"></span>
+      </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: clamp(24px, 3vw, 56px); align-items: center;">
         <div style="display: flex; flex-direction: column; gap: clamp(16px, 2vw, 28px);">
           <div style="border-radius: 10px; aspect-ratio: 390/317; background: url(assets/about-1.jpg) 88% 50% / cover no-repeat;"></div>
@@ -183,8 +224,13 @@
         </div>
       </div>
     </section>
-    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
-      <h2 data-reveal="0" style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Explore Collection</h2>
+
+    <section data-screen-label="Collections" style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(72px, 8vw, 120px);">
+      <div data-reveal="0" style="display: flex; flex-direction: column; gap: 14px; margin-bottom: clamp(30px, 3.4vw, 54px);">
+        <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #621E69;">Shop</p>
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-wrap: balance;">Explore Collection</h2>
+        <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #621E69;"></span>
+      </div>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: clamp(16px, 1.6vw, 20px);">
         <sc-for list="{{ collections }}" as="c" hint-placeholder-count="3">
           <a href="#" onClick="{{ c.go }}" style="display: block; border-radius: 20px; background: #F7E8F1; padding: 12px; text-decoration: none;" style-hover="background: #ECD6E3; text-decoration: none;">
@@ -197,37 +243,12 @@
       </div>
     </section>
 
-    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
-      <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: clamp(28px, 3vw, 48px); flex-wrap: wrap;">
-        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;" data-reveal="0">Our Bestseller Hairpieces</h2>
-        <a href="#" onClick="{{ goShop }}" style="font-size: 18px; font-weight: 500; color: #621E69; border-bottom: 1px solid #621E69;">View all</a>
+    <section id="faq" data-screen-label="FAQ" style="scroll-margin-top: 110px; max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(72px, 8vw, 120px);">
+      <div data-reveal="0" style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; margin-bottom: clamp(30px, 3.4vw, 54px);">
+        <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #621E69;">Good to know</p>
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-wrap: balance;">Frequently Asked Questions</h2>
+        <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #621E69;"></span>
       </div>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(16px, 1.6vw, 24px);">
-        <sc-for list="{{ bestsellers }}" as="p" hint-placeholder-count="4">
-          <div style="position: relative; display: flex; flex-direction: column;">
-            <a href="#" onClick="{{ p.go }}" style="display: block; border-radius: 20px; overflow: hidden; background: #F7E8F1;" style-hover="text-decoration: none;">
-              <div style="aspect-ratio: 390/463; background-image: {{ p.bg }}; background-size: cover; background-position: center top;"></div>
-            </a>
-            <div style="display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; padding: 18px 8px 0;">
-              <div style="display: flex; flex-direction: column; gap: 10px;">
-                <span style="font-size: 20px; line-height: 100%; color: rgba(21,0,26,0.83); text-transform: uppercase;">{{ p.name }}</span>
-                <span style="font-size: 20px; font-weight: 600; line-height: 100%; letter-spacing: -0.04em; color: #15001A;">{{ p.priceLabel }}</span>
-              </div>
-              <button onClick="{{ p.add }}" style="width: 40px; height: 40px; border-radius: 50%; border: none; background: #621E69; display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0;" style-hover="background: #6B0D83;" aria-label="Add to cart">
-                <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="#F1DEDE" stroke-width="1.6" stroke-linecap="round"><path d="M7 1.5V12.5M1.5 7H12.5" /></svg>
-              </button>
-            </div>
-          </div>
-        </sc-for>
-      </div>
-    </section>
-
-
-
-
-
-    <section style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px);">
-      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center; text-wrap: balance;" data-reveal="0">Frequently Asked  Questions</h2>
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 0 clamp(40px, 5vw, 103px);">
         <sc-for list="{{ faqs }}" as="f" hint-placeholder-count="12">
           <div style="border-bottom: 1px solid rgba(21,0,26,0.4);">
@@ -243,31 +264,28 @@
           </div>
         </sc-for>
       </div>
-      <div style="margin-top: clamp(32px, 4vw, 60px); border-radius: 8px; background: #F7E8F1; padding: clamp(24px, 3vw, 43px) clamp(20px, 2vw, 37px); display: flex; align-items: center; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
-        <div>
-          <p style="margin: 0 0 6px; font-size: clamp(21px, 1.7vw, 26px); font-weight: 500; letter-spacing: -0.03em; color: #621E69;">Do You Have Any Question ?</p>
-          <p style="margin: 0; font-size: 16px; font-weight: 500; letter-spacing: -0.03em; color: #621E69; text-wrap: pretty;">If you have any question about delivery, return or refund policy, please feel free to contact</p>
-        </div>
-        <a href="#contact" data-smooth="1" style="height: 55px; display: flex; align-items: center; border-radius: 10px; background: #FEF1D5; color: #6B0D83; font-size: 18px; font-weight: 500; padding: 0 24px; text-decoration: none; white-space: nowrap;" style-hover="background: #FFFDF8; text-decoration: none;">Contact Us</a>
-      </div>
     </section>
 
-    <section id="contact" style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(64px, 7vw, 120px); scroll-margin-top: 120px;">
+    <section id="contact" data-screen-label="Contact" style="max-width: 1770px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 150px) clamp(72px, 8vw, 120px); scroll-margin-top: 120px;">
       <div style="border-radius: 20px; background: #621E69; padding: clamp(32px, 4vw, 66px) clamp(24px, 5vw, 97px);">
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: clamp(32px, 4vw, 84px); align-items: center;">
-          <div style="display: flex; flex-direction: column; gap: clamp(20px, 2.5vw, 36px);">
+          <div style="display: flex; flex-direction: column; gap: clamp(18px, 2.2vw, 30px);">
+            <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #D8C08E;">Contact</p>
             <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 4.4vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #FEF1D5;" data-reveal="0">Let’s Stay Connected</h2>
+            <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #D8C08E;"></span>
             <p style="margin: 0; max-width: 582px; font-size: 18px; line-height: 27px; color: #FEF1D5; text-wrap: pretty;">Have questions or need assistance? We're here to help! Drop us a message and let’s connect. Whether you’re looking for expert advice, customization options, or just want to say hello, we’d love to hear from you. Let us help you find your perfect style!"</p>
             <div>
               <p style="margin: 0 0 16px; font-size: 18px; font-weight: 600; line-height: 27px; color: #FEF1D5;">Follow Us on Social Medias</p>
               <div style="display: flex; gap: 12px;">
                 <a href="#" aria-label="Facebook" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="22" height="22" viewBox="0 0 24 24" fill="#621E69"><path d="M 24 12.03 C 24 5.389 18.624 0 12 0 C 5.376 0 0 5.389 0 12.03 C 0 17.853 4.128 22.701 9.6 23.82 L 9.6 15.639 L 7.2 15.639 L 7.2 12.03 L 9.6 12.03 L 9.6 9.023 C 9.6 6.701 11.484 4.812 13.8 4.812 L 16.8 4.812 L 16.8 8.421 L 14.4 8.421 C 13.74 8.421 13.2 8.962 13.2 9.624 L 13.2 12.03 L 16.8 12.03 L 16.8 15.639 L 13.2 15.639 L 13.2 24 C 19.26 23.398 24 18.274 24 12.03 Z" /></svg></a>
-                <a href="#" aria-label="Instagram" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6" /><circle cx="12" cy="12" r="4.6" /><circle cx="17.8" cy="6.2" r="1.2" fill="#621E69" stroke="none" /></svg></a>
+                <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Instagram" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="6" /><circle cx="12" cy="12" r="4.6" /><circle cx="17.8" cy="6.2" r="1.2" fill="#621E69" stroke="none" /></svg></a>
                 <a href="#" aria-label="YouTube" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="#621E69"><path d="M21.6 7.2c-.2-1-.9-1.7-1.9-1.9C17.9 5 12 5 12 5s-5.9 0-7.7.3c-1 .2-1.7.9-1.9 1.9C2.1 9 2.1 12 2.1 12s0 3 .3 4.8c.2 1 .9 1.7 1.9 1.9C6.1 19 12 19 12 19s5.9 0 7.7-.3c1-.2 1.7-.9 1.9-1.9.3-1.8.3-4.8.3-4.8s0-3-.3-4.8ZM9.9 15.3V8.7l5.6 3.3-5.6 3.3Z" /></svg></a>
                 <a href="#" aria-label="X" style="width: 42px; height: 42px; border-radius: 50%; background: #FEF1D5; display: flex; align-items: center; justify-content: center;" style-hover="opacity: .82; text-decoration: none;"><svg width="17" height="17" viewBox="0 0 13.224 13.515" fill="#621E69"><path d="M 7.87 5.723 L 12.793 0 L 11.627 0 L 7.352 4.969 L 3.938 0 L 0 0 L 5.163 7.514 L 0 13.515 L 1.167 13.515 L 5.681 8.268 L 9.286 13.515 L 13.224 13.515 L 7.87 5.723 L 7.87 5.723 Z M 1.587 0.878 L 3.379 0.878 L 11.627 12.677 L 9.835 12.677 L 1.587 0.878 Z" /></svg></a>
               </div>
             </div>
           </div>
+
+          <sc-if value="{{ contactOpen }}" hint-placeholder-val="{{ true }}">
           <div style="border-radius: 10px; background: #F4E8E8; padding: clamp(24px, 2.4vw, 35px); display: flex; flex-direction: column; gap: 18px;">
             <label style="display: flex; flex-direction: column; gap: 11px;">
               <span style="font-size: 16px; font-weight: 500; color: #333333;">Name</span>
@@ -283,18 +301,29 @@
             </label>
             <button onClick="{{ submitContact }}" style="height: 55px; border-radius: 6px; border: none; background: #621E69; color: #FEF1D5; font-size: 18px; font-weight: 500; letter-spacing: -0.03em; cursor: pointer;" style-hover="background: #6B0D83;">Contact Us</button>
           </div>
-        </div>
-      </div>
-    </section>
+          </sc-if>
 
-    <section style="padding: 0 0 clamp(64px, 7vw, 110px);">
-      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(30px, 4.2vw, 64px); line-height: 110%; letter-spacing: -0.04em; color: #15001A; text-align: center; padding: 0 20px; text-wrap: balance;" data-reveal="0">Follow &amp; Tag  on Instagram @Nessclusive</h2>
-      <div style="display: flex; gap: clamp(10px, 1vw, 16px); overflow-x: auto; padding: 0 clamp(14px, 2vw, 40px);">
-        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-1.jpg) center / cover no-repeat;"></div>
-        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-2.jpg) center / cover no-repeat;"></div>
-        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-3.jpg) center / cover no-repeat;"></div>
-        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-4.jpg) center / cover no-repeat;"></div>
-        <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-5.jpg) center / cover no-repeat;"></div>
+          <sc-if value="{{ contactDone }}" hint-placeholder-val="{{ false }}">
+          <div style="border-radius: 10px; background: #F4E8E8; padding: clamp(32px, 3vw, 48px); min-height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 20px; animation: ness-fade .35s ease both;">
+            <div style="position: relative; width: 150px; height: 150px; display: flex; align-items: center; justify-content: center;">
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(0deg);"><span style="position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #621E69; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .16s both;"></span></span>
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(45deg);"><span style="position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #D8C08E; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .24s both;"></span></span>
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(90deg);"><span style="position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #621E69; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .2s both;"></span></span>
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(135deg);"><span style="position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #D8C08E; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .3s both;"></span></span>
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(180deg);"><span style="position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #621E69; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .18s both;"></span></span>
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(225deg);"><span style="position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #D8C08E; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .26s both;"></span></span>
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(270deg);"><span style="position: absolute; width: 9px; height: 9px; border-radius: 50%; background: #621E69; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .22s both;"></span></span>
+              <span style="position: absolute; left: 50%; top: 50%; width: 0; height: 0; transform: rotate(315deg);"><span style="position: absolute; width: 7px; height: 7px; border-radius: 50%; background: #D8C08E; animation: ness-spark 1s cubic-bezier(.2,.7,.3,1) .32s both;"></span></span>
+              <span style="position: relative; width: 96px; height: 96px; border-radius: 50%; background: #1E7A4B; display: flex; align-items: center; justify-content: center; animation: ness-pop .5s cubic-bezier(.22,1.25,.36,1) both;">
+                <svg width="42" height="32" viewBox="0 0 42 32" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17L15 29L39 3" style="stroke-dasharray: 62; animation: ness-check .45s ease .3s both;" /></svg>
+              </span>
+            </div>
+            <h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(26px, 2.6vw, 36px); line-height: 110%; letter-spacing: -0.04em; color: #15001A; text-wrap: balance;">Thanks for contacting us.</h3>
+            <p style="margin: 0; max-width: 380px; font-size: 18px; line-height: 28px; color: #5F5462; text-wrap: pretty;">We’ll get back to you as soon as possible.</p>
+            <button onClick="{{ contactReset }}" style="margin-top: 6px; height: 55px; padding: 0 26px; border-radius: 6px; border: 1px solid #621E69; background: transparent; color: #621E69; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #621E69; color: #FEF1D5;">Send another message</button>
+          </div>
+          </sc-if>
+        </div>
       </div>
     </section>
 
@@ -544,135 +573,212 @@
       </div>
     </section>
 
-    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(48px, 5vw, 80px) clamp(20px, 4vw, 150px) 0;">
-      <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 4.4vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center;">Plan your Perfect Style</h2>
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(16px, 1.6vw, 24px);">
-        <sc-for list="{{ stepLabels }}" as="st" hint-placeholder-count="3">
-          <div style="border-radius: 20px; background: #F7E8F1; padding: clamp(28px, 3vw, 54px) clamp(20px, 2vw, 32px); display: flex; flex-direction: column; align-items: center; gap: 24px; text-align: center;">
-            <div style="width: 118px; height: 118px; border-radius: 50%; background: {{ st.bg }}; color: {{ st.fg }}; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 48px; font-weight: 600;">{{ st.n }}</div>
-            <p style="margin: 0; font-size: clamp(19px, 1.5vw, 24px); font-weight: 500; letter-spacing: -0.01em; color: #621E69; text-wrap: balance;">{{ st.label }}</p>
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(64px, 7vw, 104px) clamp(20px, 4vw, 150px) 0;">
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; margin-bottom: clamp(30px, 3.4vw, 54px);">
+        <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #621E69;">Before you arrive</p>
+        <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(32px, 4.4vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Plan your Perfect Style</h2>
+        <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #621E69;"></span>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(16px, 1.6vw, 24px);">
+        <sc-for list="{{ prepCards }}" as="st" hint-placeholder-count="4">
+          <div style="border-radius: 20px; background: #F7E8F1; padding: clamp(28px, 3vw, 46px) clamp(20px, 2vw, 28px); display: flex; flex-direction: column; align-items: center; gap: 22px; text-align: center;">
+            <div style="width: 104px; height: 104px; border-radius: 50%; background: #621E69; color: #FEF1D5; display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-size: 44px; font-weight: 600;">{{ st.n }}</div>
+            <p style="margin: 0; font-size: clamp(18px, 1.4vw, 22px); font-weight: 500; line-height: 140%; letter-spacing: -0.01em; color: #621E69; text-wrap: balance;">{{ st.label }}</p>
           </div>
         </sc-for>
       </div>
     </section>
 
-    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(40px, 4vw, 64px) clamp(20px, 4vw, 150px) 0;">
-      <div style="border-radius: 20px; border: 1px solid #E3D2E6; background: #FDF9F0; padding: clamp(24px, 3vw, 48px);">
-
-        <sc-if value="{{ bDone }}" hint-placeholder-val="{{ false }}">
-          <div style="text-align: center; padding: clamp(24px, 4vw, 56px) 0;">
-            <div style="width: 88px; height: 88px; border-radius: 50%; background: #621E69; margin: 0 auto 28px; display: flex; align-items: center; justify-content: center;">
-              <svg width="38" height="28" viewBox="0 0 38 28" fill="none" stroke="#FEF1D5" stroke-width="3.4"><path d="M2 15L13 26L36 3" stroke-linecap="round" stroke-linejoin="round" /></svg>
-            </div>
-            <h3 style="margin: 0 0 14px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(26px, 2.6vw, 36px); letter-spacing: -0.04em; color: #15001A;">Request received</h3>
-            <p style="margin: 0 auto 28px; max-width: 520px; font-size: 18px; line-height: 27px; color: #5F5462; text-wrap: pretty;">{{ bSummary }}</p>
-            <p style="margin: 0 auto 28px; max-width: 560px; font-size: 16px; line-height: 26px; color: #5F5462; text-wrap: pretty;">Your slot is held once the non-refundable deposit is paid. We will text the deposit link to the number on your request.</p>
-            <button onClick="{{ bReset }}" style="height: 55px; padding: 0 26px; border-radius: 10px; border: 1px solid #15001A; background: transparent; color: #15001A; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #15001A; color: #FFFDF8;">Book another service</button>
-          </div>
-        </sc-if>
-
-        <sc-if value="{{ bStep0 }}" hint-placeholder-val="{{ true }}">
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(56px, 6vw, 88px) clamp(20px, 4vw, 150px) 0;">
+      <div style="border-radius: 20px; background: #FEF1D5; padding: clamp(24px, 3vw, 48px);">
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: clamp(24px, 2.6vw, 36px);">
+          <h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); line-height: 110%; letter-spacing: -0.04em; color: #15001A;">Studio Info</h3>
+          <p style="margin: 0; font-size: 16px; line-height: 24px; color: #5F5462;">Hours, contact and where to find us.</p>
+          <span style="display: block; width: 48px; height: 3px; border-radius: 2px; background: #621E69;"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: clamp(24px, 3vw, 56px);">
           <div>
-            <p style="margin: 0 0 6px; font-size: 15px; line-height: 22px; color: #5F5462;">Step 1 of 3</p>
-            <h3 style="margin: 0 0 clamp(20px, 2vw, 32px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Select Your Desired Service</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 14px;">
-              <sc-for list="{{ services }}" as="sv" hint-placeholder-count="5">
-                <button onClick="{{ sv.pick }}" style="text-align: left; border: {{ sv.border }}; border-radius: 12px; background: {{ sv.bg }}; padding: 22px; cursor: pointer; display: flex; flex-direction: column; gap: 8px;" style-hover="border-color: #621E69;">
-                  <span style="font-size: 20px; font-weight: 600; letter-spacing: -0.02em; color: #15001A;">{{ sv.name }}</span>
-                  <span style="font-size: 15px; line-height: 22px; color: #5F5462;">{{ sv.note }}</span>
-                </button>
-              </sc-for>
+            <p style="margin: 0 0 8px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Office Hours</p>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; font-weight: 500; color: #15001A;">Monday</span>
+              <span style="font-size: 17px; color: #9A8E9C; ">Closed</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; font-weight: 500; color: #15001A;">Tuesday</span>
+              <span style="font-size: 17px; color: #621E69; font-weight: 500;">10:30am – 7pm</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; font-weight: 500; color: #15001A;">Wednesday</span>
+              <span style="font-size: 17px; color: #621E69; font-weight: 500;">10:30am – 7pm</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; font-weight: 500; color: #15001A;">Thursday</span>
+              <span style="font-size: 17px; color: #621E69; font-weight: 500;">10:30am – 7pm</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; font-weight: 500; color: #15001A;">Friday</span>
+              <span style="font-size: 17px; color: #621E69; font-weight: 500;">10:30am – 7pm</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; font-weight: 500; color: #15001A;">Saturday</span>
+              <span style="font-size: 17px; color: #621E69; font-weight: 500;">10:30am – 7pm</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; font-weight: 500; color: #15001A;">Sunday</span>
+              <span style="font-size: 17px; color: #9A8E9C; ">Closed</span>
             </div>
           </div>
-        </sc-if>
-
-        <sc-if value="{{ bStep1 }}" hint-placeholder-val="{{ false }}">
-          <div>
-            <p style="margin: 0 0 6px; font-size: 15px; line-height: 22px; color: #5F5462;">Step 2 of 3</p>
-            <h3 style="margin: 0 0 clamp(20px, 2vw, 32px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Select your preferable Time &amp; date</h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(24px, 3vw, 40px);">
-              <label style="display: flex; flex-direction: column; gap: 11px;">
-                <span style="font-size: 16px; font-weight: 500; color: #333333;">Date</span>
-                <input type="date" value="{{ bDate }}" onChange="{{ onDate }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
-              </label>
-              <div>
-                <p style="margin: 0 0 11px; font-size: 16px; font-weight: 500; color: #333333;">Time</p>
-                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                  <sc-for list="{{ times }}" as="t" hint-placeholder-count="6">
-                    <button onClick="{{ t.pick }}" style="height: 50px; padding: 0 18px; border-radius: 41px; border: {{ t.border }}; background: {{ t.bg }}; color: {{ t.fg }}; font-size: 16px; cursor: pointer;">{{ t.label }}</button>
-                  </sc-for>
+          <div style="display: flex; flex-direction: column; gap: clamp(24px, 2.4vw, 34px);">
+            <div>
+              <p style="margin: 0 0 8px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Contact</p>
+            <a href="tel:9175878962" style="display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14); text-decoration: none;" style-hover="text-decoration: none; opacity: .75;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z" /></svg>
+              <span style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #9A8E9C;">Phone</span>
+                <span style="font-size: 17px; color: #15001A;">917-587-8962</span>
+              </span>
+            </a>
+            <a href="mailto:info@nessclusive.com" style="display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14); text-decoration: none;" style-hover="text-decoration: none; opacity: .75;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect x="2" y="4" width="20" height="16" rx="2.5" /><path d="m3 6.5 9 6 9-6" /></svg>
+              <span style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #9A8E9C;">Email</span>
+                <span style="font-size: 17px; color: #15001A;">info@nessclusive.com</span>
+              </span>
+            </a>
+            <a href="https://instagram.com/nessclusive" style="display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14); text-decoration: none;" style-hover="text-decoration: none; opacity: .75;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><rect x="2.5" y="2.5" width="19" height="19" rx="5.5" /><circle cx="12" cy="12" r="4.4" /><circle cx="17.6" cy="6.4" r="1.1" fill="#621E69" stroke="none" /></svg>
+              <span style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #9A8E9C;">Instagram</span>
+                <span style="font-size: 17px; color: #15001A;">@nessclusive</span>
+              </span>
+            </a>
+            <a href="https://tiktok.com/@nessclusive_" style="display: flex; align-items: center; gap: 14px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14); text-decoration: none;" style-hover="text-decoration: none; opacity: .75;">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;"><path d="M14 3.5c.6 2.7 2.3 4.4 5 4.7v3.2c-1.9.1-3.6-.5-5-1.6v5.7a5.9 5.9 0 1 1-5.1-5.9v3.3a2.7 2.7 0 1 0 1.9 2.6V3.5Z" /></svg>
+              <span style="display: flex; flex-direction: column; gap: 2px;">
+                <span style="font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: #9A8E9C;">TikTok</span>
+                <span style="font-size: 17px; color: #15001A;">@nessclusive_</span>
+              </span>
+            </a>
+            </div>
+            <div>
+              <p style="margin: 0 0 8px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Location</p>
+              <div style="display: flex; align-items: flex-start; gap: 14px; padding: 13px 0;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#621E69" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 3px;"><path d="M20 10.5c0 6-8 12.5-8 12.5s-8-6.5-8-12.5a8 8 0 1 1 16 0Z" /><circle cx="12" cy="10.3" r="3" /></svg>
+                <div>
+                  <p style="margin: 0 0 6px; font-size: 17px; font-weight: 500; color: #15001A;">E 169 St, Bronx, NY 10456</p>
+                  <p style="margin: 0; font-size: 15px; line-height: 23px; color: #5F5462;">Exact address is sent in a reminder email 24 hours before your appointment.</p>
                 </div>
               </div>
             </div>
           </div>
-        </sc-if>
-
-        <sc-if value="{{ bStep2 }}" hint-placeholder-val="{{ false }}">
-          <div>
-            <p style="margin: 0 0 6px; font-size: 15px; line-height: 22px; color: #5F5462;">Step 3 of 3</p>
-            <h3 style="margin: 0 0 clamp(20px, 2vw, 32px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Confirm and Get Ready </h3>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: clamp(20px, 2vw, 32px);">
-              <label style="display: flex; flex-direction: column; gap: 11px;">
-                <span style="font-size: 16px; font-weight: 500; color: #333333;">Name</span>
-                <input type="text" placeholder="Ex. Park" value="{{ bName }}" onInput="{{ onName }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
-              </label>
-              <label style="display: flex; flex-direction: column; gap: 11px;">
-                <span style="font-size: 16px; font-weight: 500; color: #333333;">Email</span>
-                <input type="email" placeholder="example@mail.com" value="{{ bEmail }}" onInput="{{ onEmail }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
-              </label>
-              <label style="display: flex; flex-direction: column; gap: 11px;">
-                <span style="font-size: 16px; font-weight: 500; color: #333333;">Phone</span>
-                <input type="tel" placeholder="917-587-8962" value="{{ bPhone }}" onInput="{{ onPhone }}" style="height: 55px; border-radius: 6px; border: 1px solid #E3D2E6; background: #FFFFFF; padding: 0 16px; font-size: 16px; color: #15001A;" />
-              </label>
-            </div>
-            <div style="margin-top: clamp(20px, 2vw, 28px); border-radius: 8px; background: #F7E8F1; padding: 20px;">
-              <p style="margin: 0; font-size: 16px; line-height: 26px; color: #621E69;">{{ bSummary }}</p>
-            </div>
-          </div>
-        </sc-if>
-
-        <sc-if value="{{ bFormOpen }}" hint-placeholder-val="{{ true }}">
-          <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: clamp(24px, 3vw, 36px);">
-            <sc-if value="{{ bCanBack }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ bBack }}" style="height: 55px; padding: 0 24px; border-radius: 10px; border: 1px solid #15001A; background: transparent; color: #15001A; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #15001A; color: #FFFDF8;">Back</button>
-            </sc-if>
-            <sc-if value="{{ bCanNext }}" hint-placeholder-val="{{ true }}">
-              <button onClick="{{ bNext }}" style="height: 55px; padding: 0 28px; border-radius: 10px; border: none; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; cursor: pointer;" style-hover="background: #621E69;">Continue</button>
-            </sc-if>
-            <sc-if value="{{ bStep2 }}" hint-placeholder-val="{{ false }}">
-              <button onClick="{{ bConfirm }}" style="height: 55px; padding: 0 28px; border-radius: 10px; border: none; background: {{ bConfirmBg }}; color: {{ bConfirmFg }}; font-size: 18px; font-weight: 500; cursor: pointer;">Confirm booking</button>
-            </sc-if>
-          </div>
-        </sc-if>
-      </div>
-    </section>
-
-    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(48px, 5vw, 80px) clamp(20px, 4vw, 150px) 0;">
-      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: clamp(24px, 3vw, 48px);">
-        <div style="border-radius: 20px; background: #FEF1D5; padding: clamp(24px, 3vw, 40px);">
-          <h3 style="margin: 0 0 24px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Booking Policy</h3>
-          <div style="display: flex; flex-direction: column; gap: 18px;">
-            <sc-for list="{{ policy }}" as="line" hint-placeholder-count="6">
-              <p style="margin: 0; font-size: 15px; line-height: 24px; color: #15001A; white-space: pre-line;">{{ line.text }}</p>
-            </sc-for>
-          </div>
-        </div>
-        <div style="border-radius: 20px; background: #F4E8E8; padding: clamp(24px, 3vw, 40px);">
-          <h3 style="margin: 0 0 24px; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); letter-spacing: -0.04em; color: #15001A;">Custom Wig , Coloring &amp; Drop off</h3>
-          <div style="display: flex; flex-direction: column; gap: 18px;">
-            <sc-for list="{{ dropoff }}" as="line" hint-placeholder-count="7">
-              <p style="margin: 0; font-size: 15px; line-height: 24px; color: #15001A; white-space: pre-line;">{{ line.text }}</p>
-            </sc-for>
-          </div>
         </div>
       </div>
     </section>
 
-    <div style="height: clamp(48px, 5vw, 80px);"></div>
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(56px, 6vw, 88px) clamp(20px, 4vw, 150px) 0;">
+      <div style="border-radius: 20px; background: #F4E8E8; padding: clamp(24px, 3vw, 48px);">
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: clamp(24px, 2.6vw, 36px);">
+          <h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); line-height: 110%; letter-spacing: -0.04em; color: #15001A;">Booking Policy</h3>
+          <p style="margin: 0; font-size: 16px; line-height: 24px; color: #5F5462;">Important — please read before booking.</p>
+          <span style="display: block; width: 48px; height: 3px; border-radius: 2px; background: #621E69;"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: clamp(14px, 1.4vw, 20px); margin-bottom: clamp(28px, 3vw, 40px);">
+          <div style="border-radius: 14px; background: #FFFDF8; padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 14px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 25s-9-5.6-9-12.4A5 5 0 0 1 14 9.4 5 5 0 0 1 23 12.6C23 19.4 14 25 14 25Z" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Health</p>
+            <p style="margin: 0; font-size: 16px; line-height: 25px; color: #15001A; text-wrap: pretty;">Please stay safe. Cancel 24hrs if you are feeling sick.</p>
+          </div>
+          <div style="border-radius: 14px; background: #FFFDF8; padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 14px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="9" r="4" /><path d="M6 24c1-4.3 4.2-6.5 8-6.5s7 2.2 8 6.5" /><circle cx="23.4" cy="10.6" r="2.6" /><circle cx="4.6" cy="10.6" r="2.6" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Guests</p>
+            <p style="margin: 0; font-size: 16px; line-height: 25px; color: #15001A; text-wrap: pretty;">No extra guests — limited space and private client experiences only.</p>
+          </div>
+          <div style="border-radius: 14px; background: #FFFDF8; padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 14px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="22" height="14" rx="2.5" /><circle cx="14" cy="14" r="3.4" /><path d="M7 11.5v5M21 11.5v5" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Deposit</p>
+            <p style="margin: 0; font-size: 16px; line-height: 25px; color: #15001A; text-wrap: pretty;">A non-refundable $40 deposit secures your booking. Remaining balance must be paid in cash or Zelle only.</p>
+          </div>
+        </div>
+        <p style="margin: 0 0 18px; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Booking Policies</p>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr)); gap: clamp(14px, 1.4vw, 20px);">
+          <div style="border-radius: 14px; background: #FEF1D5; padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 14px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="20" height="18" rx="2.5" /><path d="M4 11h20M9.5 3.5v5M18.5 3.5v5" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Schedule</p>
+            <p style="margin: 0; font-size: 16px; line-height: 25px; color: #15001A; text-wrap: pretty;">Book at least 5 days ahead, that way you can prevent extra costs.</p>
+          </div>
+          <div style="border-radius: 14px; background: #FEF1D5; padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 14px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="10.5" /><path d="M10.4 10.4l7.2 7.2M17.6 10.4l-7.2 7.2" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Cancellation</p>
+            <p style="margin: 0; font-size: 16px; line-height: 25px; color: #15001A; text-wrap: pretty;">Same day — deposit lost and 50% of service charged.</p>
+          </div>
+          <div style="border-radius: 14px; background: #FEF1D5; padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 14px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="6" width="20" height="18" rx="2.5" /><path d="M4 11h20M9.5 3.5v5M18.5 3.5v5M10 18h6.5a2.5 2.5 0 0 0 0-5H13" /><path d="M14.6 10.6L12.4 13l2.2 2.4" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Reschedule</p>
+            <p style="margin: 0; font-size: 16px; line-height: 25px; color: #15001A; text-wrap: pretty;">You can reschedule once with your deposit in the same month. Reschedule up to 3 days before your original appointment. No exceptions!</p>
+          </div>
+          <div style="border-radius: 14px; background: #FEF1D5; padding: clamp(20px, 2vw, 28px); display: flex; flex-direction: column; gap: 14px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="10.5" /><path d="M14 8v6.4l4 2.4" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Lateness</p>
+            <p style="margin: 0; font-size: 16px; line-height: 25px; color: #15001A; text-wrap: pretty;">You have a 10 min grace period. After 10 min you will be charged a $20 fee. After 20 mins the appointment will be cancelled.</p>
+          </div>
+        </div>
+        <p style="margin: clamp(24px, 2.6vw, 34px) 0 0; font-size: 15px; font-weight: 600; letter-spacing: 0.02em; color: #621E69; text-wrap: pretty;">By booking you have accepted and agreed to the terms of this policy.</p>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(56px, 6vw, 88px) clamp(20px, 4vw, 150px) 0;">
+      <div style="border-radius: 20px; background: #F7E8F1; padding: clamp(24px, 3vw, 48px);">
+        <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: clamp(24px, 2.6vw, 36px);">
+          <h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(24px, 2.4vw, 36px); line-height: 110%; letter-spacing: -0.04em; color: #15001A;">Custom Wig, Coloring &amp; Drop off</h3>
+          <p style="margin: 0; font-size: 16px; line-height: 24px; color: #5F5462;">Text 917-587-8962 or email info@nessclusive.com for all wig orders.</p>
+          <span style="display: block; width: 48px; height: 3px; border-radius: 2px; background: #621E69;"></span>
+        </div>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: clamp(20px, 2vw, 32px);">
+          <div style="border-radius: 14px; background: #FFFDF8; padding: clamp(22px, 2.4vw, 34px); display: flex; flex-direction: column; gap: 16px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 10.5 14 5l10 5.5v9L14 25 4 19.5Z" /><path d="M4 10.5 14 16l10-5.5M14 16v9" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Wig / Hair Drop Off</p>
+            <p style="margin: 0; font-size: 17px; line-height: 27px; color: #15001A; text-wrap: pretty;">All frontals, closures and wigs must be dropped off 4–5 days in advance or a fee will be charged.</p>
+            <p style="margin: 0; font-size: 17px; line-height: 27px; color: #5F5462; text-wrap: pretty;">Contact me for the address. Please do not come to the shop without prior knowledge.</p>
+          </div>
+          <div style="border-radius: 14px; background: #FFFDF8; padding: clamp(22px, 2.4vw, 34px); display: flex; flex-direction: column; gap: 16px;">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#621E69" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="10.5" /><path d="M14 8.5v11M17 11.2c-.7-.9-1.8-1.4-3-1.4-1.8 0-3.2 1-3.2 2.5 0 3.2 6.4 1.7 6.4 4.9 0 1.6-1.4 2.6-3.2 2.6-1.3 0-2.5-.5-3.2-1.5" /></svg>
+            <p style="margin: 0; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.14em; color: #621E69;">Late Drop Off Charge</p>
+            <div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; color: #15001A;">3 days</span>
+              <span style="font-size: 17px; font-weight: 600; color: #621E69; white-space: nowrap;">$15 fee</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; color: #15001A;">2 days</span>
+              <span style="font-size: 17px; font-weight: 600; color: #621E69; white-space: nowrap;">$25 fee</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; color: #15001A;">1 day</span>
+              <span style="font-size: 17px; font-weight: 600; color: #621E69; white-space: nowrap;">Not accepted</span>
+            </div>
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding: 13px 0; border-bottom: 1px solid rgba(98,30,105,0.14);">
+              <span style="font-size: 17px; color: #15001A;">Same day customization</span>
+              <span style="font-size: 17px; font-weight: 600; color: #621E69; white-space: nowrap;">$40 fee</span>
+            </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width: 1770px; margin: 0 auto; padding: clamp(48px, 5vw, 72px) clamp(20px, 4vw, 150px) 0;">
+      <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 14px;">
+        <a href="{{ acuityUrl }}" target="_blank" rel="noopener" style="height: 60px; display: flex; align-items: center; border-radius: 10px; background: #6B0D83; color: #FFFCF8; font-size: 18px; font-weight: 500; padding: 0 32px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; text-decoration: none;">Book a Reservation</a>
+        <a href="#" onClick="{{ goHomeContact }}" style="height: 60px; display: flex; align-items: center; border-radius: 10px; border: 1px solid #621E69; color: #621E69; font-size: 18px; font-weight: 500; padding: 0 32px; text-decoration: none; transition: background .4s ease;" style-hover="background: #621E69; color: #FEF1D5; text-decoration: none;">Ask question</a>
+      </div>
+    </section>
+
+    <div style="height: clamp(56px, 6vw, 96px);"></div>
+
   </main>
   </sc-if>
 
-  <sc-if value="{{ isNotHome }}" hint-placeholder-val="{{ false }}">
+  <sc-if value="{{ isCatalog }}" hint-placeholder-val="{{ false }}">
   <section style="padding: 0 0 clamp(64px, 7vw, 110px);">
     <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A; text-align: center; padding: 0 20px;">Words from our Happy Clients</h2>
     <div style="display: flex; gap: 20px; overflow-x: auto; padding: 4px clamp(20px, 4vw, 150px) 20px; scroll-snap-type: x mandatory;">
@@ -699,13 +805,18 @@
   </section>
 
   <section style="padding: 0 0 clamp(64px, 7vw, 110px);">
-    <h2 style="margin: 0 0 clamp(28px, 3vw, 48px); font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(30px, 4.2vw, 64px); line-height: 110%; letter-spacing: -0.04em; color: #15001A; text-align: center; padding: 0 20px; text-wrap: balance;" data-reveal="0">Follow &amp; Tag  on Instagram @Nessclusive</h2>
+    <div data-reveal="0" style="display: flex; flex-direction: column; align-items: center; gap: 14px; text-align: center; padding: 0 20px; margin-bottom: clamp(30px, 3.4vw, 54px);">
+      <p style="margin: 0; font-size: 15px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.18em; color: #621E69;">On Instagram</p>
+      <h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 600; font-size: clamp(34px, 4.6vw, 64px); line-height: 100%; letter-spacing: -0.04em; color: #15001A;">Luxury Looks</h2>
+      <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" style="font-size: clamp(18px, 1.5vw, 22px); font-weight: 500; color: #621E69; border-bottom: 1px solid #621E69;">Follow @Nessclusive</a>
+      <span style="display: block; width: 64px; height: 3px; border-radius: 2px; background: #621E69; margin-top: 4px;"></span>
+    </div>
     <div style="display: flex; gap: clamp(10px, 1vw, 16px); overflow-x: auto; padding: 0 clamp(14px, 2vw, 40px);">
-      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-1.jpg) center / cover no-repeat;"></div>
-      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-2.jpg) center / cover no-repeat;"></div>
-      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-3.jpg) center / cover no-repeat;"></div>
-      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-4.jpg) center / cover no-repeat;"></div>
-      <div style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-5.jpg) center / cover no-repeat;"></div>
+      <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-1.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+      <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-2.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+      <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-3.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+      <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-4.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
+      <a href="https://instagram.com/nessclusive" target="_blank" rel="noopener" aria-label="Nessclusive on Instagram" style="flex: 1 0 min(320px, 60vw); aspect-ratio: 4/5; border-radius: 10px; background: url(assets/ig-5.jpg) center / cover no-repeat; display: block; transition: opacity .35s ease;" style-hover="opacity: .86; text-decoration: none;"></a>
     </div>
   </section>
   </sc-if>
@@ -893,15 +1004,14 @@ const TESTIMONIALS = [
   { quote:'The wig fits perfectly, feels natural, and is so lightweight. I can’t believe how real it looks—absolutely love it!', name:'A. Stouten' }
 ];
 
-const SERVICES = [
-  { id:'custom',   name:'Custom Wig Construction', note:'Unit built from your bundles or ours. Drop off required 4–5 days in advance.' },
-  { id:'coloring', name:'Coloring',                note:'Root tint, full colour or highlights on a unit you already own.' },
-  { id:'dropoff',  name:'Drop Off Customization',  note:'Plucking, bleaching and styling on frontals, closures and wigs.' },
-  { id:'revamp',   name:'Wig Revamp',              note:'Wash, deep condition, reinstall lace and restyle an existing unit.' },
-  { id:'install',  name:'Wig Install',             note:'In-studio install with a custom melt and style.' }
-];
 
-const TIMES = ['10:00 AM','11:30 AM','1:00 PM','2:30 PM','4:00 PM','5:30 PM'];
+const ACUITY_URL = 'https://nessclusive.as.me/';
+const PREP = [
+  'Avoid any extra product in your hair.',
+  'Clean your hair before your appointment.',
+  'Hair should be at least ear length.',
+  'Hair should be dry and completely detangled.'
+];
 const RATES = { USD:{ s:'$', r:1 }, CAD:{ s:'CA$', r:1.37 }, GBP:{ s:'£', r:0.79 } };
 
 class Component extends DCLogic {
@@ -911,7 +1021,7 @@ class Component extends DCLogic {
     proc:'Standard — 7 to 10 days', pickup:'Ship to me', qty:1,
     cart:[], cartOpen:false, menuOpen:false, searchOpen:false, query:'',
     faqOpen:null, filtersOpen:false, sortOpen:false, currency:'USD',
-    bStep:0, bService:null, bDate:'', bTime:'', bName:'', bEmail:'', bPhone:'', bDone:false,
+    cinePaused:false, contactDone:false,
     toast:''
   };
 
@@ -1017,6 +1127,17 @@ class Component extends DCLogic {
     this._t = setTimeout(() => this.setState({ toast:'' }), 2600);
   }
 
+  jumpHome(id) {
+    this.go('home');
+    setTimeout(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const top = el.getBoundingClientRect().top + window.pageYOffset - 108;
+      const calm = !window.matchMedia || !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollTo({ top, behavior: calm ? 'smooth' : 'auto' });
+    }, 140);
+  }
+
   go(page, productId) {
     const next = { page, menuOpen:false, searchOpen:false, cartOpen:false, filtersOpen:false, sortOpen:false };
     if (productId) { next.productId = productId; next.gallery = 0; next.qty = 1; next.size = '18”'; }
@@ -1081,12 +1202,12 @@ class Component extends DCLogic {
     const cartCount = s.cart.reduce((n, l) => n + l.qty, 0);
     const subtotal = s.cart.reduce((n, l) => n + l.qty * l.price, 0);
     const galleryImgs = [product.img, product.alt];
-    const bookingReady = !!(s.bService && s.bDate && s.bTime && s.bName && s.bEmail);
 
     return {
       isHome: s.page === 'home', isShop: s.page === 'shop',
       isProduct: s.page === 'product', isBooking: s.page === 'booking',
       isNotHome: s.page !== 'home',
+      isCatalog: s.page === 'shop' || s.page === 'product',
       isWide: !s.narrow, isNarrow: !!s.narrow,
 
       navLinks: [
@@ -1094,13 +1215,21 @@ class Component extends DCLogic {
         { label:'Pre-Order',     go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Pre-order' }); this.go('shop'); } },
         { label:'Accessories',   go:(e)=>{ if(e) e.preventDefault(); this.setState({ collection:'Accessories' }); this.go('shop'); } },
         { label:'Booking',       go:(e)=>{ if(e) e.preventDefault(); this.go('booking'); } },
-        { label:'FAQ',           go:(e)=>{ if(e) e.preventDefault(); this.go('home'); setTimeout(()=>{ const el=document.getElementById('contact'); if(el) window.scrollTo({ top: el.offsetTop - 400, behavior:'smooth' }); }, 60); } },
+        { label:'FAQ',           go:(e)=>{ if(e) e.preventDefault(); this.jumpHome('faq'); } },
         { label:'Contact Us',    go:(e)=>{ if(e) e.preventDefault(); this.go('home'); setTimeout(()=>{ const el=document.getElementById('contact'); if(el) window.scrollTo({ top: el.offsetTop - 100, behavior:'smooth' }); }, 60); } }
       ],
 
       goHome: (e) => { if (e) e.preventDefault(); this.go('home'); },
       goShop: (e) => { if (e) e.preventDefault(); this.go('shop'); },
       goBooking: (e) => { if (e) e.preventDefault(); this.go('booking'); },
+      goHomeContact: (e) => { if (e) e.preventDefault(); this.jumpHome('contact'); },
+      acuityUrl: ACUITY_URL,
+      cinePlaying: !s.cinePaused,
+      cinePaused: s.cinePaused,
+      cineState: s.cinePaused ? 'paused' : 'running',
+      cineLabel: s.cinePaused ? 'Play' : 'Pause',
+      toggleCine: () => this.setState({ cinePaused: !s.cinePaused }),
+      prepCards: PREP.map((t, i) => ({ n: String(i + 1), label: t })),
       toggleMenu: () => this.setState({ menuOpen: !s.menuOpen }),
       openSearch: () => this.setState({ searchOpen:true, cartOpen:false, menuOpen:false }),
       openCart: () => this.setState({ cartOpen:true, menuOpen:false, searchOpen:false }),
@@ -1144,7 +1273,10 @@ class Component extends DCLogic {
         toggle: () => this.setState({ faqOpen: s.faqOpen === i ? null : i })
       })),
 
-      submitContact: () => this.flash('Message sent. We reply within one business day.'),
+      contactOpen: !s.contactDone,
+      contactDone: s.contactDone,
+      submitContact: () => this.setState({ contactDone: true }),
+      contactReset: () => this.setState({ contactDone: false }),
       submitSubscribe: () => this.flash('You’re on the list.'),
 
       hasToast: !!s.toast, toast: s.toast,
@@ -1225,71 +1357,7 @@ class Component extends DCLogic {
       qtyDec: () => this.setState({ qty: Math.max(1, s.qty - 1) }),
       addProduct: () => this.addToCart(product, s.size + ' · ' + s.part + ' part · ' + s.cap + ' cap', s.qty),
       buyNow: () => { this.addToCart(product, s.size + ' · ' + s.part + ' part · ' + s.cap + ' cap', s.qty); this.flash('Express checkout hands off to Shopify.'); },
-      related: PRODUCTS.filter(x => x.id !== product.id).slice(0, 4).map(x => this.card(x)),
-
-      services: SERVICES.map(sv => ({
-        name: sv.name, note: sv.note,
-        bg: s.bService === sv.id ? '#F7E8F1' : '#FFFFFF',
-        border: s.bService === sv.id ? '2px solid #621E69' : '1px solid #E3D2E6',
-        pick: () => this.setState({ bService: sv.id })
-      })),
-      bStep: s.bStep,
-      stepLabels: [
-        { n:'1', label:'Select Your Desired Service',        bg: s.bStep >= 0 ? '#621E69' : '#E3D2E6', fg: s.bStep >= 0 ? '#FEF1D5' : '#15001A' },
-        { n:'2', label:'Select your preferable Time & date',  bg: s.bStep >= 1 ? '#621E69' : '#E3D2E6', fg: s.bStep >= 1 ? '#FEF1D5' : '#15001A' },
-        { n:'3', label:'Confirm and Get Ready ',              bg: s.bStep >= 2 ? '#621E69' : '#E3D2E6', fg: s.bStep >= 2 ? '#FEF1D5' : '#15001A' }
-      ],
-      bServiceChosen: !!s.bService,
-      bStep0: !s.bDone && s.bStep === 0,
-      bStep1: !s.bDone && s.bStep === 1,
-      bStep2: !s.bDone && s.bStep === 2,
-      bFormOpen: !s.bDone,
-      bCanBack: !s.bDone && s.bStep > 0,
-      bCanNext: !s.bDone && s.bStep < 2,
-      bNext: () => {
-        if (s.bStep === 0 && !s.bService) return this.flash('Choose a service to continue.');
-        if (s.bStep === 1 && !(s.bDate && s.bTime)) return this.flash('Pick a date and a time.');
-        this.setState({ bStep: Math.min(2, s.bStep + 1) });
-      },
-      bBack: () => this.setState({ bStep: Math.max(0, s.bStep - 1) }),
-      bDate: s.bDate,
-      onDate: (e) => this.setState({ bDate: e.target.value }),
-      times: TIMES.map(t => ({
-        label: t, bg: s.bTime === t ? '#621E69' : 'transparent', fg: s.bTime === t ? '#FEF1D5' : '#15001A',
-        border: s.bTime === t ? '1px solid #621E69' : '1px solid #E3D2E6',
-        pick: () => this.setState({ bTime: t })
-      })),
-      bName: s.bName, bEmail: s.bEmail, bPhone: s.bPhone,
-      onName: (e) => this.setState({ bName: e.target.value }),
-      onEmail: (e) => this.setState({ bEmail: e.target.value }),
-      onPhone: (e) => this.setState({ bPhone: e.target.value }),
-      bSummary: s.bService ? (SERVICES.find(x => x.id === s.bService).name + ' · ' + (s.bDate || 'date TBC') + ' · ' + (s.bTime || 'time TBC')) : 'No service selected yet',
-      bReady: bookingReady,
-      bConfirmBg: bookingReady ? '#6B0D83' : '#E3D2E6',
-      bConfirmFg: bookingReady ? '#FFFCF8' : '#5F5462',
-      bDone: s.bDone,
-      bConfirm: () => {
-        if (!bookingReady) return this.flash('Fill in your name and email to confirm.');
-        this.setState({ bDone:true });
-      },
-      bReset: () => this.setState({ bDone:false, bStep:0, bService:null, bDate:'', bTime:'', bName:'', bEmail:'', bPhone:'' }),
-      policy: [
-        'Deposit : ALL APPOINTMENTS REQUIRE A NON REFUNDABLE\nDEPOSIT TO SECURE YOUR SPOT.\nREMAINING BALANCE MUST BE PAID IN CASH OR ZELLE\nON THE DAY OF YOUR APPOINTMENT.',
-        'Reschedule : YOU CAN RESCHEDULE ONCE WITH YOUR DEPOSIT\nIN THE SAME MONTH RESCHEDULE UPTO 3 DAYS\nbEFORE YOUR ORIGINAL APPOINTMENT. NO EXCEPTIONS!',
-        'Lateness : AFTER 10 MIN, YOU WILL BE CHARGED A $20 FEE.\nAFTER 20 MINS APPOINTMENT WILL BE CANCELLED',
-        'Same day cancelation : DEPOSIT LOST AND 50% OF SERVICE CHARGED.',
-        'No call, No show : DEPOSIT LOST AND 50% OF SERVICE CHARGED.',
-        '** BY BOOKING YOU HAVE ACCEPTED AND AGREED TO THE TERM OF MY POLICY**'
-      ].map(t => ({ text: t })),
-      dropoff: [
-        'For Order : TEXT 917-587-8962\nOR EMAIL INFO@NESSCLUSIVE.COM FOR ALL WIG ORDERS ',
-        'ALL FRONTALS, CLOSURES AND WIGS\nMUST BE DROPPED OFF 4-5 DAYS IN ADVANCE\nOR A FEE WILL BE CHARGED!',
-        'For Late Drop Off Policy:',
-        '3 Days - $15 FEE,',
-        '2 Days - $25 FEE,',
-        'No 1 Day Drop off',
-        '$40 FEE CHARGED FOR SAME DAY CUSTOMIZATION.'
-      ].map(t => ({ text: t }))
+      related: PRODUCTS.filter(x => x.id !== product.id).slice(0, 4).map(x => this.card(x))
     };
   }
 }
