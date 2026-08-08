@@ -2,6 +2,13 @@
 
 {%- liquid
   assign heading_id = 'ness-hero-heading-' | append: section.id
+  assign cine_id = 'ness-hero-cine-' | append: section.id
+  comment
+    Always three: each layer now falls back to a bundled photograph, so a
+    merchant cannot reduce the count by clearing an image. The CSS keys its
+    delays off this, and three is what the design's -8s spacing is built for.
+  endcomment
+  assign layer_count = 3
 -%}
 
 <section
@@ -9,35 +16,152 @@
   {% if section.settings.heading != blank %}aria-labelledby="{{ heading_id }}"{% endif %}
 >
   {%- comment -%}
-    The photograph is decorative — the headline beside it carries the meaning —
-    so alt is empty and the layer is hidden from assistive tech. Eager, and
-    with fetchpriority, because it is the largest contentful paint on the page.
+    The photographs are decorative — the headline beside them carries the
+    meaning — so alt is empty and the layer is hidden from assistive tech.
+    The first is eager and fetchpriority high because it is the largest
+    contentful paint on the page; the others are eager (they are on screen
+    within seconds) but left at default priority so they do not compete with
+    it.
+
+    Slots two and three have no bundled fallback on purpose: an unchosen slot
+    renders no layer at all rather than a placeholder, and data-cine-count
+    tells the stylesheet how many there are to cross-fade between. One
+    photograph gets no animation — see ness-hero.css.
   {%- endcomment -%}
-  <div class="ness-hero__media" aria-hidden="true">
-    {%- if section.settings.image != blank -%}
-      {{
-        section.settings.image
-        | image_url: width: 2400
-        | image_tag:
-          alt: '',
-          widths: '750, 1100, 1500, 1900, 2400',
-          sizes: '100vw',
-          loading: 'eager',
-          fetchpriority: 'high'
-      }}
-    {%- else -%}
-      <img
-        src="{{ 'ness-hero-bg.jpg' | asset_url }}"
-        alt=""
-        width="1000"
-        height="667"
-        loading="eager"
-        fetchpriority="high"
-      >
-    {%- endif -%}
+  <div class="ness-hero__media" data-cine-count="{{ layer_count }}" aria-hidden="true">
+    <div class="ness-hero__layer">
+      {%- if section.settings.image != blank -%}
+        {{
+          section.settings.image
+          | image_url: width: 2400
+          | image_tag:
+            alt: '',
+            widths: '750, 1100, 1500, 1900, 2400',
+            sizes: '100vw',
+            loading: 'eager',
+            fetchpriority: 'high'
+        }}
+      {%- else -%}
+        <img
+          src="{{ 'ness-hero-bg.jpg' | asset_url }}"
+          alt=""
+          width="1000"
+          height="667"
+          loading="eager"
+          fetchpriority="high"
+        >
+      {%- endif -%}
+    </div>
+
+    <div class="ness-hero__layer">
+      {%- if section.settings.image_2 != blank -%}
+        {{
+          section.settings.image_2
+          | image_url: width: 2400
+          | image_tag:
+            alt: '',
+            widths: '750, 1100, 1500, 1900, 2400',
+            sizes: '100vw',
+            loading: 'eager',
+            fetchpriority: 'low'
+        }}
+      {%- else -%}
+        {%- comment -%}
+          Bundled so the crossfade the design specifies actually happens on a
+          fresh install. Without a default here layer_count fell to 1, the hero
+          degraded to a single still, and the pause control never rendered
+          because there was nothing to pause.
+
+          fetchpriority low: all three layers are viewport-sized and in view, so
+          lazy would not defer them either, and without this they compete with
+          layer one — the LCP candidate and the only one visible at t=0.
+        {%- endcomment -%}
+        <img
+          src="{{ 'ness-hero-bg-2.jpg' | asset_url }}"
+          alt=""
+          width="1000"
+          height="659"
+          loading="eager"
+          fetchpriority="low"
+        >
+      {%- endif -%}
+    </div>
+
+    <div class="ness-hero__layer">
+      {%- if section.settings.image_3 != blank -%}
+        {{
+          section.settings.image_3
+          | image_url: width: 2400
+          | image_tag:
+            alt: '',
+            widths: '750, 1100, 1500, 1900, 2400',
+            sizes: '100vw',
+            loading: 'eager',
+            fetchpriority: 'low'
+        }}
+      {%- else -%}
+        {%- comment -%}
+          Bundled so the crossfade the design specifies actually happens on a
+          fresh install. Without a default here layer_count fell to 1, the hero
+          degraded to a single still, and the pause control never rendered
+          because there was nothing to pause.
+
+          fetchpriority low: all three layers are viewport-sized and in view, so
+          lazy would not defer them either, and without this they compete with
+          layer one — the LCP candidate and the only one visible at t=0.
+        {%- endcomment -%}
+        <img
+          src="{{ 'ness-hero-bg-3.jpg' | asset_url }}"
+          alt=""
+          width="667"
+          height="1000"
+          loading="eager"
+          fetchpriority="low"
+        >
+      {%- endif -%}
+    </div>
   </div>
 
   <div class="ness-hero__wash" aria-hidden="true"></div>
+
+  {%- comment -%}
+    Play/pause for the crossfade. Rendered only when there is more than one
+    photograph, because with one there is no animation to hold.
+  {%- endcomment -%}
+  {%- if layer_count > 1 -%}
+    {%- comment -%}
+      A checkbox, not a button, and no JavaScript.
+
+      WCAG 2.2.2 requires a pause control for anything that moves for more than
+      five seconds, and this loop is infinite. A scripted button fails that the
+      moment JavaScript is blocked — the CSS keeps animating and the control
+      never appears. `:checked ~` pauses a CSS animation with no script at all,
+      so the guarantee holds unconditionally.
+
+      role="switch" gives it the right semantics: the accessible name stays
+      "Pause the slideshow" and aria-checked carries the state, rather than a
+      changing name plus aria-pressed, which announces "Play, pressed" — the
+      exact inverse of what is true.
+    {%- endcomment -%}
+    <input
+      type="checkbox"
+      id="{{ cine_id }}"
+      class="ness-hero__cine-input"
+      role="switch"
+    >
+    <label class="ness-hero__cine" for="{{ cine_id }}">
+      <svg class="ness-hero__cine-icon ness-hero__cine-icon--pause" width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" focusable="false">
+        <rect x="0" y="0" width="4" height="14" rx="1"/>
+        <rect x="8" y="0" width="4" height="14" rx="1"/>
+      </svg>
+      <svg class="ness-hero__cine-icon ness-hero__cine-icon--play" width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" focusable="false">
+        <path d="M0 0.8 C0 0.1 0.8 -0.3 1.4 0.1 L11.4 6.3 C11.9 6.6 11.9 7.4 11.4 7.7 L1.4 13.9 C0.8 14.3 0 13.9 0 13.2 Z"/>
+      </svg>
+      <span class="ness-hero__cine-label ness-hero__cine-label--pause">Pause</span>
+      <span class="ness-hero__cine-label ness-hero__cine-label--play">Play</span>
+      <span class="visually-hidden"> the slideshow</span>
+    </label>
+  {%- endif -%}
 
   <div class="ness-hero__content">
     {%- if section.settings.heading != blank -%}
@@ -66,7 +190,7 @@
             {{ block.shopify_attributes }}
           >
             <span>{{ block.settings.label | escape }}</span>
-            <svg width="13" height="9" viewBox="0 0 12.126 8.907" fill="#621E69" aria-hidden="true" focusable="false">
+            <svg width="13" height="9" viewBox="0 0 12.126 8.907" aria-hidden="true" focusable="false">
               <path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z"/>
             </svg>
           </a>
@@ -82,13 +206,25 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Full-height opening image with the headline over it. Type, colours, and the gradient wash are fixed by the design."
+      "content": "Full-height opening photographs with the headline over them. Add two or three and they cross-fade on a slow loop with a play/pause control; add one and it sits still. Type, colours, and the dark overlay are fixed by the design."
     },
     {
       "type": "image_picker",
       "id": "image",
-      "label": "Background photograph",
-      "info": "Fills the screen and is cropped to fit, so nothing stretches. Use a wide landscape image of at least 2400px. Keep the subject right of centre — the left side sits under the wash that the headline reads against."
+      "label": "Background photograph 1",
+      "info": "Fills the screen and is cropped to fit, so nothing stretches. Use a wide landscape image of at least 2400px. Keep the subject away from the top-left, where the headline sits. Left empty, the photograph the theme ships with is used."
+    },
+    {
+      "type": "image_picker",
+      "id": "image_2",
+      "label": "Background photograph 2",
+      "info": "Optional. Same guidance as the first. Left empty, the hero simply shows fewer photographs — nothing is left blank."
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Background photograph 3",
+      "info": "Optional. Three photographs is what the loop was drawn for and gives the smoothest result."
     },
     { "type": "text", "id": "heading", "label": "Headline", "default": "Nessclusive, Be Bold, Be Exclusive", "info": "Around 30 characters is what the design was drawn for." },
     { "type": "textarea", "id": "body", "label": "Sub-heading", "default": "Let your Wig do the talking with Nessclusive" }
@@ -99,7 +235,7 @@
       "type": "link",
       "name": "Quick link",
       "settings": [
-        { "type": "text", "id": "label", "label": "Wording", "default": "Our Services" },
+        { "type": "text", "id": "label", "label": "Wording", "default": "Our Service" },
         {
           "type": "select",
           "id": "target",
@@ -110,7 +246,7 @@
             { "value": "services", "label": "Services" },
             { "value": "book", "label": "Book a session" },
             { "value": "about", "label": "About us" },
-            { "value": "looks", "label": "Looks — Instagram" },
+            { "value": "luxury", "label": "Luxury Looks" },
             { "value": "collections", "label": "Explore Collection" },
             { "value": "faq", "label": "FAQ" },
             { "value": "contact", "label": "Contact" }
@@ -121,9 +257,9 @@
   ],
   "default": {
     "blocks": [
-      { "type": "link", "settings": { "label": "Our Services", "target": "services" } },
-      { "type": "link", "settings": { "label": "Luxury Looks", "target": "looks" } },
-      { "type": "link", "settings": { "label": "Book a Session", "target": "book" } }
+      { "type": "link", "settings": { "label": "Our Service", "target": "services" } },
+      { "type": "link", "settings": { "label": "Luxury Looks", "target": "luxury" } },
+      { "type": "link", "settings": { "label": "Booking", "target": "book" } }
     ]
   }
 }

@@ -126,8 +126,24 @@
       { rootMargin: '0px 0px -10% 0px', threshold: 0.05 },
     );
 
-    revealables.forEach(function (el) {
-      observer.observe(el);
+    var observe = function (root) {
+      (root || document).querySelectorAll('[data-reveal]').forEach(function (el) {
+        if (el.classList.contains('ness-revealed')) return;
+        observer.observe(el);
+      });
+    };
+
+    observe(document);
+
+    /* Shopify re-renders a section when its settings change in the theme
+       editor. The new nodes match the opacity-0 rule but were never observed,
+       so the whole group — heading, eyebrow, rule — vanishes from the preview
+       and stays gone until a full reload. The FAQ makes it worst: editing a
+       question is exactly what triggers the re-render.
+
+       Storefront visitors never hit this; it only affects the person editing. */
+    document.addEventListener('shopify:section:load', function (event) {
+      observe(event.target);
     });
   }
 })();

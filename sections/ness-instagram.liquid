@@ -48,15 +48,51 @@
   assign profile_url = section.settings.profile_url | default: 'https://www.instagram.com/nessclusive'
 -%}
 
+{%- comment -%}
+  id="luxury" is a fixed anchor, not a setting — the hero's quick links scroll
+  here by that name, and letting it be edited would break them silently. It was
+  "looks" until the revised design renamed it; the hero's dropdown value moves
+  with it. scroll-margin-top clears the floating header.
+{%- endcomment -%}
 <section
   class="ness-instagram"
-  id="looks"
+  id="luxury"
   {% if section.settings.heading != blank %}aria-labelledby="ness-instagram-heading-{{ section.id }}"{% endif %}
 >
-  {%- if section.settings.heading != blank -%}
-    <h2 class="ness-instagram__heading" id="ness-instagram-heading-{{ section.id }}">
-      {{- section.settings.heading | escape -}}
-    </h2>
+  {%- if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.follow_label != blank -%}
+    <div class="ness-instagram__intro" data-reveal="0">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="ness-instagram__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+      {%- endif -%}
+      {%- if section.settings.heading != blank -%}
+        <h2 class="ness-instagram__heading" id="ness-instagram-heading-{{ section.id }}">
+          {{- section.settings.heading | escape -}}
+        </h2>
+      {%- endif -%}
+      {%- if section.settings.follow_label != blank -%}
+        {%- comment -%}
+          The follow link goes to the profile, never to a post — it is the one
+          place in this section that always uses the profile URL. aria-label
+          repeats the visible wording before adding the new-tab warning, so the
+          accessible name still contains the label the merchant typed.
+        {%- endcomment -%}
+        <a
+          class="ness-instagram__follow"
+          href="{{ profile_url | escape }}"
+          target="_blank"
+          rel="noopener"
+          aria-label="{{ section.settings.follow_label | escape }}, opens in a new tab"
+        >
+          {{- section.settings.follow_label | escape -}}
+        </a>
+      {%- endif -%}
+      {%- comment -%}
+        Purely decorative rule under the heading block. It carries no meaning,
+        so it is hidden from assistive tech rather than announced as an empty
+        element.
+      {%- endcomment -%}
+      <span class="ness-instagram__rule" aria-hidden="true"></span>
+    </div>
   {%- endif -%}
 
   {%- comment -%}
@@ -153,10 +189,12 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "The photos are live — they come straight from the Instagram account and refresh on their own, so there is nothing to upload here. Only the heading and the profile link are editable; the number of tiles, their shape, and all colours and spacing are fixed by the design."
+      "content": "The photos are live — they come straight from the Instagram account and refresh on their own, so there is nothing to upload here. Only the wording and the profile link are editable; the number of tiles, their shape, and all colours and spacing are fixed by the design."
     },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Looks and follow @Nessclusive" },
-    { "type": "url", "id": "profile_url", "label": "Instagram profile", "info": "Used only while the live feed is unavailable and the five bundled photos are showing — those tiles open the profile instead. Live tiles always open their own post. Leave empty to use instagram.com/nessclusive." }
+    { "type": "text", "id": "eyebrow", "label": "Small heading above", "default": "On Instagram" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Luxury Looks" },
+    { "type": "text", "id": "follow_label", "label": "Follow link wording", "default": "Follow @Nessclusive", "info": "Opens the Instagram profile below. Leave empty to hide the link." },
+    { "type": "url", "id": "profile_url", "label": "Instagram profile", "info": "Where the follow link goes. It is also where the tiles go while the live feed is unavailable and the five bundled photos are showing — live tiles always open their own post instead. Leave empty to use instagram.com/nessclusive." }
   ]
 }
 {% endschema %}

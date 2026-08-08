@@ -1,8 +1,8 @@
 /* ==========================================================================
    Nessclusive — homepage hero
-   Full-bleed photograph with a slow zoom, layered wash, and a glass panel of
-   quick links pinned to the bottom.
-   Values transcribed from project/Nessclusive Storefront.dc.html:86-107.
+   Full-bleed cinematic crossfade of up to three photographs over a dark
+   ground, a flat scrim, and a glass panel of quick links pinned to the bottom.
+   Values transcribed from project/Nessclusive Storefront.dc.html:90-126.
    ========================================================================== */
 
 .ness-hero {
@@ -14,7 +14,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: var(--ness-background);
+  /* Not just a fallback: ness-cine fades every layer out completely, so this
+     is the ground the crossfade actually happens over. Same near-black plum
+     the palette carries as --ness-ink (#15001A). */
+  background: var(--ness-ink);
+
+  /* The design's on-dark ink is the same cream the palette already carries as
+     --ness-background (#FFFDF8). Aliased here so the intent reads as "ink on
+     the dark hero" rather than "a background colour used as text". */
+  --ness-hero-on-dark: var(--ness-background);
 }
 
 /* Fallback for browsers without dvh — svh/lvh churn on mobile as the URL bar
@@ -25,62 +33,211 @@
   }
 }
 
+/* --- Cinematic crossfade ------------------------------------------------ */
+
 .ness-hero__media {
   position: absolute;
   inset: 0;
+  /* ness-cine scales each layer past its box; clipped here as well as on the
+     section so the overflow can never reach the header sitting on top. */
+  overflow: hidden;
 }
 
-.ness-hero__media img {
+.ness-hero__layer {
+  position: absolute;
+  inset: 0;
+  /* 24s, linear, infinite — transcribed from the prototype. The layers are
+     staggered by negative delays below so they overlap instead of queueing. */
+  animation: ness-cine 24s linear infinite both;
+}
+
+.ness-hero__layer img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 30%;
-  /* A 24s drift from 1.09 to 1. Long and eased so it reads as depth rather
-     than as an animation the visitor is meant to notice. */
-  animation: ness-hero-zoom 24s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  object-position: center 28%;
 }
 
-@keyframes ness-hero-zoom {
-  from {
-    transform: scale(1.09);
+.ness-hero__media > .ness-hero__layer:nth-child(2) img {
+  object-position: center 26%;
+}
+
+.ness-hero__media > .ness-hero__layer:nth-child(3) img {
+  object-position: center 30%;
+}
+
+@keyframes ness-cine {
+  0% {
+    opacity: 0;
+    transform: scale(1.03);
   }
-  to {
-    transform: scale(1);
+  5% {
+    opacity: 1;
   }
+  31% {
+    opacity: 1;
+  }
+  36% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.15);
+  }
+}
+
+/* Three layers, 8s apart in a 24s loop, exactly as the design specifies.
+
+   All three are shifted back a further 5s from the design's 0 / -8s / -16s so
+   that LAYER ONE is inside its opaque plateau at t=0 rather than at opacity 0.
+   The relative spacing — and therefore the visual result — is identical; what
+   changes is which photograph is on screen at first paint. That matters
+   because layer one is the only one carrying fetchpriority="high", and with
+   the design's literal delays the image actually visible for the first second
+   was layer two, so the priority hint pointed at an invisible element and the
+   LCP candidate was decided by network ordering.
+
+   Coverage note: these keyframes do NOT tile the loop seamlessly. A layer
+   fades out over 31–36% while the next fades in over 33.3–38.3%, and the
+   crossover never sums to 1 — composited coverage dips to ~0.46 three times
+   per loop, briefly showing the dark ground through. That is the design's own
+   behaviour, transcribed faithfully, not a defect introduced here. */
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(1) {
+  animation-delay: -5s;
+}
+
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(2) {
+  animation-delay: -13s;
+}
+
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(3) {
+  animation-delay: -21s;
+}
+
+/* Fewer photographs cannot tile the loop — 36% of a cycle will not cover half
+   of one at any offset, so two layers both running ness-cine would leave the
+   hero on bare background for seconds at a time, twice a loop. Instead the
+   first photograph is held still as the ground and the second fades in and
+   out over it: both are seen, the crossfade still reads, and there is never a
+   frame with no photograph in it.
+
+   One photograph is the same rule with nothing on top: still, and no
+   animation at all — ness-cine would otherwise fade the only image the hero
+   has out for two thirds of every loop. */
+.ness-hero__media[data-cine-count='1'] > .ness-hero__layer,
+.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(1) {
+  animation: none;
+}
+
+/* Paused by the visitor. Holding the animation keeps whatever is on screen on
+   screen rather than snapping to a fixed frame — and it is done with
+   :checked ~, so it works with no JavaScript at all. */
+.ness-hero__cine-input:checked ~ .ness-hero__media .ness-hero__layer {
+  animation-play-state: paused;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ness-hero__media img {
+  /* This has to be explicit. `animation: none` alone would leave all three
+     layers at their static opacity of 1, stacked — only the last would be
+     seen and the first two would be wasted paint. The blanket rule in
+     ness-base.css is no better: it clamps the duration to 0.01ms, which lands
+     ness-cine on its 100% frame, opacity 0, and the hero goes black.
+     So: no animation, all layers hidden, first one shown still. */
+  .ness-hero__layer {
     animation: none;
+    opacity: 0;
+    transform: none;
+  }
+
+  .ness-hero__media > .ness-hero__layer:first-child {
+    opacity: 1;
+  }
+
+  /* Nothing is moving, so there is nothing to pause. */
+  .ness-hero__cine,
+  .ness-hero__cine-input {
+    display: none;
   }
 }
 
-/* Four stacked washes: a diagonal cream-to-pink sweep that keeps the left side
-   readable, two purple radials in opposite corners for depth, and a vertical
-   fade that hands off cleanly to the section below. */
+/* A flat scrim, replacing the four-layer wash the pale hero used: the type is
+   cream over a dark photograph now, so the overlay only has to hold contrast,
+   not sculpt a readable corner out of a bright image. */
 .ness-hero__wash {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background:
-    linear-gradient(
-      102deg,
-      rgba(255, 253, 248, 0.93) 0%,
-      rgba(253, 246, 240, 0.72) 26%,
-      rgba(254, 241, 213, 0.34) 46%,
-      rgba(240, 225, 241, 0.24) 66%,
-      rgba(246, 234, 243, 0.52) 100%
-    ),
-    radial-gradient(58% 46% at 6% 2%, rgba(107, 13, 131, 0.26) 0%, rgba(107, 13, 131, 0) 62%),
-    radial-gradient(62% 48% at 96% 96%, rgba(98, 30, 105, 0.3) 0%, rgba(98, 30, 105, 0) 60%),
-    linear-gradient(
-      180deg,
-      rgba(255, 253, 248, 0.45) 0%,
-      rgba(255, 253, 248, 0) 20%,
-      rgba(255, 253, 248, 0) 70%,
-      rgba(255, 253, 248, 0.97) 100%
-    );
+  background: rgba(0, 0, 0, 0.5);
 }
+
+/* --- Play / pause ------------------------------------------------------- */
+
+.ness-hero__cine {
+  position: absolute;
+  z-index: 4;
+  top: clamp(112px, 13vh, 156px);
+  right: clamp(20px, 4vw, 150px);
+  height: 46px;
+  padding: 0 18px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-radius: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: rgba(0, 0, 0, 0.34);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  color: var(--ness-hero-on-dark);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.ness-hero__cine:hover {
+  background: rgba(0, 0, 0, 0.52);
+}
+
+/* The real checkbox stays in the layout and stays focusable — it is simply
+   invisible, with the label beside it as the visible control. Removing it from
+   the accessibility tree would make the pause unusable by keyboard, which is
+   the requirement it exists to satisfy. */
+.ness-hero__cine-input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ness-hero__cine-icon {
+  fill: var(--ness-hero-on-dark);
+  flex-shrink: 0;
+}
+
+/* Playing: pause bars and the word "Pause". Paused: a play triangle and the
+   word "Play". display:none on the inactive word keeps it out of the
+   accessibility tree, so the accessible name is always the visible one. */
+.ness-hero__cine-icon--play,
+.ness-hero__cine-label--play {
+  display: none;
+}
+
+.ness-hero__cine-input:checked ~ .ness-hero__cine .ness-hero__cine-icon--pause,
+.ness-hero__cine-input:checked ~ .ness-hero__cine .ness-hero__cine-label--pause {
+  display: none;
+}
+
+.ness-hero__cine-input:checked ~ .ness-hero__cine .ness-hero__cine-icon--play,
+.ness-hero__cine-input:checked ~ .ness-hero__cine .ness-hero__cine-label--play {
+  display: block;
+}
+
+/* The ring has to sit on the label, since the input it belongs to is
+   invisible. */
+.ness-hero__cine-input:focus-visible ~ .ness-hero__cine {
+  outline: 2px solid var(--ness-hero-on-dark);
+  outline-offset: 3px;
+}
+
+/* --- Content ------------------------------------------------------------ */
 
 .ness-hero__content {
   position: relative;
@@ -97,13 +254,13 @@
 
 .ness-hero__heading {
   margin: 0;
-  max-width: 16ch;
+  max-width: 15ch;
   font-family: var(--ness-font-display);
   font-weight: 600;
   font-size: clamp(40px, 6.4vw, 104px);
   line-height: 100%;
   letter-spacing: -0.04em;
-  color: var(--ness-ink);
+  color: var(--ness-hero-on-dark);
   text-align: left;
   text-wrap: balance;
   animation: ness-rise 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) 0.08s both;
@@ -114,7 +271,7 @@
   max-width: 520px;
   font-size: clamp(17px, 1.35vw, 22px);
   line-height: 1.55;
-  color: #4a3f4d;
+  color: rgba(255, 253, 248, 0.84);
   text-align: left;
   text-wrap: pretty;
   animation: ness-rise 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) 0.26s both;
@@ -131,17 +288,20 @@
   gap: 8px;
   padding: 8px;
   border-radius: 18px;
-  background: rgba(255, 253, 248, 0.52);
-  border: 1px solid rgba(255, 255, 255, 0.72);
-  -webkit-backdrop-filter: blur(20px);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 20px 52px rgba(21, 0, 26, 0.1);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.28);
   animation: ness-rise 1.05s cubic-bezier(0.22, 0.61, 0.36, 1) 0.44s both;
 }
 
+/* Without the blur the panel is 10% white over an unblurred photograph, which
+   is not a panel. Darkening it keeps the cream labels legible and reads as
+   the same object. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
   .ness-hero__links {
-    background: rgba(255, 253, 248, 0.9);
+    background: rgba(0, 0, 0, 0.42);
   }
 }
 
@@ -153,22 +313,21 @@
   height: 64px;
   padding: 0 22px;
   border-radius: 12px;
-  color: var(--ness-ink);
+  color: var(--ness-hero-on-dark);
   font-size: 16px;
   text-decoration: none;
-  transition:
-    background 0.4s ease,
-    color 0.4s ease;
+  transition: background 0.4s ease;
 }
 
 .ness-hero__link:hover {
-  background: rgba(255, 255, 255, 0.8);
-  color: var(--ness-primary);
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
   text-decoration: none;
 }
 
 .ness-hero__link svg {
   flex-shrink: 0;
+  fill: var(--ness-secondary);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -176,5 +335,34 @@
   .ness-hero__body,
   .ness-hero__links {
     animation: none;
+  }
+}
+
+/* --- On-dark corrections ------------------------------------------------
+
+   The hero flipped from a cream wash to a dark scrim over photography, and the
+   theme's only focus treatment is a purple ring (--ness-primary-deep) chosen
+   against cream. Measured against the new surfaces it collapses: 1.5–3.1:1 on
+   the links panel, and 1.01:1 against the pause control's own chrome — the
+   ring effectively disappears. WCAG 2.4.11 wants 3:1 or better.
+
+   Cream is the hero's ink and reads against every surface here, including a
+   near-white photograph, because the scrim is always between them. */
+.ness-hero :focus-visible {
+  outline-color: var(--ness-hero-on-dark);
+}
+
+/* The design is a desktop-only prototype with no breakpoints, so its clamps
+   put the pause control on top of the headline once the viewport is narrow:
+   measured at 375x812 the pill occupies y[112,158] and the H1's first line
+   y[128,208], with the pill winning on z-index and striking through the words.
+
+   Below the header's own collapse point the control moves under the header
+   instead of beside the headline. */
+@media (max-width: 749px) {
+  .ness-hero__cine {
+    top: auto;
+    bottom: clamp(20px, 4vw, 40px);
+    right: clamp(20px, 4vw, 40px);
   }
 }

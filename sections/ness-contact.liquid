@@ -105,21 +105,67 @@
           without this the outcome is announced to nobody.
         {%- endcomment -%}
         {%- comment -%}
-          Falls back to a real sentence rather than trusting the setting: an
-          emptied field would otherwise seize focus with an empty live region
-          that announces nothing, and paint a bare cream box.
+          The success panel replaces the fields, as the design has it. Nothing
+          client-side is involved: the form is a real POST, the page reloads,
+          and form.posted_successfully? is what swaps the two states. The form
+          element itself stays either way — it is the card, and it is still the
+          #<form id> target Shopify appends to its redirect.
+
+          Both lines of the panel fall back to real sentences rather than
+          trusting the settings: an emptied field would otherwise seize focus
+          with a live region that announces nothing, and paint a panel with a
+          hole in it.
         {%- endcomment -%}
         {%- if form.posted_successfully? -%}
-          {%- assign success_text = section.settings.success_message
-            | default: 'Thanks — we have your message and will be in touch.' -%}
-          <p
-            class="ness-contact__notice ness-contact__notice--success"
+          {%- assign success_heading = section.settings.success_heading | default: 'Thanks for contacting us.' -%}
+          {%- assign success_text = section.settings.success_body | default: 'We’ll get back to you as soon as possible.' -%}
+          <div
+            class="ness-contact__success"
             role="status"
             tabindex="-1"
             autofocus
           >
-            {{- success_text | escape -}}
-          </p>
+            {%- comment -%}
+              Decoration only, so the live region announces the two lines of
+              copy and nothing else. The eight sparks are identical markup —
+              angle, colour, size, and delay come from :nth-child in the
+              stylesheet, so the burst costs no repetition here.
+            {%- endcomment -%}
+            <div class="ness-contact__seal" aria-hidden="true">
+              {%- for i in (1..8) -%}
+                <span class="ness-contact__spark"></span>
+              {%- endfor -%}
+              <span class="ness-contact__seal-disc">
+                <svg
+                  width="42"
+                  height="32"
+                  viewBox="0 0 42 32"
+                  fill="none"
+                  stroke="#ffffff"
+                  stroke-width="4"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  focusable="false"
+                >
+                  <path class="ness-contact__tick" d="M3 17L15 29L39 3"/>
+                </svg>
+              </span>
+            </div>
+
+            <h3 class="ness-contact__success-title">{{ success_heading | escape }}</h3>
+            <p class="ness-contact__success-body">{{ success_text | escape }}</p>
+
+            {%- comment -%}
+              Not a state reset — there is no state to reset. The way back to
+              an empty form is a fresh request, so this is a plain link:
+              request.path drops the ?contact_posted=true Shopify redirected
+              with, and #contact replaces the #<form id> it appended. The
+              result is always a different URL from the one being viewed, so
+              the browser really navigates instead of just moving the hash,
+              and it lands on the section rather than the top of the page.
+            {%- endcomment -%}
+            <a class="ness-contact__again" href="{{ request.path | escape }}#contact">Send another message</a>
+          </div>
         {%- elsif form.errors -%}
           <div
             class="ness-contact__notice ness-contact__notice--error"
@@ -150,6 +196,17 @@
           </div>
         {%- endif -%}
 
+        {%- comment -%}
+          A successful post REPLACES the fields, as the design has it. Without
+          this guard the panel simply stacked on top of a still-rendered form:
+          two submit buttons, and a "Send another message" link sitting
+          directly above the empty form it claimed to bring back.
+
+          Guarded on posted_successfully? rather than written as an else of the
+          branch above, because the ERROR branch must keep the fields — and the
+          values the shopper already typed.
+        {%- endcomment -%}
+        {%- unless form.posted_successfully? -%}
         <div class="ness-contact__field">
           <label class="ness-contact__label" for="{{ form_id }}-name">Name</label>
           <input
@@ -200,6 +257,7 @@
         </div>
 
         <button type="submit" class="ness-contact__submit">Contact Us</button>
+        {%- endunless -%}
       {%- endform -%}
     </div>
   </div>
@@ -215,7 +273,8 @@
     },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Let’s Stay Connected" },
     { "type": "textarea", "id": "body", "label": "Body copy", "default": "Have questions or need assistance? We're here to help! Drop us a message and let’s connect. Whether you’re looking for expert advice, customization options, or just want to say hello, we’d love to hear from you. Let us help you find your perfect style!" },
-    { "type": "text", "id": "success_message", "label": "Message after sending", "default": "Thanks for contacting us. We'll get back to you as soon as possible.", "info": "Appears above the fields, which stay on screen so another message can be sent. Error wording comes from Shopify and is not editable here." },
+    { "type": "text", "id": "success_heading", "label": "Heading after sending", "default": "Thanks for contacting us." },
+    { "type": "text", "id": "success_body", "label": "Line under that heading", "default": "We’ll get back to you as soon as possible.", "info": "Both appear on the panel that replaces the form once a message is sent; a “Send another message” link brings the empty form back. Error wording comes from Shopify and is not editable here." },
     { "type": "header", "content": "Social links" },
     {
       "type": "paragraph",

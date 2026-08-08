@@ -1,7 +1,7 @@
 /* ==========================================================================
    Nessclusive — Services
    Intro block, then full-height panels that stack over one another on scroll.
-   Values transcribed from project/Nessclusive Storefront.dc.html:109-148.
+   Values transcribed from project/Nessclusive Storefront.dc.html:128-172.
    ========================================================================== */
 
 .ness-services {
@@ -12,15 +12,30 @@
 .ness-services__intro {
   max-width: var(--ness-shell-max);
   margin-inline: auto;
-  padding: clamp(64px, 7vw, 110px) var(--ness-shell-pad) clamp(28px, 3vw, 44px);
+  padding: clamp(72px, 8vw, 120px) var(--ness-shell-pad) clamp(28px, 3vw, 44px);
+}
+
+/* Eyebrow, heading and rule are one reveal group; the gap replaces the
+   per-child margins so a blank eyebrow or heading leaves no orphan space. */
+.ness-services__intro-head {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: clamp(30px, 3.4vw, 54px);
+}
+
+/* Without the lede below it there is nothing for that margin to separate, so
+   the intro would close on a gap the design never draws. */
+.ness-services__intro-head:last-child {
+  margin-bottom: 0;
 }
 
 .ness-services__eyebrow {
-  margin: 0 0 14px;
-  font-size: 16px;
+  margin: 0;
+  font-size: 15px;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   color: var(--ness-primary);
 }
 
@@ -32,6 +47,34 @@
   line-height: 100%;
   letter-spacing: -0.04em;
   color: var(--ness-ink);
+  text-wrap: balance;
+}
+
+/* Decorative rule under the heading block. */
+.ness-services__rule {
+  display: block;
+  width: 64px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ness-primary);
+}
+
+/* The negative top margin is deliberate and comes from the design: it pulls
+   the lede back under the rule so the group's own margin-bottom reads as the
+   space before the panels, not as space inside the intro. */
+.ness-services__lede {
+  margin: -18px 0 0;
+  max-width: 620px;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--ness-muted);
+  text-wrap: pretty;
+}
+
+/* With no heading block above it, that pull-up would eat the intro's own top
+   padding instead. */
+.ness-services__lede:first-child {
+  margin-top: 0;
 }
 
 /* --- Stacking panels ----------------------------------------------------

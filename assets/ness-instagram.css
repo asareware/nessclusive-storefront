@@ -1,31 +1,83 @@
 /* ==========================================================================
-   Nessclusive — Instagram strip
-   Values transcribed from project/Nessclusive Storefront.dc.html:278-288.
+   Nessclusive — Instagram strip ("Luxury Looks")
+   Values transcribed from project/Nessclusive Storefront.dc.html:174-188.
 
-   Full-bleed by design. Unlike every other homepage section this one carries
-   no 1770px shell and no --ness-shell-pad: the row of tiles runs edge to edge
-   and scrolls sideways, so only the heading is padded and the strip gets its
-   own, much smaller, side padding.
+   Half full-bleed by design: the centred header sits in the usual 1770px
+   shell, but the row of tiles below it runs edge to edge and scrolls
+   sideways, so the strip ignores --ness-shell-pad and takes its own, much
+   smaller, side padding.
    ========================================================================== */
 
 .ness-instagram {
-  /* Deliberately not --ness-section-gap: this is the last section on the page
-     and the design caps its tail at 110px, not the 120px used between
-     sections. */
-  padding: 0 0 clamp(64px, 7vw, 110px);
+  /* Clears the floating header when the hero's quick link scrolls to #luxury. */
+  scroll-margin-top: 90px;
+  /* Symmetric, and no longer --ness-section-gap: the revised design gives this
+     section its own top and bottom padding rather than leaning on the section
+     above for the gap. */
+  padding: clamp(72px, 8vw, 120px) 0;
+}
+
+/* Eyebrow, heading, follow link and rule are one centred reveal group; the gap
+   replaces the per-child margins, so a blank eyebrow or heading leaves no
+   orphan space. */
+.ness-instagram__intro {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: 0 var(--ness-shell-pad) clamp(30px, 3.4vw, 54px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  text-align: center;
+}
+
+.ness-instagram__eyebrow {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ness-primary);
 }
 
 .ness-instagram__heading {
-  margin: 0 0 clamp(28px, 3vw, 48px);
-  padding: 0 20px;
-  font-size: clamp(30px, 4.2vw, 64px);
-  /* 110%, overriding the 100% the h1–h4 default sets in ness-base.css: this
-     heading wraps to two or three lines at most widths and the design gives
-     it the extra leading. Family, weight, tracking, and balance all come from
-     that default unchanged. */
-  line-height: 110%;
+  margin: 0;
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  font-size: clamp(34px, 4.6vw, 64px);
+  line-height: 100%;
+  letter-spacing: -0.04em;
   color: var(--ness-ink);
-  text-align: center;
+  text-wrap: balance;
+}
+
+/* The underline is a border rather than text-decoration so it sits at the
+   design's distance from the baseline. currentColor keeps it with the text on
+   hover; the prototype's global a:hover also adds a text-decoration underline,
+   which is dropped here because on top of this border it renders as two
+   rules. */
+.ness-instagram__follow {
+  font-size: clamp(18px, 1.5vw, 22px);
+  font-weight: 500;
+  color: var(--ness-primary);
+  text-decoration: none;
+  border-bottom: 1px solid currentColor;
+}
+
+.ness-instagram__follow:hover,
+.ness-instagram__follow:focus-visible {
+  color: var(--ness-primary-deep);
+}
+
+/* Decorative rule under the heading block. The extra 4px is the design's, on
+   top of the group gap. */
+.ness-instagram__rule {
+  display: block;
+  width: 64px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--ness-primary);
+  margin-top: 4px;
 }
 
 /* --- Strip -------------------------------------------------------------- */
@@ -56,15 +108,14 @@
   /* Clips the photo to the radius. The focus ring in ness-base.css sits
      outside the box and is unaffected. */
   overflow: hidden;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.35s ease;
 }
 
-/* The prototype's tiles are plain divs with no hover state; as links they need
-   an affordance, so they borrow the opacity the prototype already uses for its
-   other image and icon links. Nothing changes at rest. */
+/* The design's own hover for these tiles. :focus-visible is matched to it so
+   the affordance exists for keyboard users too. Nothing changes at rest. */
 .ness-instagram__tile:hover,
 .ness-instagram__tile:focus-visible {
-  opacity: 0.82;
+  opacity: 0.86;
 }
 
 /* Matches the prototype's `center / cover no-repeat`, so a post of any shape

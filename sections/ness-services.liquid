@@ -15,15 +15,28 @@
   id="services"
   {% if section.settings.heading != blank %}aria-labelledby="{{ heading_id }}"{% endif %}
 >
-  {%- if section.settings.heading != blank or section.settings.eyebrow != blank -%}
-    <div class="ness-services__intro" data-reveal="0">
-      {%- if section.settings.eyebrow != blank -%}
-        <p class="ness-services__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+  {%- if section.settings.heading != blank or section.settings.eyebrow != blank or section.settings.intro != blank -%}
+    <div class="ness-services__intro">
+      {%- if section.settings.heading != blank or section.settings.eyebrow != blank -%}
+        <div class="ness-services__intro-head" data-reveal="0">
+          {%- if section.settings.eyebrow != blank -%}
+            <p class="ness-services__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+          {%- endif -%}
+          {%- if section.settings.heading != blank -%}
+            <h2 class="ness-services__heading" id="{{ heading_id }}">
+              {{- section.settings.heading | escape -}}
+            </h2>
+          {%- endif -%}
+          {%- comment -%}
+            Purely decorative rule under the heading block. It carries no
+            meaning, so it is hidden from assistive tech rather than announced
+            as an empty element.
+          {%- endcomment -%}
+          <span class="ness-services__rule" aria-hidden="true"></span>
+        </div>
       {%- endif -%}
-      {%- if section.settings.heading != blank -%}
-        <h2 class="ness-services__heading" id="{{ heading_id }}">
-          {{- section.settings.heading | escape -}}
-        </h2>
+      {%- if section.settings.intro != blank -%}
+        <p class="ness-services__lede" data-reveal="80">{{ section.settings.intro | escape }}</p>
       {%- endif -%}
     </div>
   {%- endif -%}
@@ -105,7 +118,14 @@
       "content": "Full-height panels that stack over one another as the page scrolls. The stacking, colours, and type are fixed by the design — you can edit each panel's picture and wording, and add or remove panels up to five."
     },
     { "type": "text", "id": "eyebrow", "label": "Small heading above", "default": "What we do" },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Services" }
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Our Services" },
+    {
+      "type": "textarea",
+      "id": "intro",
+      "label": "Intro paragraph",
+      "default": "Three ways we look after your hair, in studio and in your chair.",
+      "info": "One or two lines under the heading. Leave empty to hide it."
+    }
   ],
   "max_blocks": 5,
   "blocks": [
@@ -119,20 +139,20 @@
           "label": "Picture",
           "info": "Cropped to fit, so any shape works. Landscape of at least 1200px wide looks best."
         },
-        { "type": "text", "id": "title", "label": "Title", "default": "Luxury" },
+        { "type": "text", "id": "title", "label": "Title", "default": "Wig Installation" },
         {
           "type": "textarea",
           "id": "body",
           "label": "Description",
-          "default": "Hand-built units made with premium hair and finished with a natural, pre-plucked hairline. Fitted, cut and styled to you.",
+          "default": "Your unit fitted, melted and styled in studio. Custom lace tint, a natural hairline and a cut shaped to your face.",
           "info": "Around 140 characters is what the design was drawn for."
         },
-        { "type": "text", "id": "cta_label", "label": "Button label", "default": "Explore luxury units", "info": "Leave empty to hide the button." },
+        { "type": "text", "id": "cta_label", "label": "Button label", "default": "Book this service", "info": "Leave empty to hide the button." },
         {
           "type": "select",
           "id": "cta_destination",
           "label": "Button goes to",
-          "default": "all_products",
+          "default": "booking",
           "options": [
             { "value": "all_products", "label": "All products" },
             { "value": "ready_to_ship", "label": "Ready to Ship" },
@@ -150,27 +170,27 @@
       {
         "type": "service",
         "settings": {
-          "title": "Luxury",
-          "body": "Hand-built units made with premium hair and finished with a natural, pre-plucked hairline. Fitted, cut and styled to you.",
-          "cta_label": "Explore luxury units",
-          "cta_destination": "all_products"
+          "title": "Wig Installation",
+          "body": "Your unit fitted, melted and styled in studio. Custom lace tint, a natural hairline and a cut shaped to your face.",
+          "cta_label": "Book this service",
+          "cta_destination": "booking"
         }
       },
       {
         "type": "service",
         "settings": {
-          "title": "Extension",
-          "body": "Added length, volume and texture, colour-matched to your own hair and installed by our specialists in a single sitting.",
-          "cta_label": "Explore extensions",
-          "cta_destination": "all_products"
+          "title": "Sew-in Service",
+          "body": "Braided down, sewn in and blended. A protective install that lays flat, moves freely and holds its shape for weeks.",
+          "cta_label": "Book this service",
+          "cta_destination": "booking"
         }
       },
       {
         "type": "service",
         "settings": {
-          "title": "Services",
-          "body": "Consultations, colouring, revamps and restyling. Book a session at the studio or online, wherever you are.",
-          "cta_label": "Book a session",
+          "title": "Natural Hair Care",
+          "body": "Wash, deep condition, trim and silk press. Treatments that keep your own hair strong underneath every style.",
+          "cta_label": "Book this service",
           "cta_destination": "booking"
         }
       }

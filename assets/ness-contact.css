@@ -97,10 +97,12 @@
    display: none and so add no gap to this flex column. */
 /* Every element a post-submit jump can land on needs to clear the sticky
    header (81px + breathing room), not just the section wrapper. Three paths
-   land here: autofocus on the notice, the error list's links to individual
-   fields, and Shopify's own redirect, which appends #<form id> to the action.
-   Without this the target sits underneath the header. */
+   land here: autofocus on the success panel or the error notice, the error
+   list's links to individual fields, and Shopify's own redirect, which appends
+   #<form id> to the action. Without this the target sits underneath the
+   header. */
 .ness-contact__form,
+.ness-contact__success,
 .ness-contact__notice,
 .ness-contact__input,
 .ness-contact__textarea {
@@ -182,11 +184,11 @@
   background: var(--ness-primary-deep);
 }
 
-/* --- Submission states -------------------------------------------------- */
+/* --- Error state -------------------------------------------------------- */
 
-/* The design specifies neither state, so both are built from the existing
-   palette rather than introducing a foreign green and red. They share the
-   field radius so they read as part of the card. */
+/* The design draws the success state but not this one, so it is built from the
+   existing palette rather than introducing a foreign red, and shares the field
+   radius so it reads as part of the card. */
 .ness-contact__notice {
   margin: 0;
   border-radius: var(--ness-radius-input);
@@ -197,11 +199,6 @@
 .ness-contact__notice:focus-visible {
   outline: 2px solid var(--ness-primary);
   outline-offset: 1px;
-}
-
-.ness-contact__notice--success {
-  background: var(--ness-secondary);
-  color: var(--ness-primary);
 }
 
 /* Ringed rather than bordered so the panel does not shift the fields when it
@@ -225,4 +222,238 @@
 .ness-contact__notice-list a {
   color: inherit;
   text-decoration: underline;
+}
+
+/* --- Success state ------------------------------------------------------ */
+
+/* The form posts for real and the page reloads, so this panel is rendered by
+   Liquid in place of the fields — there is no client state and no script.
+
+   The form element is still the card, so the design's success card (roomier
+   padding, 420px tall) has to be applied to it while it holds the panel, and
+   :has() is the only way to reach a parent from its content. Where :has() is
+   unsupported the card simply keeps its form padding and sizes to the panel:
+   the panel is unaffected and nothing is hidden, only the breathing room
+   differs. */
+.ness-contact__form:has(.ness-contact__success) {
+  padding: clamp(32px, 3vw, 48px);
+  min-height: 420px;
+}
+
+.ness-contact__success {
+  /* Fills the card so the centring is against the full 420px, not the copy. */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 20px;
+  animation: ness-fade 0.35s ease both;
+}
+
+/* Focused on arrival, like the error notice — same ring, for the same reason:
+   the global one is easy to miss against this pale card. */
+.ness-contact__success:focus-visible {
+  outline: 2px solid var(--ness-primary);
+  outline-offset: 1px;
+}
+
+.ness-contact__seal {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ness-contact__seal-disc {
+  /* position keeps the disc above the sparks, which are absolutely positioned
+     and come earlier in the stage. */
+  position: relative;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  /* The success green is a prototype one-off — nothing else in the design uses
+     it, so it is deliberately not a design token. */
+  background: #1e7a4b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: ness-contact-pop 0.5s cubic-bezier(0.22, 1.25, 0.36, 1) both;
+}
+
+/* The dash pattern is longer than the path, so with no offset the tick is
+   simply drawn — the animation is what starts it hidden. */
+.ness-contact__tick {
+  stroke-dasharray: 62;
+  animation: ness-contact-check 0.45s ease 0.3s both;
+}
+
+/* Eight dots leaving the circle at 45° intervals. Each wrapper is a zero-sized
+   point pinned to the centre of the stage and rotated; the dot is a pseudo-
+   element, so the burst costs eight nodes rather than sixteen, and it travels
+   "up" inside that rotated frame. */
+.ness-contact__spark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: rotate(var(--ness-contact-spark-angle));
+}
+
+.ness-contact__spark::after {
+  content: '';
+  position: absolute;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--ness-primary);
+  animation: ness-contact-spark 1s cubic-bezier(0.2, 0.7, 0.3, 1) var(--ness-contact-spark-delay) both;
+}
+
+/* The burst alternates purple and gold around the circle. */
+.ness-contact__spark:nth-child(even)::after {
+  width: 7px;
+  height: 7px;
+  background: var(--ness-gold);
+}
+
+.ness-contact__spark:nth-child(1) {
+  --ness-contact-spark-angle: 0deg;
+  --ness-contact-spark-delay: 0.16s;
+}
+
+.ness-contact__spark:nth-child(2) {
+  --ness-contact-spark-angle: 45deg;
+  --ness-contact-spark-delay: 0.24s;
+}
+
+.ness-contact__spark:nth-child(3) {
+  --ness-contact-spark-angle: 90deg;
+  --ness-contact-spark-delay: 0.2s;
+}
+
+.ness-contact__spark:nth-child(4) {
+  --ness-contact-spark-angle: 135deg;
+  --ness-contact-spark-delay: 0.3s;
+}
+
+.ness-contact__spark:nth-child(5) {
+  --ness-contact-spark-angle: 180deg;
+  --ness-contact-spark-delay: 0.18s;
+}
+
+.ness-contact__spark:nth-child(6) {
+  --ness-contact-spark-angle: 225deg;
+  --ness-contact-spark-delay: 0.26s;
+}
+
+.ness-contact__spark:nth-child(7) {
+  --ness-contact-spark-angle: 270deg;
+  --ness-contact-spark-delay: 0.22s;
+}
+
+.ness-contact__spark:nth-child(8) {
+  --ness-contact-spark-angle: 315deg;
+  --ness-contact-spark-delay: 0.32s;
+}
+
+/* line-height 110%, not the 100% ness-base.css gives h1–h4: this line is
+   allowed to wrap on a narrow card. */
+.ness-contact__success-title {
+  margin: 0;
+  font: 600 clamp(26px, 2.6vw, 36px) / 110% var(--ness-font-display);
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+  text-wrap: balance;
+}
+
+.ness-contact__success-body {
+  margin: 0;
+  max-width: 380px;
+  font: 400 18px / 28px var(--ness-font-text);
+  color: var(--ness-muted);
+  text-wrap: pretty;
+}
+
+/* An anchor, not a button: it is a fresh request for an empty form, not a
+   state toggle. Sized like the submit button so the two read as one family. */
+.ness-contact__again {
+  margin-top: 6px;
+  height: var(--ness-cta-height);
+  flex-shrink: 0;
+  padding: 0 26px;
+  border: 1px solid var(--ness-primary);
+  border-radius: var(--ness-radius-input);
+  background: transparent;
+  font: 500 18px / normal var(--ness-font-text);
+  color: var(--ness-primary);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ness-contact__again:hover {
+  background: var(--ness-primary);
+  color: var(--ness-on-primary);
+}
+
+/* --- Motion ------------------------------------------------------------- */
+
+/* The prototype's ness-pop, ness-check, and ness-spark, namespaced and kept
+   local so no shared stylesheet has to be touched. ness-fade, used by the
+   panel itself, already lives in ness-base.css. */
+@keyframes ness-contact-pop {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes ness-contact-check {
+  from {
+    stroke-dashoffset: 62;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ness-contact-spark {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -74px) scale(0.5);
+  }
+}
+
+/* base.css collapses every animation to 0.01ms under reduced motion, but the
+   delays survive that — the tick would still arrive a third of a second after
+   the circle, and the dots would flicker. Cancelled outright here so the panel
+   is simply complete on arrival. The burst is pure decoration (the stage is
+   aria-hidden), so it is dropped rather than frozen mid-flight. */
+@media (prefers-reduced-motion: reduce) {
+  .ness-contact__success,
+  .ness-contact__seal-disc,
+  .ness-contact__tick {
+    animation: none;
+  }
+
+  .ness-contact__spark {
+    display: none;
+  }
 }
