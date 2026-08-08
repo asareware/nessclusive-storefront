@@ -373,7 +373,7 @@ automated
 - [x] ✅ **Phase 6 — Booking page.** `templates/page.booking.liquid` with the prototype's hero, steps and policy cards; the page's own CTA resolves to the site-wide Acuity theme setting. Rebuilt against the current design 2026-08-08 — Studio Info / Booking Policy / Custom Wig cards, contact tiles including TikTok, "Book a Reservation" → Acuity. Passed review clean both times
 - [ ] 🔜 👤 **Phase 7 — Content & data.** Menus, Markets, policies, shipping zones/duties. **Reuse existing collection and page handles** — do not create duplicates (Decision #9)
 - [x] ✅ **Phase 8 — QA.** New `404`, generic page, and cart page templates on a shared `ness-simple.css` — the prototype specifies none of these. Cart line item extracted into `ness-cart-line.liquid`, shared by the drawer and the new page, so the two cannot drift. Automated pass across home/collection/product/cart/booking: 0 images missing alt, 0 duplicate ids, 0 empty links, one `h1` per page. One real finding fixed — the product page skipped from `h1` to `h3` because merchant product descriptions in this catalog start their own headings at `h3`; a hidden `h2` closes the gap without touching merchant content. `ness-customer.css` re-skins Dawn's customer templates but is currently inert — confirmed via `/account` redirecting to `shopify.com/…`, i.e. **this store is on Shopify's new customer accounts**, so the theme's customer templates never render *(commit `36d3841`)*
-- [ ] 🔜 👤 **Phase 8b — Live order test.** Place a real paid order on the dev theme and refund it. See the full script under **Cutover → Step 3** below — this is a prerequisite for cutover, not a separate task
+- [ ] 🔜 👤 **Phase 8b — Live order test.** Place a real paid order on **Aj-Build-Nessclusive** and refund it. See the full script under **Cutover → Step 3** below — this is a prerequisite for cutover, not a separate task
 - [ ] ⬜ 👤 **Phase 9 — Cutover.** See **## Cutover checklist** below for the full step-by-step. **Holding — do not publish.** Owner review in progress
 
 ## Cutover checklist
@@ -386,10 +386,22 @@ Current state, confirmed against the store on 2026-08-08:
 | Theme | Role | ID |
 |---|---|---|
 | `Champion` | **live** — this is what www.nessclusive.com serves today | `133414355143` |
-| `Development (…)` | unpublished — this repo, on the dev theme | `159626559687` |
+| `Aj-Build-Nessclusive` | **unpublished** — this repo. The one to browse, review, and eventually publish from admin | `159689867463` |
+| `Aj-Buid-Nessclusive` *(typo, cosmetic only)* | `development` — my working copy for CLI pushes; deliberately excluded from the Themes page grid by Shopify itself, not something to look for or interact with | `159626559687` |
 
-Nothing else exists. Cutover means switching which of these two the domain
-points at — a single click in admin — and everything before that click is
+⚠️ **Development-role themes never appear in Online Store → Themes**, by
+Shopify's own design — they exist only for the CLI's hot-reload workflow.
+`Aj-Build-Nessclusive` is a separate, ordinary unpublished theme pushed
+specifically so it is visible and clickable in admin. Every link and ID below
+now points at that one.
+
+Kept in sync by re-running, after any future round of changes:
+```
+shopify theme push --theme 159689867463
+```
+
+Nothing else exists. Cutover means switching which of these the domain points
+at — a single click in admin — and everything before that click is
 preparation and verification.
 
 ### Step 1 — Blockers (must be closed before Step 2)
@@ -433,13 +445,13 @@ admin**, below. Checklist form here:
       this is done both pages render Dawn's stock template, not the new
       design.
 
-### Step 3 — Phase 8b: live order test (owner, on the dev theme preview)
+### Step 3 — Phase 8b: live order test (owner, on the Aj-Build-Nessclusive preview)
 
-Do this **before** cutover, against the dev theme preview link, so a mistake
-costs nothing:
+Do this **before** cutover, against the Aj-Build-Nessclusive preview link, so
+a mistake costs nothing:
 
 ```
-https://nessclusive-llc.myshopify.com/?preview_theme_id=159626559687
+https://nessclusive-llc.myshopify.com/?preview_theme_id=159689867463
 ```
 
 - [ ] Place a real paid order on a **multi-variant wig** (e.g. Pre-order),
@@ -461,9 +473,9 @@ https://nessclusive-llc.myshopify.com/?preview_theme_id=159626559687
 
 ### Step 4 — Final review (owner)
 
-- [ ] Open the dev theme in the **theme editor**
-      (`Online Store → Themes → Development → Customize`, or
-      [direct link](https://nessclusive-llc.myshopify.com/admin/themes/159626559687/editor))
+- [ ] Open **Aj-Build-Nessclusive** in the **theme editor**
+      (`Online Store → Themes → Aj-Build-Nessclusive → Customize`, or
+      [direct link](https://nessclusive-llc.myshopify.com/admin/themes/159689867463/editor))
       and click through every page once, on both desktop and a phone.
 - [ ] Confirm the **logo** is set (Header → Logo) — it currently falls back
       to a bundled default if unset.
@@ -477,9 +489,10 @@ https://nessclusive-llc.myshopify.com/?preview_theme_id=159626559687
 
 ### Step 5 — Publish (owner, admin only — I cannot do this step)
 
-1. **Online Store → Themes.** The dev theme should appear under
-   "Unpublished themes."
-2. Click **Actions → Publish** on the dev theme.
+1. **Online Store → Themes.** **Aj-Build-Nessclusive** appears under
+   "Unpublished themes" — it will not be confused with anything else, since
+   it is the only other theme on the store besides `Champion`.
+2. Click **Actions → Publish** on **Aj-Build-Nessclusive**.
 3. Shopify asks to confirm — this makes it live on www.nessclusive.com
    **immediately**, no delay, no separate DNS step.
 4. `Champion` automatically moves to "Unpublished themes." **Do not delete
@@ -565,14 +578,14 @@ it was before cutover. Takes under a minute.
 
 ## Editing the store from Shopify admin
 
-Everything below works the same on the **dev theme now** and on the **live
-theme after cutover** — practice on the dev theme preview first if unsure:
+Everything below works the same on **Aj-Build-Nessclusive now** and on the
+**live theme after cutover** — practice on the preview first if unsure:
 ```
-https://nessclusive-llc.myshopify.com/?preview_theme_id=159626559687
+https://nessclusive-llc.myshopify.com/?preview_theme_id=159689867463
 ```
 Open the editor at **Online Store → Themes → [theme] → Customize**, or jump
-straight to the dev theme:
-[direct link](https://nessclusive-llc.myshopify.com/admin/themes/159626559687/editor).
+straight to it:
+[direct link](https://nessclusive-llc.myshopify.com/admin/themes/159689867463/editor).
 
 Reminder of the rule this theme is built on (PLAN.md, Editability policy):
 **structure is locked, content is editable.** Sections cannot be reordered,
