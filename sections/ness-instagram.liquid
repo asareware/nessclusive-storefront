@@ -50,6 +50,7 @@
 
 <section
   class="ness-instagram"
+  id="looks"
   {% if section.settings.heading != blank %}aria-labelledby="ness-instagram-heading-{{ section.id }}"{% endif %}
 >
   {%- if section.settings.heading != blank -%}
@@ -154,7 +155,7 @@
       "type": "paragraph",
       "content": "The photos are live — they come straight from the Instagram account and refresh on their own, so there is nothing to upload here. Only the heading and the profile link are editable; the number of tiles, their shape, and all colours and spacing are fixed by the design."
     },
-    { "type": "text", "id": "heading", "label": "Heading", "default": "Follow & Tag on Instagram @Nessclusive" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Looks and follow @Nessclusive" },
     { "type": "url", "id": "profile_url", "label": "Instagram profile", "info": "Used only while the live feed is unavailable and the five bundled photos are showing — those tiles open the profile instead. Live tiles always open their own post. Leave empty to use instagram.com/nessclusive." }
   ]
 }
