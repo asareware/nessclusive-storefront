@@ -289,6 +289,16 @@
     {% render 'ness-fonts' %}
     {{ 'ness-tokens.css' | asset_url | stylesheet_tag }}
     {{ 'ness-base.css' | asset_url | stylesheet_tag }}
+    {%- comment -%}
+      Re-skins Dawn's customer templates — login, register, account, order,
+      addresses, password reset, activation. All seven share customer.css and
+      are scoped under .customer, so one override covers the set. Loaded only
+      where it applies. The prototype specifies none of these screens; this is
+      the theme's own type and controls, not a transcription.
+    {%- endcomment -%}
+    {%- if request.page_type contains 'customers' -%}
+      {{ 'ness-customer.css' | asset_url | stylesheet_tag }}
+    {%- endif -%}
     {{ 'ness-card.css' | asset_url | stylesheet_tag }}
     {%- comment -%}
       Smooth scrolling, reveal-on-scroll, and the header pill's scrolled state.

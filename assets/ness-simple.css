@@ -1,0 +1,261 @@
+/* ==========================================================================
+   Nessclusive — simple content pages
+
+   The prototype covers four screens: homepage, shop, product, booking. Every
+   other page a real store needs — 404, a generic page, the collections index,
+   a gift card — has no design to transcribe.
+
+   Rather than invent a look for each, this is one treatment built from the
+   theme's own tokens: the display face on headings, the shell width and side
+   padding the rest of the site uses, and the same pill and CTA shapes. The
+   goal is that these pages read as the same site, not that they are
+   individually designed.
+   ========================================================================== */
+
+.ness-simple {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: clamp(40px, 6vw, 90px) var(--ness-shell-pad) clamp(64px, 7vw, 110px);
+}
+
+/* Narrow measure for prose. A policy or an About page set to the full 1770px
+   shell would run to 200 characters a line. */
+.ness-simple--prose {
+  max-width: 760px;
+}
+
+.ness-simple--centered {
+  max-width: 720px;
+  text-align: center;
+  min-height: 52vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.ness-simple__eyebrow {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ness-primary);
+}
+
+.ness-simple__title {
+  margin: 0 0 clamp(18px, 2vw, 28px);
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  font-size: clamp(34px, 4.6vw, 64px);
+  line-height: 100%;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+  text-wrap: balance;
+}
+
+.ness-simple__body {
+  margin: 0 0 clamp(24px, 3vw, 36px);
+  max-width: 560px;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--ness-muted);
+  text-wrap: pretty;
+}
+
+.ness-simple--centered .ness-simple__body {
+  margin-inline: auto;
+}
+
+.ness-simple__actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ness-simple__cta {
+  height: var(--ness-cta-height);
+  padding: 0 28px;
+  border-radius: var(--ness-radius-cta);
+  border: none;
+  background: var(--ness-primary-deep);
+  color: #fffcf8;
+  font-size: 18px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.ness-simple__cta:hover {
+  background: var(--ness-primary);
+  color: #fffcf8;
+  text-decoration: none;
+}
+
+.ness-simple__cta--ghost {
+  background: transparent;
+  border: 1px solid var(--ness-ink);
+  color: var(--ness-ink);
+}
+
+.ness-simple__cta--ghost:hover {
+  background: var(--ness-ink);
+  color: var(--ness-background);
+}
+
+/* --- Rich text ----------------------------------------------------------- */
+
+/* Page content comes from the merchant through Shopify's rich text editor, so
+   every element it can emit needs a resting style — otherwise a policy page
+   inherits Dawn's defaults for anything the theme has not spoken for. */
+.ness-simple__rte {
+  font-size: 17px;
+  line-height: 28px;
+  color: var(--ness-muted);
+}
+
+.ness-simple__rte > * + * {
+  margin-top: 18px;
+}
+
+.ness-simple__rte h2,
+.ness-simple__rte h3,
+.ness-simple__rte h4 {
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+  margin-top: clamp(28px, 3vw, 44px);
+}
+
+.ness-simple__rte h2 {
+  font-size: clamp(26px, 2.6vw, 36px);
+}
+
+.ness-simple__rte h3 {
+  font-size: clamp(22px, 2.2vw, 28px);
+}
+
+.ness-simple__rte a {
+  color: var(--ness-primary);
+  text-decoration: underline;
+}
+
+.ness-simple__rte a:hover {
+  color: var(--ness-primary-deep);
+}
+
+.ness-simple__rte ul,
+.ness-simple__rte ol {
+  padding-left: 22px;
+}
+
+.ness-simple__rte li + li {
+  margin-top: 8px;
+}
+
+.ness-simple__rte img {
+  border-radius: var(--ness-radius-media);
+}
+
+.ness-simple__rte blockquote {
+  margin: 0;
+  padding: 18px 22px;
+  border-left: 3px solid var(--ness-primary);
+  background: var(--ness-card-1);
+  border-radius: 0 var(--ness-radius-media) var(--ness-radius-media) 0;
+  color: var(--ness-ink);
+}
+
+.ness-simple__rte table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ness-simple__rte th,
+.ness-simple__rte td {
+  padding: 12px;
+  border-bottom: 1px solid var(--ness-border);
+  text-align: left;
+}
+
+/* --- Cart page ----------------------------------------------------------- */
+
+/* The lines and the summary sit side by side once there is room, and stack
+   below that. The summary is sticky on wide screens so Checkout stays reachable
+   through a long bag. */
+.ness-cart-page__form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 4vw, 64px);
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .ness-cart-page__form {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  }
+
+  .ness-cart-page__summary {
+    position: sticky;
+    /* Clears the fixed header. */
+    top: 120px;
+  }
+}
+
+.ness-cart-page__lines {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.ness-cart-page__summary {
+  border: 1px solid var(--ness-border);
+  border-radius: var(--ness-radius-card);
+  padding: clamp(22px, 2.4vw, 32px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: var(--ness-card-3);
+}
+
+.ness-cart-page__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 18px;
+  color: var(--ness-ink);
+}
+
+.ness-cart-page__row--discount {
+  font-size: 16px;
+  color: var(--ness-primary);
+}
+
+.ness-cart-page__note {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+}
+
+.ness-cart-page__checkout {
+  justify-content: center;
+  width: 100%;
+}
+
+.ness-cart-page__continue {
+  text-align: center;
+  font-size: 16px;
+  color: var(--ness-primary);
+}
+
+.ness-cart-page__actions {
+  justify-content: flex-start;
+}

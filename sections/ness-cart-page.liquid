@@ -1,0 +1,81 @@
+{{ 'ness-cart.css' | asset_url | stylesheet_tag }}
+{{ 'ness-simple.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Cart page.
+
+  The design has a cart drawer and no cart page, but /cart is reachable
+  regardless: it is where Shopify sends people from several flows, it is the
+  no-JavaScript path, and the drawer deliberately stands aside on this template
+  (see ness-cart.js — the drawer would otherwise shadow this form and its edits
+  would be reverted by it).
+
+  So this is the drawer's content laid out as a page, sharing ness-cart-line so
+  the two cannot drift apart. Everything is a real form: quantity POSTs to
+  /cart/change, checkout POSTs to /cart with name="checkout".
+{%- endcomment -%}
+
+<section class="ness-simple ness-cart-page">
+  <h1 class="ness-simple__title">{{ section.settings.heading | escape }}</h1>
+
+  {%- if cart.item_count == 0 -%}
+    <p class="ness-simple__body">{{ section.settings.empty_text | escape }}</p>
+    <div class="ness-simple__actions ness-cart-page__actions">
+      <a class="ness-simple__cta" href="{{ routes.all_products_collection_url }}">
+        {{- section.settings.empty_cta | escape -}}
+      </a>
+    </div>
+  {%- else -%}
+    <form action="{{ routes.cart_url }}" method="post" class="ness-cart-page__form">
+      <div class="ness-cart-page__lines">
+        {%- for item in cart.items -%}
+          {%- render 'ness-cart-line', item: item -%}
+        {%- endfor -%}
+      </div>
+
+      <aside class="ness-cart-page__summary" aria-label="Order summary">
+        <div class="ness-cart-page__row">
+          <span>Subtotal</span>
+          <strong>{{ cart.total_price | money }}</strong>
+        </div>
+
+        {%- if cart.cart_level_discount_applications.size > 0 -%}
+          {%- for discount in cart.cart_level_discount_applications -%}
+            <div class="ness-cart-page__row ness-cart-page__row--discount">
+              <span>{{ discount.title | escape }}</span>
+              <span>−{{ discount.total_allocated_amount | money }}</span>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+
+        <p class="ness-cart-page__note">{{ section.settings.note | escape }}</p>
+
+        <button type="submit" name="checkout" class="ness-simple__cta ness-cart-page__checkout">
+          {{- section.settings.checkout_label | escape -}}
+        </button>
+
+        <a class="ness-cart-page__continue" href="{{ routes.all_products_collection_url }}">
+          {{- section.settings.continue_label | escape -}}
+        </a>
+      </aside>
+    </form>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Cart",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Line items, prices and totals come from the cart itself. Only the wording below is editable."
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Your bag" },
+    { "type": "text", "id": "empty_text", "label": "Empty message", "default": "Your bag is empty." },
+    { "type": "text", "id": "empty_cta", "label": "Empty button", "default": "Shop all pieces" },
+    { "type": "text", "id": "checkout_label", "label": "Checkout button", "default": "Checkout" },
+    { "type": "text", "id": "continue_label", "label": "Continue link", "default": "Continue shopping" },
+    { "type": "text", "id": "note", "label": "Note above checkout", "default": "Shipping and taxes are calculated at checkout." }
+  ]
+}
+{% endschema %}

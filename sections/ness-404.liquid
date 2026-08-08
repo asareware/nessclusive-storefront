@@ -1,0 +1,38 @@
+{{ 'ness-simple.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  404. The prototype specifies no error page, so this is the theme's own type
+  and controls rather than a transcription — and it does the one job a 404 has:
+  say plainly what happened and offer the two routes back that a shopper on a
+  wig store actually wants.
+{%- endcomment -%}
+
+<section class="ness-simple ness-simple--centered">
+  <p class="ness-simple__eyebrow">{{ section.settings.eyebrow | escape }}</p>
+  <h1 class="ness-simple__title">{{ section.settings.heading | escape }}</h1>
+  {%- if section.settings.body != blank -%}
+    <p class="ness-simple__body">{{ section.settings.body | escape }}</p>
+  {%- endif -%}
+
+  <div class="ness-simple__actions">
+    <a class="ness-simple__cta" href="{{ routes.all_products_collection_url }}">
+      {{- section.settings.primary_label | escape -}}
+    </a>
+    <a class="ness-simple__cta ness-simple__cta--ghost" href="{{ routes.root_url }}">
+      {{- section.settings.secondary_label | escape -}}
+    </a>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "404",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Small heading above", "default": "404" },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "We can’t find that page" },
+    { "type": "textarea", "id": "body", "label": "Body", "default": "The link may be out of date, or the piece may have sold out and been retired. Everything currently available is in the shop." },
+    { "type": "text", "id": "primary_label", "label": "First button", "default": "Shop all pieces" },
+    { "type": "text", "id": "secondary_label", "label": "Second button", "default": "Back to home" }
+  ]
+}
+{% endschema %}

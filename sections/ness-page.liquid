@@ -1,0 +1,29 @@
+{{ 'ness-simple.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Generic page. Anything without a template of its own — About, policies as
+  pages, anything the owner adds later — renders here.
+
+  Nothing about it is a theme setting: the title and body are the page's own
+  content, edited in Content -> Pages, which is where a merchant expects to
+  edit a page.
+{%- endcomment -%}
+
+<section class="ness-simple ness-simple--prose">
+  <h1 class="ness-simple__title">{{ page.title | escape }}</h1>
+  {%- if page.content != blank -%}
+    <div class="ness-simple__rte">{{ page.content }}</div>
+  {%- endif -%}
+</section>
+
+{% schema %}
+{
+  "name": "Page",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The heading and body come from the page itself — edit them in Content → Pages. Typography and spacing are fixed by the theme."
+    }
+  ]
+}
+{% endschema %}

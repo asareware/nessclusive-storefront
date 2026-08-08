@@ -177,6 +177,16 @@
       {%- endif -%}
 
       {%- if product.description != blank -%}
+        {%- comment -%}
+          The description is merchant rich text and its internal heading levels
+          are not ours to change — this catalog's start at <h3> ("SPECS",
+          "PROCESSING TIME"), which jumps straight from the product's <h1> and
+          leaves a screen reader's heading list with a hole in it.
+
+          A hidden <h2> closes that without touching the merchant's content or
+          adding copy the design does not have.
+        {%- endcomment -%}
+        <h2 class="visually-hidden">Product details</h2>
         <div class="ness-product__description rte">{{ product.description }}</div>
       {%- endif -%}
     </div>
