@@ -1,0 +1,392 @@
+/* ==========================================================================
+   Nessclusive — cart drawer
+   Values transcribed from project/Nessclusive Storefront.dc.html:805-851
+   (the cart aside). Colours, radii, and the CTA height come from
+   ness-tokens.css; nothing here is exposed as a theme setting.
+
+   The full-screen scrim reuses .ness-overlay from ness-chrome.css — the menu
+   drawer and the cart drawer share one scrim in the prototype too, and
+   ness-chrome.css is loaded on every page by the header section.
+   ========================================================================== */
+
+/* The host is closed with the `hidden` attribute rather than a class, so the
+   drawer is shut even if this stylesheet never arrives. Declared here as well
+   as in ness-chrome.css so the component does not depend on load order. */
+ness-cart-drawer[hidden] {
+  display: none !important;
+}
+
+/* --- Panel -------------------------------------------------------------- */
+
+.ness-cart {
+  position: fixed;
+  inset: 0 0 0 auto;
+  z-index: 91;
+  width: min(460px, 94vw);
+  background: var(--ness-background);
+  display: flex;
+  flex-direction: column;
+  animation: ness-cart-slide-in 0.26s cubic-bezier(0.22, 0.8, 0.3, 1) both;
+}
+
+@keyframes ness-cart-slide-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+/* The panel is a destination, not a decoration — under reduced motion it
+   simply appears. */
+@media (prefers-reduced-motion: reduce) {
+  .ness-cart {
+    animation: none;
+  }
+}
+
+/* The one child of the panel, and the only part swapped on re-render. It
+   carries the column layout so the header and footer stay put while the list
+   between them scrolls. */
+.ness-cart__inner {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* While a quantity change is in flight the list and totals are dimmed and
+   inert, so a shopper cannot queue three conflicting changes against a cart
+   that has not caught up. The close button stays live throughout — a busy
+   drawer must never be a trap. */
+.ness-cart__inner[aria-busy='true'] .ness-cart__body,
+.ness-cart__inner[aria-busy='true'] .ness-cart__foot {
+  opacity: 0.55;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+/* --- Head --------------------------------------------------------------- */
+
+.ness-cart__head {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 24px;
+  border-bottom: 1px solid var(--ness-border);
+}
+
+.ness-cart__title {
+  margin: 0;
+  font-family: var(--ness-font-display);
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 100%;
+  /* The drawer title is -0.03em in the prototype; ness-base.css sets -0.04em
+     on every heading. */
+  letter-spacing: -0.03em;
+  color: var(--ness-ink);
+}
+
+.ness-cart__close {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.ness-cart__close:hover {
+  border-color: var(--ness-primary);
+}
+
+/* --- Body --------------------------------------------------------------- */
+
+.ness-cart__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.ness-cart__empty {
+  padding: 48px 0;
+  text-align: center;
+}
+
+.ness-cart__empty p {
+  margin: 0 0 20px;
+  font-size: 18px;
+  line-height: 27px;
+  color: var(--ness-muted);
+}
+
+/* --- Line item ---------------------------------------------------------- */
+
+.ness-cart__line {
+  display: flex;
+  gap: 16px;
+}
+
+.ness-cart__media {
+  width: 88px;
+  flex-shrink: 0;
+  aspect-ratio: 3 / 4;
+  border-radius: var(--ness-radius-band);
+  overflow: hidden;
+  background: var(--ness-card-1);
+  display: block;
+}
+
+.ness-cart__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+.ness-cart__info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ness-cart__text {
+  margin: 0 0 10px;
+}
+
+.ness-cart__name {
+  display: block;
+  margin: 0 0 4px;
+  font-size: 16px;
+  line-height: 1.3;
+  text-transform: uppercase;
+  color: var(--ness-ink);
+  text-decoration: none;
+}
+
+.ness-cart__name:hover {
+  color: var(--ness-primary);
+  text-decoration: underline;
+}
+
+.ness-cart__variant {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+}
+
+/* Processing Time and Pickup Option land here. They decide how the order is
+   fulfilled, so they are shown in full rather than folded into the variant
+   line — a shopper has to be able to check them before paying. */
+.ness-cart__props {
+  margin: 4px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+}
+
+.ness-cart__prop {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 6px;
+}
+
+.ness-cart__prop-name {
+  margin: 0;
+  font-weight: 500;
+}
+
+.ness-cart__prop-value {
+  margin: 0;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* --- Quantity, price, remove -------------------------------------------- */
+
+.ness-cart__controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.ness-cart__qty {
+  display: flex;
+  align-items: center;
+  height: 36px;
+  border: 1px solid var(--ness-border);
+  border-radius: var(--ness-radius-pill);
+}
+
+.ness-cart__qty-btn {
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--ness-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ness-cart__qty-btn:hover {
+  color: var(--ness-primary);
+}
+
+.ness-cart__qty-value {
+  min-width: 22px;
+  text-align: center;
+  font-size: 15px;
+  color: var(--ness-ink);
+}
+
+.ness-cart__line-price {
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-cart__line-price-was {
+  margin-right: 6px;
+  font-weight: 400;
+  color: var(--ness-muted);
+}
+
+.ness-cart__remove {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  font-size: 15px;
+  color: var(--ness-muted);
+  text-decoration: underline;
+}
+
+.ness-cart__remove:hover {
+  color: var(--ness-ink);
+  text-decoration: underline;
+}
+
+.ness-cart__discounts {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-primary);
+}
+
+/* --- Foot --------------------------------------------------------------- */
+
+.ness-cart__foot {
+  flex-shrink: 0;
+  border-top: 1px solid var(--ness-border);
+  padding: 24px;
+  /* On iOS the home indicator overlaps the bottom of a full-height panel, so
+     the Checkout button is lifted clear of it where the browser reports one. */
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ness-cart__foot .ness-cart__discounts {
+  margin: 0;
+}
+
+.ness-cart__totals {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+}
+
+.ness-cart__subtotal-label {
+  font-size: 18px;
+  color: var(--ness-muted);
+}
+
+.ness-cart__subtotal-value {
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-cart__note {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+}
+
+.ness-cart__checkout {
+  margin: 0;
+}
+
+/* --- Shared CTA --------------------------------------------------------- */
+
+.ness-cart__cta {
+  height: var(--ness-cta-height);
+  padding: 0 24px;
+  border: none;
+  border-radius: var(--ness-radius-cta);
+  background: var(--ness-primary-deep);
+  color: #fffcf8;
+  font-family: inherit;
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: background 0.4s ease;
+}
+
+.ness-cart__cta:hover {
+  background: var(--ness-primary);
+  color: #fffcf8;
+  text-decoration: none;
+}
+
+/* Checkout fills the footer; "Start Shopping" is centred inside the empty
+   state and keeps its intrinsic width, as in the prototype. */
+.ness-cart__cta--block {
+  width: 100%;
+}
+
+/* --- Narrow screens ------------------------------------------------------ */
+
+/* Below ~380px the quantity control, price, and Remove no longer fit on one
+   line. They wrap (flex-wrap is already set); Remove loses its auto margin so
+   it sits at the start of the new row rather than being pushed to the far
+   edge on its own. */
+@media (max-width: 380px) {
+  .ness-cart__remove {
+    margin-left: 0;
+  }
+}

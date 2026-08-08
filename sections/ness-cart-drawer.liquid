@@ -1,0 +1,37 @@
+{%- comment -%}
+  Cart drawer — thin section wrapper.
+
+  All of the markup lives in snippets/ness-cart-drawer.liquid. This file exists
+  so the drawer is addressable by the Section Rendering API: ness-cart.js calls
+  `/?sections=ness-cart-drawer` after every cart mutation and swaps the returned
+  [data-cart-content] into the live drawer. That keeps the Liquid as the single
+  source of truth for the drawer's markup — no line item is ever assembled in
+  JavaScript, so prices, discounts, and line item properties can only ever be
+  what Shopify rendered.
+
+  Rendered once per page by layout/theme.liquid with a static {% section %} tag.
+  It has no presets and no settings, so it cannot be added, removed, or
+  reordered from the customizer — see PLAN.md, Editability policy, where the
+  cart overlay is listed as "editable: nothing".
+
+  The stylesheet and script tags come back in every Section Rendering API
+  response too, but the script only ever reads [data-cart-content] out of that
+  response, so they are discarded rather than accumulating in the document.
+{%- endcomment -%}
+
+{{ 'ness-cart.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ness-cart.js' | asset_url }}" defer="defer"></script>
+
+{%- render 'ness-cart-drawer' -%}
+
+{% schema %}
+{
+  "name": "Cart drawer",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "The cart drawer has nothing to configure. Everything in it — products, quantities, prices, discounts, and the Processing Time and Pickup Option chosen on the product page — comes from Shopify and from what the shopper picked."
+    }
+  ]
+}
+{% endschema %}

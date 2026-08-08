@@ -1,0 +1,321 @@
+{%- comment -%}
+  Search results page.
+
+  Where the overlay's form lands, and where anyone who searches without
+  JavaScript lands directly. The design has no dedicated search page, so this
+  is deliberately the collection page wearing a search field: it loads
+  ness-collection.css and reuses its head, toolbar, filter, grid, and
+  pagination classes so the two pages are the same page, not two pages that
+  resemble each other. The only search-specific styling is in ness-search.css.
+
+  ness-collection.js is loaded for the same reason — it keys off the
+  `ness-facets` form id and the `ness-collection__` class names, so the filter
+  panel and the submit-on-sort behave identically here. It is an enhancement in
+  both places: the Apply button submits the form without it.
+{%- endcomment -%}
+
+{%- comment -%}
+  ness-search.css is also loaded by the overlay snippet in the header, so on
+  this page the browser sees the link twice and fetches it once. The dependency
+  is declared here anyway: this page uses `ness-search__form` and friends on its
+  own account, and must not quietly break the day the overlay moves elsewhere.
+{%- endcomment -%}
+{{ 'ness-collection.css' | asset_url | stylesheet_tag }}
+{{ 'ness-search.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ness-collection.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign terms = search.terms
+  assign has_filters = false
+  for filter in search.filters
+    assign has_filters = true
+    break
+  endfor
+-%}
+
+{%- comment -%}
+  Searches are scoped to products, which is what makes `search.filters` and the
+  product grid available at all. Any other scope only arrives via the "pages and
+  articles" link in the empty state below; when it does, it is carried forward
+  here so a filter or sort submit does not silently snap the shopper back to
+  products mid-search.
+{%- endcomment -%}
+{%- assign search_types = 'product' -%}
+{%- if search.performed and search.types != blank -%}
+  {%- assign search_types = search.types | join: ',' -%}
+{%- endif -%}
+
+{%- if search.results_count == 1 -%}
+  {%- assign count_label = '1 result' -%}
+{%- else -%}
+  {%- assign count_label = search.results_count | append: ' results' -%}
+{%- endif -%}
+
+{%- capture clear_url -%}
+  {{- routes.search_url }}?q={{ terms | url_encode }}&amp;type={{ search_types | url_encode }}&amp;options%5Bprefix%5D=last
+{%- endcapture -%}
+
+{%- paginate search.results by 24 -%}
+  <section class="ness-collection">
+    <div class="ness-collection__head">
+      <div>
+        <h1 class="ness-collection__title">
+          {%- if search.performed -%}Search results{%- else -%}Search{%- endif -%}
+        </h1>
+      </div>
+      {%- if search.performed -%}
+        <span class="ness-collection__count">{{ count_label }} for “{{ terms | escape }}”</span>
+      {%- endif -%}
+    </div>
+
+    {%- comment -%}
+      The same field as the overlay, in the flow of the page. A shopper who
+      arrived here by pressing Enter can refine without going back, and a
+      shopper with no JavaScript has a search box that has never depended on
+      any.
+    {%- endcomment -%}
+    <form
+      class="ness-search__form ness-search__form--page"
+      action="{{ routes.search_url }}"
+      method="get"
+      role="search"
+    >
+      <input type="hidden" name="type" value="{{ search_types | escape }}">
+      <input type="hidden" name="options[prefix]" value="last">
+
+      <svg
+        class="ness-search__icon"
+        width="22"
+        height="22"
+        viewBox="0 0 16 16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <circle cx="6.8" cy="6.8" r="6.05"/>
+        <path d="M11.4 11.4 L15.2 15.2" stroke-linecap="round"/>
+      </svg>
+
+      <label class="visually-hidden" for="ness-search-page-input">Search products</label>
+      <input
+        id="ness-search-page-input"
+        class="ness-search__input"
+        type="search"
+        name="q"
+        value="{{ terms | escape }}"
+        placeholder="Search wigs, closures, accessories"
+        autocomplete="off"
+        autocorrect="off"
+        autocapitalize="off"
+        spellcheck="false"
+      >
+
+      <button type="submit" class="ness-search__go">Search</button>
+    </form>
+
+    {%- if search.performed -%}
+      {%- comment -%}
+        Filters and sort share one form so a no-JavaScript submit carries both.
+        Unlike the collection page this form needs hidden fields: without `q`
+        and `type` riding along, applying a filter would submit to /search with
+        no query at all and throw the results away.
+
+        `page` is deliberately not carried — page 4 of the old result set means
+        nothing against the new one.
+      {%- endcomment -%}
+      {%- if has_filters or search.sort_options.size > 0 -%}
+        <form class="ness-collection__controls" id="ness-facets">
+          <input type="hidden" name="q" value="{{ terms | escape }}">
+          <input type="hidden" name="type" value="{{ search_types | escape }}">
+          <input type="hidden" name="options[prefix]" value="last">
+
+          <div class="ness-collection__toolbar">
+            {%- if has_filters -%}
+              <button
+                type="button"
+                class="ness-pill ness-collection__filter-toggle"
+                aria-expanded="false"
+                aria-controls="ness-filters"
+              >
+                <svg width="16" height="14" viewBox="0 0 16 14" stroke="currentColor" stroke-width="1.4" fill="none" aria-hidden="true" focusable="false">
+                  <path d="M1 3h14M3.5 7h9M6 11h4" stroke-linecap="round"/>
+                </svg>
+                Filters
+              </button>
+            {%- else -%}
+              <span></span>
+            {%- endif -%}
+
+            {%- if search.sort_options.size > 0 -%}
+              {%- assign current_sort = search.sort_by | default: search.default_sort_by -%}
+              <div class="ness-collection__sort">
+                <label class="ness-pill" for="ness-sort">
+                  <span class="ness-collection__sort-label">Sort By</span>
+                  <select id="ness-sort" name="sort_by" class="ness-collection__sort-select">
+                    {%- for option in search.sort_options -%}
+                      <option value="{{ option.value }}" {% if option.value == current_sort %}selected{% endif %}>
+                        {{ option.name }}
+                      </option>
+                    {%- endfor -%}
+                  </select>
+                  <svg width="12" height="9" viewBox="0 0 12.126 8.907" fill="currentColor" aria-hidden="true" focusable="false">
+                    <path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z"/>
+                  </svg>
+                </label>
+              </div>
+            {%- endif -%}
+          </div>
+
+          {%- if has_filters -%}
+            <div class="ness-collection__filters" id="ness-filters" hidden>
+              {%- for filter in search.filters -%}
+                <div class="ness-collection__filter">
+                  <p class="ness-collection__filter-title">{{ filter.label | escape }}</p>
+
+                  {%- case filter.type -%}
+                    {%- when 'list' -%}
+                      {%- for value in filter.values -%}
+                        <label class="ness-check{% if value.count == 0 and value.active == false %} ness-check--empty{% endif %}">
+                          <input
+                            type="checkbox"
+                            name="{{ value.param_name | escape }}"
+                            value="{{ value.value | escape }}"
+                            {% if value.active %}checked{% endif %}
+                            {% if value.count == 0 and value.active == false %}disabled{% endif %}
+                          >
+                          <span class="ness-check__box" aria-hidden="true">
+                            <svg width="12" height="9" viewBox="0 0 12 9" fill="none" stroke="currentColor" stroke-width="2" focusable="false">
+                              <path d="M1 4.4L4.4 7.8L11 1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                          </span>
+                          <span class="ness-check__label">{{ value.label | escape }}</span>
+                          <span class="ness-check__count">{{ value.count }}</span>
+                        </label>
+                      {%- endfor -%}
+
+                    {%- when 'price_range' -%}
+                      {%- assign price_max = filter.range_max | money_without_currency | replace: ',', '' -%}
+                      <div class="ness-collection__price">
+                        <label class="ness-collection__price-field">
+                          <span>From</span>
+                          <input
+                            type="number"
+                            name="{{ filter.min_value.param_name }}"
+                            value="{{ filter.min_value.value | default: '' }}"
+                            min="0"
+                            max="{{ price_max }}"
+                            placeholder="0"
+                            inputmode="numeric"
+                          >
+                        </label>
+                        <label class="ness-collection__price-field">
+                          <span>To</span>
+                          <input
+                            type="number"
+                            name="{{ filter.max_value.param_name }}"
+                            value="{{ filter.max_value.value | default: '' }}"
+                            min="0"
+                            max="{{ price_max }}"
+                            placeholder="{{ price_max }}"
+                            inputmode="numeric"
+                          >
+                        </label>
+                      </div>
+                  {%- endcase -%}
+                </div>
+              {%- endfor -%}
+
+              <div class="ness-collection__filter-actions">
+                <button type="submit" class="ness-collection__apply">Apply</button>
+                <a href="{{ clear_url | strip }}" class="ness-collection__clear">Clear all</a>
+              </div>
+            </div>
+          {%- endif -%}
+        </form>
+      {%- endif -%}
+
+      {%- if search.results.size == 0 -%}
+        <div class="ness-collection__empty">
+          <p>
+            {%- if has_filters -%}
+              Nothing matching “{{ terms | escape }}” survives those filters. Try widening them, or start again.
+            {%- else -%}
+              We could not find anything for “{{ terms | escape }}”. Check the spelling, or try a shorter word.
+            {%- endif -%}
+          </p>
+          <a href="{{ routes.all_products_collection_url }}" class="ness-collection__apply">Browse all products</a>
+        </div>
+
+        {%- comment -%}
+          Products are the whole point of the search, but a shopper looking for
+          the returns policy should not hit a dead end. This is the one route
+          to the other result types, offered only when the product search has
+          come up empty.
+        {%- endcomment -%}
+        <p class="ness-search__note">
+          Looking for information rather than a product?
+          <a href="{{ routes.search_url }}?q={{ terms | url_encode }}&amp;type=article,page">
+            Search pages and articles for “{{ terms | escape }}”</a>.
+        </p>
+      {%- else -%}
+        <div class="ness-collection__grid">
+          {%- for item in search.results -%}
+            {%- case item.object_type -%}
+              {%- when 'product' -%}
+                {%- comment -%}
+                  The first row is above the fold on most screens, so those
+                  images load eagerly and the rest lazily.
+                {%- endcomment -%}
+                {%- if forloop.index <= 4 -%}
+                  {%- render 'ness-product-card', product: item, loading: 'eager' -%}
+                {%- else -%}
+                  {%- render 'ness-product-card', product: item -%}
+                {%- endif -%}
+
+              {%- when 'article' -%}
+                <a class="ness-search__doc" href="{{ item.url }}">
+                  <span class="ness-search__doc-kind">Article</span>
+                  <span class="ness-search__doc-title">{{ item.title | escape }}</span>
+                </a>
+
+              {%- when 'page' -%}
+                <a class="ness-search__doc" href="{{ item.url }}">
+                  <span class="ness-search__doc-kind">Page</span>
+                  <span class="ness-search__doc-title">{{ item.title | escape }}</span>
+                </a>
+            {%- endcase -%}
+          {%- endfor -%}
+        </div>
+
+        {%- if paginate.pages > 1 -%}
+          {%- render 'ness-pagination', paginate: paginate -%}
+        {%- endif -%}
+      {%- endif -%}
+
+    {%- else -%}
+      {%- comment -%}
+        /search with no query. Not an error — someone followed the header link
+        with JavaScript off — so it gets a prompt and a way onward rather than
+        an empty page.
+      {%- endcomment -%}
+      <div class="ness-collection__empty">
+        <p>Search for a style, a length, or a cap size and we will find it.</p>
+        <a href="{{ routes.all_products_collection_url }}" class="ness-collection__apply">Browse all products</a>
+      </div>
+    {%- endif -%}
+  </section>
+{%- endpaginate -%}
+
+{% schema %}
+{
+  "name": "Search results",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Nothing on this page is editable. Results, filters, and sorting all come from Shopify, and the layout matches the shop page by design."
+    }
+  ]
+}
+{% endschema %}

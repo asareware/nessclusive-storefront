@@ -330,7 +330,15 @@
   color: #fffcf8;
 }
 
-[hidden] {
+/* Scoped to the drawer rather than global.
+
+   A bare `[hidden] { display: none !important }` also silenced the collection
+   and search filter panels, which rely on an author-level `display: grid`
+   out-ranking the UA [hidden] rule so they stay usable without JavaScript.
+   An !important author declaration beats that regardless of order, so the
+   panel — and the only submit button in the facets form — became permanently
+   unreachable with scripting off. */
+ness-drawer[hidden] {
   display: none !important;
 }
 

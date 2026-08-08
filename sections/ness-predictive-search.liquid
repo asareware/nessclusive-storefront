@@ -1,0 +1,84 @@
+{%- comment -%}
+  Predictive search results.
+
+  Rendered by Shopify's Predictive Search API, not by a template — ness-search.js
+  fetches /search/suggest?q=…&section_id=ness-predictive-search and swaps in the
+  contents of #ness-predictive-search-results. Keeping the markup here means the
+  overlay's tiles are the same Liquid product card as every other tile on the
+  site, rather than a second card built from JSON in the browser.
+
+  Deliberately carries no schema tag and no stylesheet tag. It is never placed
+  in a template, so there is nothing to configure; and its CSS (ness-search.css)
+  is already on the page — a stylesheet link inside a fetched fragment would be
+  injected into the middle of the document on every keystroke.
+
+  The wrapper's data-summary is the sentence the overlay announces through its
+  live region, composed here so the phrasing and the pluralisation live with the
+  rest of the copy rather than in JavaScript.
+{%- endcomment -%}
+
+{%- liquid
+  assign products = predictive_search.resources.products
+  assign terms = predictive_search.terms
+-%}
+
+{%- if predictive_search.performed == false -%}
+  {%- assign summary = '' -%}
+{%- elsif products.size == 0 -%}
+  {%- capture summary -%}No products match “{{ terms }}”.{%- endcapture -%}
+{%- elsif products.size == 1 -%}
+  {%- capture summary -%}1 result for “{{ terms }}”.{%- endcapture -%}
+{%- else -%}
+  {%- capture summary -%}{{ products.size }} results for “{{ terms }}”.{%- endcapture -%}
+{%- endif -%}
+
+{%- comment -%}
+  Built by hand rather than with a filter so the parameters match the overlay's
+  own form exactly — a shopper pressing Enter and a shopper following this link
+  must land on identical results.
+{%- endcomment -%}
+{%- capture all_results_url -%}
+  {{- routes.search_url }}?q={{ terms | url_encode }}&amp;type=product&amp;options%5Bprefix%5D=last
+{%- endcapture -%}
+
+<div id="ness-predictive-search-results" data-summary="{{ summary | strip | escape }}">
+  {%- if products.size > 0 -%}
+    <div class="ness-search__scroll">
+      <div class="ness-search__grid">
+        {%- for product in products -%}
+          {%- comment -%}
+            The tiles are 150px wide at their narrowest, so the card's default
+            grid `sizes` would have the browser fetch a collection-sized image
+            for each one.
+          {%- endcomment -%}
+          {%- if forloop.index <= 4 -%}
+            {%- render 'ness-product-card',
+              product: product,
+              loading: 'eager',
+              sizes: '(min-width: 750px) 240px, 45vw'
+            -%}
+          {%- else -%}
+            {%- render 'ness-product-card',
+              product: product,
+              sizes: '(min-width: 750px) 240px, 45vw'
+            -%}
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    </div>
+
+    {%- comment -%}
+      Suggestions are capped at 8. Without this the shopper has no visible route
+      to the rest — only the unadvertised Enter key.
+    {%- endcomment -%}
+    <a class="ness-search__all" href="{{ all_results_url | strip }}">
+      See all results for “{{ terms | escape }}”
+    </a>
+
+  {%- elsif predictive_search.performed -%}
+    <p class="ness-search__empty">
+      No products match “{{ terms | escape }}”. Try a shorter word — wig, closure,
+      bundle — or press Enter to search everything.
+    </p>
+  {%- endif -%}
+</div>

@@ -1,0 +1,11 @@
+{%- comment -%}
+  Search results template.
+
+  Replaces templates/search.json, which rendered Dawn's main-search section.
+  A .liquid template with a static {% section %} tag rather than a JSON one,
+  for the same reason as the homepage and the collection page: a JSON template
+  lets the customizer reorder and delete sections, and this page's structure is
+  fixed by the design. See PLAN.md, Decision #12.
+{%- endcomment -%}
+
+{% section 'ness-search-results' %}

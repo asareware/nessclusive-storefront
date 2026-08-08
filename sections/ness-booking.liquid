@@ -1,0 +1,446 @@
+{{ 'ness-booking.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  Booking page.
+
+  The prototype draws a three-step wizard here. It is deliberately not built:
+  PLAN.md Decision #1 replaced it with a redirect to the studio's existing
+  Acuity Scheduling page, so there is exactly one calendar to keep and no
+  half-captured requests sitting in a theme with no backend.
+
+  Everything else from the design survives — hero banner, "Plan your Perfect
+  Style" steps, and the Booking Policy / Custom Wig & Drop-off cards. The
+  wizard's card shell and its confirmation-state typography are reused for the
+  panel that sends people to Acuity.
+
+  No JavaScript: every control on this page is a link, so the page is complete
+  the moment the HTML arrives.
+{%- endcomment -%}
+
+{%- liquid
+  comment
+    Booking URL, most specific first: a per-section override, then the
+    site-wide theme setting (PLAN.md specifies a theme setting so every
+    "Book a Session" control on the site reads one value), then the known
+    Acuity link as a last resort so the button is never dead. This mirrors
+    sections/ness-booking-banner.liquid exactly — the two must not drift.
+
+    Kept on one line: inside a liquid tag every newline starts a new statement.
+  endcomment
+  assign booking_url = section.settings.booking_url | default: settings.acuity_url | default: 'https://nessclusive.as.me/schedule/6f74a017'
+  assign cta_label = section.settings.cta_label | default: 'Book a Session'
+  comment
+    Falling back to the page's own title means the page can never render
+    without an h1, whatever the merchant clears.
+  endcomment
+  assign hero_heading = section.settings.hero_heading | default: page.title | default: 'Book Nessclusive'
+  assign steps = section.blocks | where: 'type', 'step'
+  assign policy_lines = section.blocks | where: 'type', 'policy_line'
+  assign dropoff_lines = section.blocks | where: 'type', 'dropoff_line'
+  assign steps_id = 'ness-booking-steps-' | append: section.id
+  assign panel_id = 'ness-booking-panel-' | append: section.id
+  assign policy_id = 'ness-booking-policy-' | append: section.id
+  assign dropoff_id = 'ness-booking-dropoff-' | append: section.id
+-%}
+
+<div class="ness-booking">
+  {%- comment -%}
+    Hero banner. The artwork is a real <img> rather than a CSS background so it
+    can carry a srcset and be fetched eagerly — it is the first thing below the
+    header on this template. The band's height is set in CSS and the image
+    covers it, so any upload crops instead of distorting (Editability policy).
+
+    `sizes` matches ness-booking-banner: the shell width less its side padding,
+    which tops out at 1630px once the 1770px shell is reached.
+  {%- endcomment -%}
+  <div class="ness-booking__hero-band ness-shell">
+    <div class="ness-booking__hero">
+      <div class="ness-booking__hero-media">
+        {%- if section.settings.hero_image != blank -%}
+          {{
+            section.settings.hero_image
+            | image_url: width: 3000
+            | image_tag:
+              class: 'ness-booking__hero-image',
+              alt: section.settings.hero_image.alt,
+              widths: '750, 1100, 1500, 1900, 2400, 3000',
+              sizes: '(min-width: 1770px) 1630px, calc(100vw - 40px)',
+              loading: 'eager'
+          }}
+        {%- else -%}
+          {%- comment -%}
+            Bundled prototype artwork as the default, so the page is never
+            bare before a photo is chosen. Decorative: the headline over it
+            carries the meaning.
+          {%- endcomment -%}
+          <img
+            class="ness-booking__hero-image"
+            src="{{ 'ness-booking-bg.jpg' | asset_url }}"
+            alt=""
+            width="1600"
+            height="1507"
+            loading="eager"
+          >
+        {%- endif -%}
+      </div>
+
+      <h1 class="ness-booking__hero-heading">{{ hero_heading | escape }}</h1>
+    </div>
+  </div>
+
+  {%- comment -%}
+    The three steps. Wording is the prototype's, and it still describes the
+    real flow — Acuity asks for a service, then a date and time, then
+    confirmation. Every circle is filled: in the prototype the second and third
+    were greyed to show wizard progress, and with no wizard a permanently grey
+    step would read as unavailable.
+  {%- endcomment -%}
+  {%- comment -%}
+    Throughout this section, aria-labelledby is emitted only when the heading
+    it names is actually rendered. Pointing at an element that was never
+    output leaves the region with an empty accessible name, which is worse
+    than having none — same reasoning as ness-booking-banner.
+  {%- endcomment -%}
+  {%- if steps.size > 0 -%}
+    <section
+      class="ness-booking__steps ness-shell"
+      {% if section.settings.steps_heading != blank %}aria-labelledby="{{ steps_id }}"{% endif %}
+    >
+      {%- if section.settings.steps_heading != blank -%}
+        <h2 class="ness-booking__steps-heading" id="{{ steps_id }}">
+          {{- section.settings.steps_heading | escape -}}
+        </h2>
+      {%- endif -%}
+
+      {%- comment -%}
+        role="list" is not redundant: Safari drops list semantics from an <ol>
+        whose list-style is none, which is exactly what the drawn circles
+        require.
+      {%- endcomment -%}
+      <ol class="ness-booking__steps-list" role="list">
+        {%- for block in steps -%}
+          <li class="ness-booking__step" {{ block.shopify_attributes }}>
+            {%- comment -%}
+              The circle is decoration — the <ol> already tells assistive tech
+              this is step N of three, and announcing the digit twice is noise.
+            {%- endcomment -%}
+            <span class="ness-booking__step-number" aria-hidden="true">{{ forloop.index }}</span>
+            <p class="ness-booking__step-label">{{ block.settings.label | escape }}</p>
+          </li>
+        {%- endfor -%}
+      </ol>
+    </section>
+  {%- endif -%}
+
+  {%- comment -%}
+    The booking call to action, standing where the wizard stood.
+
+    The link is a plain same-tab navigation, matching ness-booking-banner. It
+    is not forced into a new tab: a forced tab has to be announced to be
+    accessible, and leaving that choice to the visitor is the behaviour the
+    rest of the site already has.
+  {%- endcomment -%}
+  <section
+    class="ness-booking__book ness-shell"
+    {% if section.settings.panel_heading != blank %}aria-labelledby="{{ panel_id }}"{% endif %}
+  >
+    <div class="ness-booking__panel">
+      <div class="ness-booking__panel-inner">
+        <span class="ness-booking__badge">
+          <svg
+            width="38"
+            height="38"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.7"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <rect x="3" y="5" width="18" height="16" rx="3"/>
+            <path d="M3 10.5h18M8 3v4M16 3v4M7.5 14.5h3M7.5 17.5h6"/>
+          </svg>
+        </span>
+
+        {%- if section.settings.panel_heading != blank -%}
+          <h2 class="ness-booking__panel-heading" id="{{ panel_id }}">
+            {{- section.settings.panel_heading | escape -}}
+          </h2>
+        {%- endif -%}
+
+        {%- if section.settings.panel_body != blank -%}
+          <p class="ness-booking__panel-body">{{ section.settings.panel_body | escape }}</p>
+        {%- endif -%}
+
+        {%- if section.settings.panel_note != blank -%}
+          <p class="ness-booking__panel-note">{{ section.settings.panel_note | escape }}</p>
+        {%- endif -%}
+
+        <div class="ness-booking__actions">
+          <a class="ness-booking__cta" href="{{ booking_url | escape }}">{{ cta_label | escape }}</a>
+
+          {%- if section.settings.secondary_label != blank -%}
+            {%- capture secondary_url -%}
+              {%- render 'ness-nav-url', destination: section.settings.secondary_destination -%}
+            {%- endcapture -%}
+            <a class="ness-booking__cta ness-booking__cta--secondary" href="{{ secondary_url }}">
+              {{- section.settings.secondary_label | escape -}}
+            </a>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {%- comment -%}
+    Booking Policy and Custom Wig / Drop-off. Each card is dropped entirely
+    when it has no lines, rather than leaving a coloured panel with a heading
+    and nothing under it.
+
+    Lines are textareas rendered with `white-space: pre-line`, because the
+    studio's policy is written as stacked clauses and reflowing it into a
+    paragraph would change what it says.
+  {%- endcomment -%}
+  {%- if policy_lines.size > 0 or dropoff_lines.size > 0 -%}
+    <div class="ness-booking__info ness-shell">
+      {%- if policy_lines.size > 0 -%}
+        <section
+          class="ness-booking__card ness-booking__card--policy"
+          {% if section.settings.policy_heading != blank %}aria-labelledby="{{ policy_id }}"{% endif %}
+        >
+          {%- if section.settings.policy_heading != blank -%}
+            <h2 class="ness-booking__card-heading" id="{{ policy_id }}">
+              {{- section.settings.policy_heading | escape -}}
+            </h2>
+          {%- endif -%}
+          <div class="ness-booking__lines">
+            {%- for block in policy_lines -%}
+              <p class="ness-booking__line" {{ block.shopify_attributes }}>
+                {{- block.settings.text | escape -}}
+              </p>
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endif -%}
+
+      {%- if dropoff_lines.size > 0 -%}
+        <section
+          class="ness-booking__card ness-booking__card--dropoff"
+          {% if section.settings.dropoff_heading != blank %}aria-labelledby="{{ dropoff_id }}"{% endif %}
+        >
+          {%- if section.settings.dropoff_heading != blank -%}
+            <h2 class="ness-booking__card-heading" id="{{ dropoff_id }}">
+              {{- section.settings.dropoff_heading | escape -}}
+            </h2>
+          {%- endif -%}
+          <div class="ness-booking__lines">
+            {%- for block in dropoff_lines -%}
+              <p class="ness-booking__line" {{ block.shopify_attributes }}>
+                {{- block.settings.text | escape -}}
+              </p>
+            {%- endfor -%}
+          </div>
+        </section>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Booking page",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Appointments are taken on Acuity, not on this page — every button here sends visitors to the Acuity link in Theme settings → Nessclusive. The wording, the banner photo, the three steps, and both policy cards are yours to edit. Layout, colours, and type are fixed by the design."
+    },
+    {
+      "type": "paragraph",
+      "content": "The page's own body text in Shopify admin is not shown on this template. Put everything you want visitors to read into the fields below."
+    },
+    { "type": "header", "content": "Banner" },
+    {
+      "type": "image_picker",
+      "id": "hero_image",
+      "label": "Banner photo",
+      "info": "Sits behind a purple wash and is cropped to fit, so nothing ever stretches. A wide landscape photo of at least 2400 × 900 works best."
+    },
+    {
+      "type": "text",
+      "id": "hero_heading",
+      "label": "Banner heading",
+      "default": "Book Nessclusive",
+      "info": "This is the page's main heading. Leave it empty and the page name is used instead."
+    },
+    { "type": "header", "content": "Steps" },
+    {
+      "type": "text",
+      "id": "steps_heading",
+      "label": "Heading",
+      "default": "Plan your Perfect Style"
+    },
+    { "type": "header", "content": "Booking button" },
+    {
+      "type": "text",
+      "id": "panel_heading",
+      "label": "Heading",
+      "default": "Book your appointment"
+    },
+    {
+      "type": "textarea",
+      "id": "panel_body",
+      "label": "Body copy",
+      "default": "Appointments are managed through our scheduler. Choose your service, pick a time that works for you, and confirm — it takes about a minute.",
+      "info": "Around 150 characters is what the design was drawn for."
+    },
+    {
+      "type": "textarea",
+      "id": "panel_note",
+      "label": "Small print",
+      "default": "Your slot is held once the non-refundable deposit is paid. Please read the booking policy below before you book.",
+      "info": "The quieter line under the body copy. Leave empty to hide it."
+    },
+    { "type": "text", "id": "cta_label", "label": "Button label", "default": "Book a Session" },
+    {
+      "type": "url",
+      "id": "booking_url",
+      "label": "Booking link (optional override)",
+      "info": "Leave empty to use the site-wide Acuity link from Theme settings → Nessclusive. Only set this to send THIS page somewhere different."
+    },
+    {
+      "type": "text",
+      "id": "secondary_label",
+      "label": "Second button label",
+      "default": "Ask a question first",
+      "info": "Leave empty to show the booking button on its own."
+    },
+    {
+      "type": "select",
+      "id": "secondary_destination",
+      "label": "Second button goes to",
+      "default": "contact",
+      "options": [
+        { "value": "contact", "label": "Contact page" },
+        { "value": "faqs", "label": "FAQs page" },
+        { "value": "all_products", "label": "All products" },
+        { "value": "ready_to_ship", "label": "Ready to Ship" },
+        { "value": "pre_order", "label": "Pre-Order" },
+        { "value": "accessories", "label": "Accessories" },
+        { "value": "home", "label": "Home page" }
+      ]
+    },
+    { "type": "header", "content": "Policy cards" },
+    {
+      "type": "text",
+      "id": "policy_heading",
+      "label": "First card heading",
+      "default": "Booking Policy"
+    },
+    {
+      "type": "text",
+      "id": "dropoff_heading",
+      "label": "Second card heading",
+      "default": "Custom Wig , Coloring & Drop off"
+    }
+  ],
+  "max_blocks": 24,
+  "blocks": [
+    {
+      "type": "step",
+      "name": "Step",
+      "limit": 4,
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "What happens at this step",
+          "default": "Select Your Desired Service",
+          "info": "The number is added automatically from the order of the steps. The design was drawn for three."
+        }
+      ]
+    },
+    {
+      "type": "policy_line",
+      "name": "Booking policy line",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "Deposit : ALL APPOINTMENTS REQUIRE A NON REFUNDABLE\nDEPOSIT TO SECURE YOUR SPOT.",
+          "info": "Line breaks are kept exactly as you type them, so the policy stacks the way it is written."
+        }
+      ]
+    },
+    {
+      "type": "dropoff_line",
+      "name": "Drop-off line",
+      "settings": [
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "ALL FRONTALS, CLOSURES AND WIGS\nMUST BE DROPPED OFF 4-5 DAYS IN ADVANCE\nOR A FEE WILL BE CHARGED!",
+          "info": "Line breaks are kept exactly as you type them."
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "step", "settings": { "label": "Select Your Desired Service" } },
+      { "type": "step", "settings": { "label": "Select your preferable Time & date" } },
+      { "type": "step", "settings": { "label": "Confirm and Get Ready" } },
+      {
+        "type": "policy_line",
+        "settings": {
+          "text": "Deposit : ALL APPOINTMENTS REQUIRE A NON REFUNDABLE\nDEPOSIT TO SECURE YOUR SPOT.\nREMAINING BALANCE MUST BE PAID IN CASH OR ZELLE\nON THE DAY OF YOUR APPOINTMENT."
+        }
+      },
+      {
+        "type": "policy_line",
+        "settings": {
+          "text": "Reschedule : YOU CAN RESCHEDULE ONCE WITH YOUR DEPOSIT\nIN THE SAME MONTH RESCHEDULE UPTO 3 DAYS\nBEFORE YOUR ORIGINAL APPOINTMENT. NO EXCEPTIONS!"
+        }
+      },
+      {
+        "type": "policy_line",
+        "settings": {
+          "text": "Lateness : AFTER 10 MIN, YOU WILL BE CHARGED A $20 FEE.\nAFTER 20 MINS APPOINTMENT WILL BE CANCELLED"
+        }
+      },
+      {
+        "type": "policy_line",
+        "settings": { "text": "Same day cancelation : DEPOSIT LOST AND 50% OF SERVICE CHARGED." }
+      },
+      {
+        "type": "policy_line",
+        "settings": { "text": "No call, No show : DEPOSIT LOST AND 50% OF SERVICE CHARGED." }
+      },
+      {
+        "type": "policy_line",
+        "settings": { "text": "** BY BOOKING YOU HAVE ACCEPTED AND AGREED TO THE TERM OF MY POLICY**" }
+      },
+      {
+        "type": "dropoff_line",
+        "settings": {
+          "text": "For Order : TEXT 917-587-8962\nOR EMAIL INFO@NESSCLUSIVE.COM FOR ALL WIG ORDERS"
+        }
+      },
+      {
+        "type": "dropoff_line",
+        "settings": {
+          "text": "ALL FRONTALS, CLOSURES AND WIGS\nMUST BE DROPPED OFF 4-5 DAYS IN ADVANCE\nOR A FEE WILL BE CHARGED!"
+        }
+      },
+      { "type": "dropoff_line", "settings": { "text": "For Late Drop Off Policy:" } },
+      { "type": "dropoff_line", "settings": { "text": "3 Days - $15 FEE," } },
+      { "type": "dropoff_line", "settings": { "text": "2 Days - $25 FEE," } },
+      { "type": "dropoff_line", "settings": { "text": "No 1 Day Drop off" } },
+      { "type": "dropoff_line", "settings": { "text": "$40 FEE CHARGED FOR SAME DAY CUSTOMIZATION." } }
+    ]
+  }
+}
+{% endschema %}

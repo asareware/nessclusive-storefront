@@ -15,7 +15,6 @@
   var root = document.querySelector('[data-ness-product]');
   if (!root) return;
 
-  var form = root.querySelector('#ness-product-form');
   var data = root.querySelector('[data-ness-variant-data]');
   var variants = [];
 
@@ -137,16 +136,14 @@
 
   update();
 
-  /* --- Submit ------------------------------------------------------------
-     The cart drawer owns adding to cart: it listens for submit on
-     [data-ness-add] and takes over. This file only makes sure the Buy Now
-     button's intent survives that interception — it must end at checkout,
-     not in the drawer. */
-  if (form && buyButton) {
-    buyButton.addEventListener('click', function () {
-      form.setAttribute('data-ness-checkout', '');
-    });
-  }
+  /* Adding to cart belongs to the cart drawer, which intercepts submit on
+     [data-ness-add]. Buy Now is deliberately NOT intercepted: ness-cart.js
+     checks event.submitter for name="checkout" and lets the browser submit
+     natively so Shopify takes the shopper to checkout.
+
+     There is nothing to do here. An earlier version set a flag attribute on
+     click, which nothing read, and which would have missed a submit triggered
+     by Enter on the focused button anyway. */
 })();
 
 /* --- Recommendations ----------------------------------------------------

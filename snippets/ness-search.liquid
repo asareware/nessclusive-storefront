@@ -1,0 +1,143 @@
+{%- comment -%}
+  Full-screen predictive search overlay.
+
+  Rendered once, from the header section, so there is exactly one overlay per
+  page and it sits next to the control that opens it.
+
+  Design: project/Nessclusive Storefront.dc.html:777-795.
+
+  Progressive enhancement, in three parts:
+
+  1. The header control stays `<a href="/search">`. ness-search.js intercepts a
+     plain left-click on it; a modified click, a blocked script, or no script
+     at all leaves a link that navigates to a real page.
+  2. This element ships with `hidden` set. Without the script it never opens —
+     which is correct, because everything inside it is reachable at /search.
+     Nothing here is content that exists only in the overlay.
+  3. The form inside is a real GET form with a real action. Enter submits it
+     natively, so a shopper reaches full results even when the suggestion
+     fetch is failing.
+
+  The suggestions themselves are markup, not JSON: ness-search.js asks the
+  Predictive Search API to render sections/ness-predictive-search.liquid and
+  swaps the result in.
+
+  No settings. Per PLAN.md's Editability policy the search overlay is entirely
+  locked — there is nothing here a merchant could usefully change that would
+  not also let them break it.
+{%- endcomment -%}
+
+{{ 'ness-search.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ness-search.js' | asset_url }}" defer="defer"></script>
+
+<ness-search id="ness-search" hidden>
+  {%- comment -%}
+    The scrim is a button so it is a real, described control rather than a
+    click-handling div — but it is taken out of the tab order and the
+    accessibility tree, because Escape and the close button are how a keyboard
+    or screen reader user is meant to leave.
+  {%- endcomment -%}
+  <button
+    type="button"
+    class="ness-search__scrim"
+    data-search-scrim
+    tabindex="-1"
+    aria-hidden="true"
+  ></button>
+
+  <div
+    class="ness-search__panel"
+    data-search-panel
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ness-search-title"
+  >
+    <div class="ness-search__inner">
+      <h2 id="ness-search-title" class="visually-hidden">Search</h2>
+
+      <form
+        class="ness-search__form"
+        action="{{ routes.search_url }}"
+        method="get"
+        role="search"
+      >
+        {%- comment -%}
+          Products only, matching what the overlay shows. `options[prefix]=last`
+          makes the last word match on a prefix, so "clos" already finds
+          "closure" — the behaviour a shopper expects while still typing.
+        {%- endcomment -%}
+        <input type="hidden" name="type" value="product">
+        <input type="hidden" name="options[prefix]" value="last">
+
+        <svg
+          class="ness-search__icon"
+          width="22"
+          height="22"
+          viewBox="0 0 16 16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <circle cx="6.8" cy="6.8" r="6.05"/>
+          <path d="M11.4 11.4 L15.2 15.2" stroke-linecap="round"/>
+        </svg>
+
+        <label class="visually-hidden" for="ness-search-input">Search products</label>
+        <input
+          id="ness-search-input"
+          class="ness-search__input"
+          data-search-input
+          type="search"
+          name="q"
+          placeholder="Search wigs, closures, accessories"
+          autocomplete="off"
+          autocorrect="off"
+          autocapitalize="off"
+          spellcheck="false"
+        >
+
+        {%- comment -%}
+          A single text field submits on Enter without this button, and the
+          design shows no submit control — but that leaves screen reader and
+          switch users with no named way to run the search. Visually hidden
+          keeps the design exact and the control real.
+        {%- endcomment -%}
+        <button type="submit" class="visually-hidden">Search</button>
+
+        <button
+          type="button"
+          class="ness-search__close"
+          data-search-close
+          aria-label="Close search"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" stroke="currentColor" stroke-width="1.6" fill="none" aria-hidden="true" focusable="false">
+            <path d="M1 1L15 15M15 1L1 15" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </form>
+
+      {%- comment -%}
+        The summary is both the design's result line and the live region that
+        tells a screen reader how many results arrived — the count is otherwise
+        conveyed only by a grid appearing silently below the field.
+      {%- endcomment -%}
+      <p
+        class="ness-search__summary"
+        data-search-summary
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></p>
+
+      {%- comment -%}
+        Deliberately unlabelled and role-less: an aria-label on a plain div is
+        ignored, and giving it a landmark role would add a second navigable
+        region inside a modal that already has one accessible name. The
+        summary above states what the grid contains.
+      {%- endcomment -%}
+      <div class="ness-search__results" data-search-results></div>
+    </div>
+  </div>
+</ness-search>

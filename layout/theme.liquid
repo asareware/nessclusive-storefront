@@ -337,7 +337,7 @@
     </script>
   </head>
 
-  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}">
+  <body class="gradient{% if settings.animations_hover_elements != 'none' %} animate--hover-{{ settings.animations_hover_elements }}{% endif %}" data-ness-template="{{ template.name }}">
     <a class="skip-to-content-link button visually-hidden" href="#MainContent">
       {{ 'accessibility.skip_to_text' | t }}
     </a>
@@ -354,6 +354,15 @@
       see PLAN.md, Decision #12.
     {%- endcomment -%}
     {% section 'ness-header' %}
+
+    {%- comment -%}
+      Cart drawer. A section rather than a bare snippet so ness-cart.js can
+      re-render it through the Section Rendering API after every cart change —
+      the drawer's Liquid stays the single source of truth for its own markup.
+      It starts closed and is opened by script; the header's cart pill is a
+      real link to /cart, so the cart is reachable without JavaScript.
+    {%- endcomment -%}
+    {% section 'ness-cart-drawer' %}
 
     <main
       id="MainContent"

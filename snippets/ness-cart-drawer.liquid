@@ -1,0 +1,329 @@
+{%- comment -%}
+  Cart drawer — the whole cart UI.
+
+  Rendered once per page from sections/ness-cart-drawer.liquid, which is pulled
+  into layout/theme.liquid with a static {% section %} tag. That section exists
+  purely so this markup can be re-rendered through the Section Rendering API
+  (`/?sections=ness-cart-drawer`) after every cart mutation — the Liquid below
+  stays the single source of truth for the drawer's markup, and ness-cart.js
+  never hand-builds a line item.
+
+  Progressive enhancement, in three parts:
+
+  1. The drawer starts closed via the `hidden` *attribute* (not a CSS rule), so
+     a blocked stylesheet cannot leave it covering the page. It is opened only
+     by ness-cart.js.
+  2. Nothing here is the only route to the cart. The header's cart pill is a
+     real link to /cart; ness-cart.js intercepts the click and opens this
+     instead. With JavaScript off the shopper lands on the cart page, which is
+     the same cart.
+  3. Every control inside is a real form or link — the quantity buttons POST to
+     /cart/change, Remove is `item.url_to_remove`, Checkout POSTs to /cart. The
+     script upgrades those to fetch calls; it does not invent them.
+
+  Line item properties are displayed, not just carried. Processing Time and
+  Pickup Option drive fulfilment (PLAN.md, "Line item properties"), so a
+  shopper must be able to see what they chose before paying.
+
+  Only [data-cart-content] is swapped on re-render, so the host element, the
+  overlay, and the live region survive and keep their listeners.
+{%- endcomment -%}
+
+{%- comment -%}
+  The announcement is composed here rather than in JavaScript so the wording
+  lives with the rest of the drawer's copy. strip_html guards against currency
+  formats whose `money` output carries markup.
+{%- endcomment -%}
+{%- capture cart_announce -%}
+  {%- if cart.item_count == 0 -%}
+    Your bag is now empty.
+  {%- else -%}
+    Your bag, {{ cart.item_count }} item{% if cart.item_count != 1 %}s{% endif %}, subtotal {{ cart.total_price | money }}.
+  {%- endif -%}
+{%- endcapture -%}
+
+<ness-cart-drawer id="ness-cart-drawer" hidden>
+  <button
+    type="button"
+    class="ness-overlay"
+    data-cart-overlay
+    tabindex="-1"
+    aria-hidden="true"
+  ></button>
+
+  <aside
+    class="ness-cart"
+    data-cart-panel
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="ness-cart-title"
+  >
+    <div
+      class="ness-cart__inner"
+      data-cart-content
+      data-item-count="{{ cart.item_count }}"
+      data-announce="{{ cart_announce | strip_html | strip | escape }}"
+    >
+      <div class="ness-cart__head">
+        <h2 class="ness-cart__title" id="ness-cart-title">
+          Your bag{% if cart.item_count > 0 %} ({{ cart.item_count }}){% endif %}
+        </h2>
+        <button
+          type="button"
+          class="ness-cart__close"
+          data-cart-close
+          data-focus-key="close"
+          aria-label="Close bag"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" stroke="#15001A" stroke-width="1.6" fill="none" aria-hidden="true" focusable="false">
+            <path d="M1 1L15 15M15 1L1 15" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+
+      <div class="ness-cart__body">
+        {%- if cart.item_count == 0 -%}
+          <div class="ness-cart__empty">
+            <p>Your bag is empty.</p>
+            <a
+              class="ness-cart__cta"
+              href="{{ routes.all_products_collection_url }}"
+              data-focus-key="shop"
+            >
+              Start Shopping
+            </a>
+          </div>
+        {%- else -%}
+          {%- for item in cart.items -%}
+            {%- comment -%}
+              Properties are captured first so the <dl> is only emitted when at
+              least one survives filtering — an empty definition list read out
+              as "list, 0 items" is noise. Shopify's own hidden properties are
+              prefixed with an underscore and are skipped.
+            {%- endcomment -%}
+            {%- capture item_properties -%}
+              {%- for property in item.properties -%}
+                {%- assign property_first_char = property.first | slice: 0 -%}
+                {%- if property.last != blank and property_first_char != '_' -%}
+                  <div class="ness-cart__prop">
+                    <dt class="ness-cart__prop-name">{{ property.first | escape }}:</dt>
+                    <dd class="ness-cart__prop-value">
+                      {%- if property.last contains '/uploads/' -%}
+                        <a
+                          href="{{ property.last | escape }}"
+                          target="_blank"
+                          rel="noopener"
+                          aria-describedby="a11y-new-window-message"
+                        >
+                          {{- property.last | split: '/' | last | escape -}}
+                        </a>
+                      {%- else -%}
+                        {{- property.last | escape -}}
+                      {%- endif -%}
+                    </dd>
+                  </div>
+                {%- endif -%}
+              {%- endfor -%}
+            {%- endcapture -%}
+
+            {%- assign item_title = item.product.title | escape -%}
+            {%- assign decreased_quantity = item.quantity | minus: 1 -%}
+            {%- assign increased_quantity = item.quantity | plus: 1 -%}
+
+            {%- comment -%}
+              At a quantity of one the decrease button removes the line, so it
+              says so rather than promising to decrease something that cannot
+              go lower.
+            {%- endcomment -%}
+            {%- if item.quantity == 1 -%}
+              {%- capture decrease_label -%}Remove {{ item_title }} from your bag{%- endcapture -%}
+            {%- else -%}
+              {%- capture decrease_label -%}Decrease quantity of {{ item_title }}{%- endcapture -%}
+            {%- endif -%}
+
+            <div class="ness-cart__line">
+              {%- comment -%}
+                The thumbnail repeats the link beside it, so it is hidden from
+                assistive technology and taken out of the tab order — the line
+                appears once in a screen reader's link list, not twice.
+              {%- endcomment -%}
+              <a class="ness-cart__media" href="{{ item.url }}" tabindex="-1" aria-hidden="true">
+                {%- if item.image -%}
+                  {{
+                    item.image
+                    | image_url: width: 264
+                    | image_tag:
+                      class: 'ness-cart__image',
+                      alt: '',
+                      width: 88,
+                      height: 117,
+                      widths: '88, 132, 176, 264',
+                      sizes: '88px',
+                      loading: 'lazy'
+                  }}
+                {%- else -%}
+                  {{ 'product-1' | placeholder_svg_tag: 'ness-cart__image ness-cart__image--placeholder' }}
+                {%- endif -%}
+              </a>
+
+              <div class="ness-cart__info">
+                <div class="ness-cart__text">
+                  <a class="ness-cart__name" href="{{ item.url }}">{{ item_title }}</a>
+
+                  {%- unless item.product.has_only_default_variant -%}
+                    <p class="ness-cart__variant">
+                      {%- for option in item.options_with_values -%}
+                        {{- option.value | escape -}}
+                        {%- unless forloop.last %} &middot; {% endunless -%}
+                      {%- endfor -%}
+                    </p>
+                  {%- endunless -%}
+
+                  {%- if item.selling_plan_allocation -%}
+                    <p class="ness-cart__variant">
+                      {{- item.selling_plan_allocation.selling_plan.name | escape -}}
+                    </p>
+                  {%- endif -%}
+
+                  {%- if item_properties != blank -%}
+                    <dl class="ness-cart__props">{{ item_properties }}</dl>
+                  {%- endif -%}
+                </div>
+
+                <div class="ness-cart__controls">
+                  {%- comment -%}
+                    A real POST to /cart/change. The quantity travels on the
+                    button that was pressed, so there is exactly one `quantity`
+                    in the payload and no JavaScript is needed to decide the
+                    direction. ness-cart.js intercepts the click and sends the
+                    same pair to /cart/change.js instead.
+                  {%- endcomment -%}
+                  <form
+                    class="ness-cart__qty"
+                    action="{{ routes.cart_change_url }}"
+                    method="post"
+                    data-cart-change
+                  >
+                    <input type="hidden" name="id" value="{{ item.key }}">
+                    <button
+                      type="submit"
+                      class="ness-cart__qty-btn"
+                      name="quantity"
+                      value="{{ decreased_quantity }}"
+                      data-cart-qty
+                      data-line="{{ item.key }}"
+                      data-focus-key="dec:{{ item.key }}"
+                      aria-label="{{ decrease_label }}"
+                    >
+                      &minus;
+                    </button>
+                    <span class="ness-cart__qty-value">
+                      <span class="visually-hidden">Quantity:</span>
+                      {{ item.quantity }}
+                    </span>
+                    <button
+                      type="submit"
+                      class="ness-cart__qty-btn"
+                      name="quantity"
+                      value="{{ increased_quantity }}"
+                      data-cart-qty
+                      data-line="{{ item.key }}"
+                      data-focus-key="inc:{{ item.key }}"
+                      aria-label="Increase quantity of {{ item_title }}"
+                    >
+                      +
+                    </button>
+                  </form>
+
+                  <span class="ness-cart__line-price">
+                    {%- if item.original_line_price != item.final_line_price -%}
+                      <s class="ness-cart__line-price-was">
+                        <span class="visually-hidden">Regular price</span>
+                        {{ item.original_line_price | money }}
+                      </s>
+                      <span>
+                        <span class="visually-hidden">Sale price</span>
+                        {{ item.final_line_price | money }}
+                      </span>
+                    {%- else -%}
+                      {{ item.final_line_price | money }}
+                    {%- endif -%}
+                  </span>
+
+                  {%- comment -%}
+                    A link, not a button: url_to_remove is a working URL, so
+                    Remove keeps working if the script never runs.
+                  {%- endcomment -%}
+                  <a
+                    class="ness-cart__remove"
+                    href="{{ item.url_to_remove }}"
+                    data-cart-remove
+                    data-line="{{ item.key }}"
+                    data-focus-key="rm:{{ item.key }}"
+                    aria-label="Remove {{ item_title }} from your bag"
+                  >
+                    Remove
+                  </a>
+                </div>
+
+                {%- if item.line_level_discount_allocations.size > 0 -%}
+                  <ul class="ness-cart__discounts" role="list" aria-label="Discounts">
+                    {%- for discount in item.line_level_discount_allocations -%}
+                      <li>
+                        {{- discount.discount_application.title | escape }} (&minus;{{ discount.amount | money }})
+                      </li>
+                    {%- endfor -%}
+                  </ul>
+                {%- endif -%}
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+
+      {%- if cart.item_count > 0 -%}
+        <div class="ness-cart__foot">
+          {%- if cart.cart_level_discount_applications.size > 0 -%}
+            <ul class="ness-cart__discounts" role="list" aria-label="Discounts">
+              {%- for discount in cart.cart_level_discount_applications -%}
+                <li>
+                  {{- discount.title | escape }} (&minus;{{ discount.total_allocated_amount | money }})
+                </li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+
+          <div class="ness-cart__totals">
+            <span class="ness-cart__subtotal-label">Subtotal</span>
+            <span class="ness-cart__subtotal-value">{{ cart.total_price | money }}</span>
+          </div>
+
+          <p class="ness-cart__note">Taxes and shipping calculated at checkout.</p>
+
+          <form action="{{ routes.cart_url }}" method="post" class="ness-cart__checkout">
+            <button
+              type="submit"
+              name="checkout"
+              class="ness-cart__cta ness-cart__cta--block"
+              data-focus-key="checkout"
+            >
+              Checkout
+            </button>
+          </form>
+        </div>
+      {%- endif -%}
+    </div>
+
+  {%- comment -%}
+    Inside the dialog, and outside [data-cart-content].
+
+    Both halves matter. aria-modal="true" prunes everything outside the dialog
+    from the accessibility tree, so a live region placed as a sibling of the
+    <aside> is never announced — which silently removed all feedback from
+    quantity changes and removals for screen reader users. And a live region
+    that is itself removed and re-inserted by a re-render is not reliably
+    announced either, so it stays out of the replaced subtree.
+  {%- endcomment -%}
+    <p class="visually-hidden" data-cart-status role="status" aria-live="polite"></p>
+  </aside>
+</ness-cart-drawer>

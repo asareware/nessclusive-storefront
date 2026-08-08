@@ -77,7 +77,13 @@
     </div>
 
     {%- if single_variant -%}
-      {%- form 'product', product, class: 'ness-card__add-form', id: null -%}
+      {%- comment -%}
+        data-ness-add is the theme-wide contract with the cart drawer: any form
+        carrying it is intercepted by ness-cart.js, posted to /cart/add.js, and
+        followed by the drawer opening. Without that script the form submits
+        natively and Shopify redirects to /cart.
+      {%- endcomment -%}
+      {%- form 'product', product, class: 'ness-card__add-form', id: null, data-ness-add: 'true' -%}
         <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
         <button
           type="submit"

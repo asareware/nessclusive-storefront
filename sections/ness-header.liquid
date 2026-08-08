@@ -97,11 +97,18 @@
       {%- endif -%}
 
       {%- comment -%}
-        Search and cart are plain links for now and become overlays in Phase 5.
-        Building them as links first means they work without JavaScript, which
-        is the behaviour we want to keep underneath the overlay anyway.
+        Search stays a link, not a button. ness-search.js intercepts a plain
+        left-click and opens the overlay instead; a Cmd-click, a blocked
+        script, or no script at all leaves an anchor that navigates to the real
+        search page. `aria-haspopup` is added by that script rather than
+        written here, because until it runs there is no popup.
       {%- endcomment -%}
-      <a href="{{ routes.search_url }}" class="ness-pill" aria-label="Search">
+      <a
+        href="{{ routes.search_url }}"
+        class="ness-pill"
+        data-search-open
+        aria-label="Search"
+      >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="#322F2C" stroke-width="1.5" aria-hidden="true" focusable="false">
           <circle cx="6.8" cy="6.8" r="6.05"/>
           <path d="M11.4 11.4 L15.2 15.2" stroke-linecap="round"/>
@@ -143,6 +150,13 @@
 </header>
 
 {%- render 'ness-menu-drawer', nav_items: nav_items, settings: section.settings -%}
+
+{%- comment -%}
+  The search overlay lives with the control that opens it, and the header is
+  rendered once per page — so there is exactly one overlay in the document and
+  no chance of two competing for the same id.
+{%- endcomment -%}
+{%- render 'ness-search' -%}
 
 {% schema %}
 {

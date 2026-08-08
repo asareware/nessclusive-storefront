@@ -1,0 +1,296 @@
+/* ==========================================================================
+   Nessclusive — search
+   The full-screen predictive overlay and the /search results page.
+   Values transcribed from project/Nessclusive Storefront.dc.html:777-795.
+   ========================================================================== */
+
+/* --- Overlay shell ------------------------------------------------------ */
+
+/* The element is a plain block until the script opens it. It ships with the
+   `hidden` attribute set in the markup, so a visitor whose JavaScript never
+   arrives sees nothing at all — the header control stays the real link to
+   /search that it always was. */
+ness-search {
+  display: block;
+}
+
+ness-search[hidden] {
+  display: none;
+}
+
+.ness-search__scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(21, 0, 26, 0.5);
+  border: 0;
+  padding: 0;
+  width: 100%;
+  cursor: default;
+  animation: ness-fade 0.2s ease both;
+}
+
+.ness-search__panel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 91;
+  background: var(--ness-background);
+  padding: clamp(20px, 3vw, 40px) clamp(20px, 4vw, 150px);
+  animation: ness-rise 0.24s ease both;
+  /* The results list carries its own scroll (max-height below). This is only
+     a backstop for very short viewports, so the close button can never end up
+     off-screen. */
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.ness-search__inner {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ness-search__scrim,
+  .ness-search__panel {
+    animation: none;
+  }
+}
+
+/* --- The field ----------------------------------------------------------
+   Shared by the overlay and the results page — it is the same component in
+   both places, so it is described once. */
+
+.ness-search__form {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px solid var(--ness-border);
+  padding-bottom: 14px;
+  margin: 0;
+}
+
+/* box-shadow rather than a thicker border, so the focus cue cannot shift the
+   layout underneath it. */
+.ness-search__form:focus-within {
+  border-bottom-color: var(--ness-primary-deep);
+  box-shadow: 0 1px 0 0 var(--ness-primary-deep);
+}
+
+.ness-search__icon {
+  color: var(--ness-primary);
+  flex-shrink: 0;
+}
+
+.ness-search__input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-family: var(--ness-font-text);
+  font-size: clamp(20px, 2.4vw, 32px);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: var(--ness-ink);
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.ness-search__input::placeholder {
+  color: var(--ness-placeholder);
+}
+
+/* Safari draws its own clear button inside type="search"; the overlay already
+   has a close control and the results page has a submit, so it is noise. */
+.ness-search__input::-webkit-search-cancel-button,
+.ness-search__input::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+
+/* The field is the only thing on the row and the whole row already lights up
+   on focus (above), so a second ring around a borderless input would be
+   redundant — but the cue itself is not removed, only relocated. */
+.ness-search__input:focus-visible {
+  outline: none;
+}
+
+.ness-search__close {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ness-ink);
+}
+
+.ness-search__close:hover {
+  border-color: var(--ness-primary);
+}
+
+/* --- Summary line -------------------------------------------------------
+   Also the live region. Dawn's base.css hides `p:empty` at (0,1,1); this is
+   (0,2,1) and wins, which matters because a live region that has been
+   display:none is not reliably announced when it is later filled in. The
+   reserved line also stops the results jumping down on the first keystroke. */
+p.ness-search__summary:empty {
+  display: block;
+}
+
+.ness-search__summary {
+  margin: 18px 0 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+  min-height: 22px;
+}
+
+/* --- Results ------------------------------------------------------------ */
+
+.ness-search__results {
+  margin-top: 18px;
+}
+
+.ness-search__scroll {
+  max-height: 46vh;
+  overflow-y: auto;
+  /* Room for the focus ring on the top row, which the scroll container would
+     otherwise clip. */
+  padding: 2px;
+}
+
+.ness-search__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 16px;
+}
+
+/* The overlay reuses the site-wide product card rather than a second card, and
+   compresses it: the prototype's suggestion tiles are 3/4, 10px-radius, and
+   drop the quick-add control. */
+.ness-search__grid .ness-card__media {
+  aspect-ratio: 3 / 4;
+  border-radius: var(--ness-radius-media);
+}
+
+.ness-search__grid .ness-card__foot {
+  padding: 10px 0 0;
+  align-items: flex-start;
+}
+
+.ness-search__grid .ness-card__text {
+  gap: 4px;
+}
+
+.ness-search__grid .ness-card__title,
+.ness-search__grid .ness-card__price {
+  font-size: 15px;
+}
+
+/* Hidden, not omitted: the card snippet is shared, and a suggestion tile that
+   narrow has no room for it. The card's title link reaches the same product,
+   so nothing becomes unreachable. */
+.ness-search__grid .ness-card__foot > .ness-card__add,
+.ness-search__grid .ness-card__add-form {
+  display: none;
+}
+
+.ness-search__empty {
+  margin: 4px 0 0;
+  font-size: 18px;
+  line-height: 28px;
+  color: var(--ness-muted);
+}
+
+.ness-search__all {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 18px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ness-primary);
+  text-decoration: none;
+  border-bottom: 1px solid currentcolor;
+}
+
+.ness-search__all:hover {
+  color: var(--ness-primary-deep);
+  text-decoration: none;
+}
+
+/* --- Results page -------------------------------------------------------
+   The page borrows the collection skeleton (ness-collection.css) so the two
+   grids are the same grid, and adds only what search needs on top. */
+
+.ness-search__form--page {
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+
+.ness-search__go {
+  height: 44px;
+  padding: 0 22px;
+  border-radius: var(--ness-radius-pill);
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  color: var(--ness-ink);
+  font-size: 16px;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.ness-search__go:hover {
+  border-color: var(--ness-primary);
+}
+
+.ness-search__note {
+  margin: 20px 0 0;
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--ness-muted);
+}
+
+.ness-search__note a {
+  color: var(--ness-primary);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* A search can legitimately return an article or a page — for instance when a
+   shopper follows the "pages and articles" link from the empty state. Those
+   results sit in the same grid as a text tile rather than being dropped. */
+.ness-search__doc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  border: 1px solid var(--ness-border);
+  border-radius: var(--ness-radius-card);
+  background: var(--ness-card-3);
+  color: var(--ness-ink);
+  text-decoration: none;
+}
+
+.ness-search__doc:hover {
+  border-color: var(--ness-primary);
+  text-decoration: none;
+}
+
+.ness-search__doc-kind {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ness-muted);
+}
+
+.ness-search__doc-title {
+  font-size: 20px;
+  line-height: 130%;
+  letter-spacing: -0.02em;
+}

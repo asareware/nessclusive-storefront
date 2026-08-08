@@ -1,0 +1,19 @@
+{%- comment -%}
+  Booking page template.
+
+  Assign this to the existing /pages/booking page in Shopify admin (Online
+  Store → Pages → Booking → Theme template). The handle is fixed by Decision
+  #9 and must not be recreated — the URL carries existing SEO.
+
+  A .liquid template with a static {% section %} tag rather than
+  templates/page.booking.json, for the same reason as the homepage and the
+  collection page: a JSON template lets the customizer reorder, duplicate, and
+  delete sections, and this page's structure is fixed by the design. Every
+  setting inside the section is still editable. See PLAN.md, Decision #12.
+
+  The section deliberately does not render the page's body content from admin —
+  all of the page's copy lives in the section's own settings, so the layout
+  cannot be broken by pasted markup.
+{%- endcomment -%}
+
+{% section 'ness-booking' %}

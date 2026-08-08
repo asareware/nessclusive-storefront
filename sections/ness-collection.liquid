@@ -158,8 +158,8 @@
                     <label class="ness-check{% if value.count == 0 and value.active == false %} ness-check--empty{% endif %}">
                       <input
                         type="checkbox"
-                        name="{{ value.param_name }}"
-                        value="{{ value.value }}"
+                        name="{{ value.param_name | escape }}"
+                        value="{{ value.value | escape }}"
                         {% if value.active %}checked{% endif %}
                         {% if value.count == 0 and value.active == false %}disabled{% endif %}
                       >
