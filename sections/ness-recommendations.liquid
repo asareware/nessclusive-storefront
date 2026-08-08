@@ -1,0 +1,43 @@
+{{ 'ness-product.css' | asset_url | stylesheet_tag }}
+
+{%- comment -%}
+  "You may also Like" — Shopify's product recommendations.
+
+  Fetched through the Recommendations API rather than rendered inline, because
+  the recommendations for a product are computed per-shopper and would
+  otherwise make every product page uncacheable. The section renders empty on
+  first paint and replaces itself once the API answers, which is the pattern
+  Shopify's own themes use.
+
+  If the request fails or returns nothing, the section stays empty and simply
+  is not there — no heading floating above an empty grid.
+{%- endcomment -%}
+
+<div
+  class="ness-recommendations"
+  data-ness-recommendations
+  data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ section.settings.limit }}"
+>
+  {%- if recommendations.performed and recommendations.products_count > 0 -%}
+    <h2 class="ness-recommendations__heading">{{ section.settings.heading | escape }}</h2>
+    <div class="ness-recommendations__grid">
+      {%- for product in recommendations.products -%}
+        {%- render 'ness-product-card', product: product -%}
+      {%- endfor -%}
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "You may also like",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Which products appear is decided by Shopify from what shoppers actually buy together. Only the heading and how many to show are editable."
+    },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "You may also Like" },
+    { "type": "range", "id": "limit", "label": "Products to show", "min": 2, "max": 8, "step": 1, "default": 4 }
+  ]
+}
+{% endschema %}

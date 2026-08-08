@@ -1,0 +1,82 @@
+{%- comment -%}
+  Product gallery — one large image with a row of thumbnails.
+
+  Every image is rendered into the page, not swapped in by script. The
+  thumbnails are radio inputs and CSS shows whichever is checked, so the
+  gallery works with JavaScript disabled and needs none to be added.
+
+  Accepts: product (required)
+{%- endcomment -%}
+
+{%- liquid
+  assign media = product.media | where: 'media_type', 'image'
+  assign gallery_id = 'ness-gallery-' | append: product.id
+-%}
+
+<div class="ness-gallery">
+  {%- if media.size > 0 -%}
+    <div class="ness-gallery__stage">
+      {%- for image in media -%}
+        {%- liquid
+          assign slide_id = gallery_id | append: '-' | append: forloop.index
+          assign slide_loading = 'lazy'
+          if forloop.first
+            assign slide_loading = 'eager'
+          endif
+        -%}
+        <input
+          class="ness-gallery__radio"
+          type="radio"
+          id="{{ slide_id }}"
+          name="{{ gallery_id }}"
+          {% if forloop.first %}checked{% endif %}
+        >
+        <div class="ness-gallery__slide">
+          {{
+            image
+            | image_url: width: 1400
+            | image_tag:
+              class: 'ness-gallery__image',
+              alt: image.alt | default: product.title,
+              widths: '400, 600, 800, 1100, 1400',
+              sizes: '(min-width: 1180px) 45vw, 92vw',
+              loading: slide_loading
+          }}
+        </div>
+      {%- endfor -%}
+    </div>
+
+    {%- if media.size > 1 -%}
+      {%- comment -%}
+        Thumbnails are <label>s for the radios above. Labels are not focusable,
+        so each carries tabindex and a role — without that the gallery is
+        unreachable by keyboard, which the prototype's <button>s would have
+        given for free.
+      {%- endcomment -%}
+      <div class="ness-gallery__thumbs" role="group" aria-label="Product images">
+        {%- for image in media -%}
+          {%- assign slide_id = gallery_id | append: '-' | append: forloop.index -%}
+          <label class="ness-gallery__thumb" for="{{ slide_id }}">
+            <span class="visually-hidden">Show image {{ forloop.index }} of {{ media.size }}</span>
+            {{
+              image
+              | image_url: width: 300
+              | image_tag:
+                class: 'ness-gallery__thumb-image',
+                alt: '',
+                widths: '120, 200, 300',
+                sizes: '15vw',
+                loading: 'lazy'
+            }}
+          </label>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  {%- else -%}
+    <div class="ness-gallery__stage">
+      <div class="ness-gallery__slide ness-gallery__slide--empty">
+        {{ 'product-1' | placeholder_svg_tag: 'ness-gallery__image' }}
+      </div>
+    </div>
+  {%- endif -%}
+</div>

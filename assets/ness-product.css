@@ -1,0 +1,513 @@
+/* ==========================================================================
+   Nessclusive — product page
+   Values transcribed from project/Nessclusive Storefront.dc.html:409-532.
+   ========================================================================== */
+
+.ness-product {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: clamp(24px, 3vw, 44px) var(--ness-shell-pad) clamp(64px, 7vw, 110px);
+}
+
+.ness-product__crumbs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+
+.ness-product__crumbs a {
+  color: var(--ness-muted);
+  text-decoration: none;
+}
+
+.ness-product__crumbs a:hover {
+  color: var(--ness-primary);
+}
+
+.ness-product__crumbs [aria-current] {
+  color: var(--ness-ink);
+}
+
+.ness-product__layout {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  gap: clamp(28px, 4vw, 72px);
+  align-items: start;
+}
+
+/* --- Gallery ------------------------------------------------------------ */
+
+.ness-gallery {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.ness-gallery__stage {
+  position: relative;
+  border-radius: var(--ness-radius-card);
+  overflow: hidden;
+  background: var(--ness-card-1);
+  aspect-ratio: 3 / 4;
+}
+
+/* The radios drive which slide shows. They sit off-screen rather than
+   display:none so they stay focusable and keyboard users can arrow between
+   images; the thumbnail labels are the visible control. */
+.ness-gallery__radio {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+}
+
+.ness-gallery__slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.4s ease;
+}
+
+.ness-gallery__radio:checked + .ness-gallery__slide {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* With one image there is no radio to check, so the lone slide must show. */
+.ness-gallery__slide--empty,
+.ness-gallery__stage > .ness-gallery__slide:only-child {
+  opacity: 1;
+  visibility: visible;
+  position: static;
+}
+
+.ness-gallery__image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+.ness-gallery__thumbs {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.ness-gallery__thumb {
+  flex: 1;
+  min-width: 0;
+  max-width: 120px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--ness-radius-media);
+  overflow: hidden;
+  background: var(--ness-card-1);
+  cursor: pointer;
+  aspect-ratio: 3 / 4;
+  transition: border-color 0.3s ease;
+}
+
+.ness-gallery__thumb:hover {
+  border-color: var(--ness-border);
+}
+
+.ness-gallery__thumb-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* :has lets the checked radio style its own thumbnail. Where it is
+   unsupported every thumb simply looks unselected — the gallery still works. */
+.ness-gallery__stage:has(.ness-gallery__radio:nth-of-type(1):checked)
+  ~ .ness-gallery__thumbs
+  .ness-gallery__thumb:nth-child(1),
+.ness-gallery__stage:has(.ness-gallery__radio:nth-of-type(2):checked)
+  ~ .ness-gallery__thumbs
+  .ness-gallery__thumb:nth-child(2),
+.ness-gallery__stage:has(.ness-gallery__radio:nth-of-type(3):checked)
+  ~ .ness-gallery__thumbs
+  .ness-gallery__thumb:nth-child(3),
+.ness-gallery__stage:has(.ness-gallery__radio:nth-of-type(4):checked)
+  ~ .ness-gallery__thumbs
+  .ness-gallery__thumb:nth-child(4),
+.ness-gallery__stage:has(.ness-gallery__radio:nth-of-type(5):checked)
+  ~ .ness-gallery__thumbs
+  .ness-gallery__thumb:nth-child(5) {
+  border-color: var(--ness-primary);
+}
+
+.ness-gallery__radio:focus-visible + .ness-gallery__slide {
+  outline: 2px solid var(--ness-primary-deep);
+  outline-offset: -2px;
+}
+
+/* --- Info column -------------------------------------------------------- */
+
+.ness-product__info {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2vw, 28px);
+}
+
+.ness-product__stock {
+  margin: 0 0 10px;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+}
+
+.ness-product__stock-state {
+  color: var(--ness-primary);
+}
+
+.ness-product__stock-state--out {
+  color: var(--ness-muted);
+}
+
+.ness-product__title {
+  margin: 0 0 14px;
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  font-size: clamp(32px, 3.6vw, 48px);
+  line-height: 105%;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-product__price {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-product__was {
+  margin-left: 10px;
+  font-size: 18px;
+  font-weight: 400;
+  color: var(--ness-muted);
+}
+
+.ness-product__installments {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--ness-border);
+}
+
+.ness-product__installments:empty {
+  padding: 0;
+  border: 0;
+}
+
+.ness-product__form {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2vw, 28px);
+  margin: 0;
+}
+
+/* --- Options and properties --------------------------------------------- */
+
+.ness-variants {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 2vw, 28px);
+}
+
+.ness-variants__group {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+}
+
+.ness-variants__label {
+  display: block;
+  padding: 0;
+  margin: 0 0 12px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ness-ink);
+}
+
+.ness-variants__pills {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* The radio stays in the layout and focusable; the label is the visible pill.
+   Hiding it with display:none would make the picker keyboard-unusable. */
+.ness-variants__radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.ness-variants__pill {
+  min-width: 74px;
+  height: var(--ness-chip-height);
+  padding: 0 18px;
+  border-radius: var(--ness-radius-pill);
+  border: 1px solid var(--ness-border);
+  background: transparent;
+  color: var(--ness-ink);
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.ness-variants__pill:hover {
+  border-color: var(--ness-primary);
+}
+
+.ness-variants__radio:checked + .ness-variants__pill {
+  background: var(--ness-primary);
+  border-color: var(--ness-primary);
+  color: var(--ness-on-primary);
+}
+
+.ness-variants__radio:focus-visible + .ness-variants__pill {
+  outline: 2px solid var(--ness-primary-deep);
+  outline-offset: 2px;
+}
+
+.ness-variants__select-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: var(--ness-chip-height);
+  padding: 0 18px;
+  border-radius: var(--ness-radius-pill);
+  border: 1px solid var(--ness-border);
+  color: var(--ness-ink);
+}
+
+.ness-variants__select-wrap:focus-within {
+  border-color: var(--ness-primary);
+  outline: 2px solid var(--ness-primary-deep);
+  outline-offset: 2px;
+}
+
+.ness-variants__select {
+  appearance: none;
+  -webkit-appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ness-variants__select:focus {
+  outline: none;
+}
+
+/* --- Quantity ------------------------------------------------------------ */
+
+.ness-quantity {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--ness-border);
+  border-radius: var(--ness-radius-pill);
+  height: var(--ness-chip-height);
+  overflow: hidden;
+}
+
+.ness-quantity__input {
+  width: 72px;
+  height: 48px;
+  border: 0;
+  background: transparent;
+  text-align: center;
+  font: inherit;
+  font-size: 16px;
+  color: var(--ness-ink);
+}
+
+/* Once the − / + buttons exist the spinner is redundant and crowds them. */
+.ness-quantity--enhanced .ness-quantity__input {
+  width: 34px;
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+
+.ness-quantity--enhanced .ness-quantity__input::-webkit-outer-spin-button,
+.ness-quantity--enhanced .ness-quantity__input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.ness-quantity__step {
+  width: 48px;
+  height: 48px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 20px;
+  color: var(--ness-ink);
+}
+
+.ness-quantity__step:hover {
+  color: var(--ness-primary);
+}
+
+/* --- Actions ------------------------------------------------------------- */
+
+.ness-product__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ness-product__add,
+.ness-product__buy {
+  height: var(--ness-cta-height);
+  border-radius: var(--ness-radius-cta);
+  font-size: 18px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition:
+    background 0.3s ease,
+    color 0.3s ease;
+}
+
+.ness-product__add {
+  border: none;
+  background: var(--ness-primary-deep);
+  color: #fffcf8;
+}
+
+.ness-product__add:hover:not(:disabled) {
+  background: var(--ness-primary);
+}
+
+.ness-product__add:disabled {
+  background: var(--ness-border);
+  color: var(--ness-muted);
+  cursor: not-allowed;
+}
+
+.ness-product__buy {
+  border: 1px solid var(--ness-ink);
+  background: transparent;
+  color: var(--ness-ink);
+}
+
+.ness-product__buy:hover {
+  background: var(--ness-ink);
+  color: var(--ness-background);
+}
+
+.ness-product__note {
+  margin: 0;
+  font-size: 15px;
+  line-height: 22px;
+  color: var(--ness-muted);
+}
+
+/* --- Authorization callout ----------------------------------------------- */
+
+.ness-product__auth {
+  border-radius: var(--ness-radius-media);
+  background: var(--ness-secondary);
+  padding: clamp(20px, 2.2vw, 28px);
+}
+
+.ness-product__auth-title {
+  margin: 0 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--ness-primary);
+}
+
+.ness-product__auth-body {
+  margin: 0 0 18px;
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--ness-ink);
+  text-wrap: pretty;
+}
+
+.ness-product__auth-cta {
+  display: inline-flex;
+  align-items: center;
+  height: var(--ness-chip-height);
+  padding: 0 22px;
+  border-radius: var(--ness-radius-pill);
+  background: var(--ness-primary);
+  color: var(--ness-secondary);
+  font-size: 16px;
+  text-decoration: none;
+  transition: background 0.3s ease;
+}
+
+.ness-product__auth-cta:hover {
+  background: var(--ness-primary-deep);
+  color: var(--ness-secondary);
+  text-decoration: none;
+}
+
+.ness-product__description {
+  font-size: 16px;
+  line-height: 26px;
+  color: var(--ness-muted);
+}
+
+.ness-product__description p {
+  margin: 0 0 14px;
+}
+
+/* --- Recommendations ------------------------------------------------------ */
+
+.ness-recommendations {
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding: 0 var(--ness-shell-pad) clamp(64px, 7vw, 110px);
+}
+
+.ness-recommendations__heading {
+  margin: 0 0 clamp(24px, 3vw, 40px);
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  font-size: clamp(30px, 3.4vw, 48px);
+  line-height: 100%;
+  letter-spacing: -0.04em;
+  color: var(--ness-ink);
+}
+
+.ness-recommendations__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+  gap: clamp(16px, 1.6vw, 24px);
+}

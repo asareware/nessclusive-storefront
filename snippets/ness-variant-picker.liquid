@@ -1,0 +1,113 @@
+{%- comment -%}
+  Variant picker.
+
+  Rendered entirely from product.options_with_values. Nothing about this file
+  knows what an option is called, and that is deliberate: the live catalog has
+  seven different option shapes across nine Ready to Ship products, including
+  `Cap Szie`, `Cap size`, `Parts`, and `size`. Any rule of the form "render
+  Length as pills" breaks the moment it meets a typo.
+
+  So presentation is chosen by the *shape* of the data, not its name:
+    - up to 8 values  → pills, as the design draws
+    - more than 8     → a select, because 20 pills wrap into a wall
+
+  That also covers the products the prototype never anticipated: Accessories
+  with a single `Title` option render nothing at all, and a one-option Ready to
+  Ship wig renders one group rather than the five the design shows.
+
+  No JavaScript is required to choose a variant. Every combination is a real
+  <input type="radio"> inside the product form, and the form posts the chosen
+  option values. ness-product.js upgrades this to update price and availability
+  live, but a shopper without it can still buy.
+
+  Accepts: product (required)
+{%- endcomment -%}
+
+{%- liquid
+  assign picker_id = 'ness-opt-' | append: product.id
+-%}
+
+{%- unless product.has_only_default_variant -%}
+  <div class="ness-variants" data-ness-variants>
+    {%- for option in product.options_with_values -%}
+      {%- liquid
+        assign option_index = forloop.index
+        assign use_select = false
+        if option.values.size > 8
+          assign use_select = true
+        endif
+        assign group_name = picker_id | append: '-' | append: option_index
+      -%}
+
+      <fieldset class="ness-variants__group">
+        <legend class="ness-variants__label">
+          Select {{ option.name | escape }}
+        </legend>
+
+        {%- if use_select -%}
+          <div class="ness-variants__select-wrap">
+            <select
+              class="ness-variants__select"
+              name="options[{{ option.name | escape }}]"
+              data-ness-option="{{ option_index }}"
+            >
+              {%- for value in option.values -%}
+                <option value="{{ value | escape }}" {% if option.selected_value == value %}selected{% endif %}>
+                  {{ value }}
+                </option>
+              {%- endfor -%}
+            </select>
+            <svg width="12" height="9" viewBox="0 0 12.126 8.907" fill="currentColor" aria-hidden="true" focusable="false">
+              <path d="M 12.126 1.241 L 11.144 0 L 6.063 6.416 L 0.982 0 L 0 1.241 L 6.063 8.907 L 12.126 1.241 Z"/>
+            </svg>
+          </div>
+        {%- else -%}
+          <div class="ness-variants__pills">
+            {%- for value in option.values -%}
+              {%- assign input_id = group_name | append: '-' | append: forloop.index -%}
+              <input
+                class="ness-variants__radio"
+                type="radio"
+                id="{{ input_id }}"
+                name="options[{{ option.name | escape }}]"
+                value="{{ value | escape }}"
+                data-ness-option="{{ option_index }}"
+                {% if option.selected_value == value %}checked{% endif %}
+              >
+              <label class="ness-variants__pill" for="{{ input_id }}">{{ value }}</label>
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      </fieldset>
+    {%- endfor -%}
+
+    {%- comment -%}
+      The full variant list, as data rather than markup. ness-product.js reads
+      it to resolve a selection to a variant without a round trip. Rendered as
+      JSON in a script tag of a non-executable type — the standard Shopify
+      pattern, and the only place the whole variant matrix is needed.
+    {%- endcomment -%}
+    <script type="application/json" data-ness-variant-data>
+      {{ product.variants | json }}
+    </script>
+
+    {%- comment -%}
+      Without JavaScript the form still needs a variant id. Shopify resolves
+      options[] parameters server-side on /cart/add, so this hidden id is the
+      fallback for the currently selected variant only; the options[] radios
+      above are what actually decide. Kept in sync by the script when present.
+    {%- endcomment -%}
+    <noscript>
+      <button type="submit" class="ness-product__submit-options" name="add">
+        Update selection
+      </button>
+    </noscript>
+  </div>
+{%- endunless -%}
+
+<input
+  type="hidden"
+  name="id"
+  value="{{ product.selected_or_first_available_variant.id }}"
+  data-ness-variant-id
+>

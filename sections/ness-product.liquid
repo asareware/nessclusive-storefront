@@ -1,0 +1,243 @@
+{{ 'ness-product.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ness-product.js' | asset_url }}" defer="defer"></script>
+
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+  assign auth_url = section.settings.authorization_url | default: settings.authorization_form_url
+-%}
+
+<section class="ness-product" data-ness-product>
+  {%- comment -%}
+    Breadcrumb. collection is only populated when the shopper arrived through
+    one, so the middle crumb is conditional rather than guessed at.
+  {%- endcomment -%}
+  <nav class="ness-product__crumbs" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}">Home</a>
+    <span aria-hidden="true">/</span>
+    {%- if collection.url != blank -%}
+      <a href="{{ collection.url }}">{{ collection.title | escape }}</a>
+      <span aria-hidden="true">/</span>
+    {%- endif -%}
+    <span aria-current="page">{{ product.title | escape }}</span>
+  </nav>
+
+  <div class="ness-product__layout">
+    {%- render 'ness-product-gallery', product: product -%}
+
+    <div class="ness-product__info">
+      <div>
+        <p class="ness-product__stock">
+          {%- comment -%}
+            Pre-order products are legitimately unavailable-but-buyable, so the
+            line keys off `available` rather than inventory counts.
+          {%- endcomment -%}
+          <span class="ness-product__stock-state{% unless product.available %} ness-product__stock-state--out{% endunless %}">
+            {%- if product.available %}In Stock{% else %}Sold Out{% endif -%}
+          </span>
+          {%- if product.type != blank -%}
+            <span aria-hidden="true"> · </span>{{ product.type | escape }}
+          {%- endif -%}
+        </p>
+
+        <h1 class="ness-product__title">{{ product.title | escape }}</h1>
+
+        <p class="ness-product__price" data-ness-price>
+          {{ variant.price | money }}
+          {%- if variant.compare_at_price > variant.price -%}
+            <s class="ness-product__was">{{ variant.compare_at_price | money }}</s>
+          {%- endif -%}
+        </p>
+      </div>
+
+      {%- comment -%}
+        Shopify renders the instalment line itself, and only when the store
+        actually offers it — hardcoding the prototype's copy would advertise
+        Shop Pay Instalments to countries where it is not available.
+      {%- endcomment -%}
+      {%- form 'product', product, id: 'ness-installments-form', class: 'ness-product__installments' -%}
+        <input type="hidden" name="id" value="{{ variant.id }}">
+        {{ form | payment_terms }}
+      {%- endform -%}
+
+      {%- form 'product',
+        product,
+        id: 'ness-product-form',
+        class: 'ness-product__form',
+        data-ness-add: ''
+      -%}
+        {%- render 'ness-variant-picker', product: product -%}
+
+        {%- comment -%}
+          Line item properties. Not product options on any live product, so they
+          are collected here and carried on the order (PLAN.md, Line item
+          properties). These drive fulfilment — a lost Pickup Option means a
+          mis-shipped wig — which is the whole reason Decision #7 keeps every
+          purchase routed through the cart rather than an express button.
+        {%- endcomment -%}
+        {%- assign property_blocks = section.blocks | where: 'type', 'property' -%}
+        {%- for block in property_blocks -%}
+          {%- assign values = block.settings.values | split: ',' -%}
+          {%- if values.size > 0 and block.settings.label != blank -%}
+            {%- assign prop_name = block.settings.label | escape -%}
+            {%- assign field_id = 'ness-prop-' | append: forloop.index -%}
+            <fieldset class="ness-variants__group" {{ block.shopify_attributes }}>
+              <legend class="ness-variants__label">{{ prop_name }}</legend>
+              <div class="ness-variants__pills">
+                {%- for value in values -%}
+                  {%- assign clean = value | strip -%}
+                  {%- assign vid = field_id | append: '-' | append: forloop.index -%}
+                  <input
+                    class="ness-variants__radio"
+                    type="radio"
+                    id="{{ vid }}"
+                    name="properties[{{ prop_name }}]"
+                    value="{{ clean | escape }}"
+                    {% if forloop.first %}checked{% endif %}
+                  >
+                  <label class="ness-variants__pill" for="{{ vid }}">{{ clean }}</label>
+                {%- endfor -%}
+              </div>
+            </fieldset>
+          {%- endif -%}
+        {%- endfor -%}
+
+        <div class="ness-variants__group">
+          <label class="ness-variants__label" for="ness-quantity">Quantity</label>
+          {%- comment -%}
+            A real number input, so it works and is announced correctly without
+            JavaScript; ness-product.js adds the − and + buttons the design
+            shows. Building it as two buttons around a <span>, as the prototype
+            does, would leave no value to submit at all with scripting off.
+          {%- endcomment -%}
+          <div class="ness-quantity" data-ness-quantity>
+            <input
+              class="ness-quantity__input"
+              id="ness-quantity"
+              type="number"
+              name="quantity"
+              value="1"
+              min="1"
+              step="1"
+              inputmode="numeric"
+            >
+          </div>
+        </div>
+
+        <div class="ness-product__actions">
+          <button
+            type="submit"
+            name="add"
+            class="ness-product__add"
+            {% unless product.available %}disabled{% endunless %}
+          >
+            <svg width="17" height="17" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true" focusable="false">
+              <path d="M1.2 2.1 H3.3 L5.2 10.6 H13.1 L14.8 4.6 H4.1" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="6.2" cy="13.4" r="1.3"/>
+              <circle cx="12.2" cy="13.4" r="1.3"/>
+            </svg>
+            <span data-ness-add-label>
+              {%- if product.available %}Add to Cart{% else %}Sold Out{% endif -%}
+            </span>
+          </button>
+
+          {%- comment -%}
+            "Buy Now" rather than the prototype's "Buy with Shop Pay"
+            (Decision #7): it adds to the cart and then goes to checkout, so
+            nothing bypasses the cart and the line item properties above always
+            reach the order. Shopify offers Shop Pay, Apple Pay and Google Pay
+            at checkout, picking the right one for the buyer's device.
+          {%- endcomment -%}
+          {%- if product.available -%}
+            <button type="submit" name="checkout" class="ness-product__buy" value="1">
+              Buy Now
+            </button>
+          {%- endif -%}
+        </div>
+      {%- endform -%}
+
+      {%- if section.settings.note != blank -%}
+        <p class="ness-product__note">{{ section.settings.note | escape }}</p>
+      {%- endif -%}
+
+      {%- comment -%}
+        Order-critical: the form's own copy says failing to submit it cancels
+        the order. It is rendered only when a URL exists, so an unset setting
+        shows nothing rather than a button that goes nowhere.
+      {%- endcomment -%}
+      {%- if section.settings.authorization_title != blank and auth_url != blank -%}
+        <aside class="ness-product__auth">
+          <p class="ness-product__auth-title">{{ section.settings.authorization_title | escape }}</p>
+          {%- if section.settings.authorization_body != blank -%}
+            <p class="ness-product__auth-body">{{ section.settings.authorization_body | escape }}</p>
+          {%- endif -%}
+          <a class="ness-product__auth-cta" href="{{ auth_url }}" target="_blank" rel="noopener">
+            {{- section.settings.authorization_cta | default: 'Wig authorization form' | escape -}}
+          </a>
+        </aside>
+      {%- endif -%}
+
+      {%- if product.description != blank -%}
+        <div class="ness-product__description rte">{{ product.description }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Product",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Title, price, images, options, and availability all come from the product itself and are edited in Products, never here. The settings below are the extras the design adds around them."
+    },
+    { "type": "text", "id": "note", "label": "Note under the buttons", "default": "Model is wearing Length 18\"" },
+    { "type": "header", "content": "Wig Authorization Form" },
+    {
+      "type": "paragraph",
+      "content": "Shown on every product. The link itself is set once in Theme settings → Nessclusive, so it can be updated in one place when the Google Form is ready."
+    },
+    { "type": "text", "id": "authorization_title", "label": "Heading", "default": "Wig Authorization Form" },
+    {
+      "type": "textarea",
+      "id": "authorization_body",
+      "label": "Body",
+      "default": "After purchasing a unit, please fill out a wig authorization form through here. Failure to do so will lead to order cancellation."
+    },
+    { "type": "text", "id": "authorization_cta", "label": "Button label", "default": "Wig authorization form" },
+    {
+      "type": "url",
+      "id": "authorization_url",
+      "label": "Form link (optional override)",
+      "info": "Leave empty to use the site-wide link from Theme settings → Nessclusive."
+    }
+  ],
+  "max_blocks": 4,
+  "blocks": [
+    {
+      "type": "property",
+      "name": "Extra choice",
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "A choice the shopper makes that is not a product variant — it does not change price or stock, and is carried through to the order for fulfilment."
+        },
+        { "type": "text", "id": "label", "label": "Question", "default": "Processing Time" },
+        {
+          "type": "text",
+          "id": "values",
+          "label": "Answers",
+          "default": "Standard, Rush",
+          "info": "Separate with commas. The first is selected by default."
+        }
+      ]
+    }
+  ],
+  "default": {
+    "blocks": [
+      { "type": "property", "settings": { "label": "Processing Time", "values": "Standard, Rush" } },
+      { "type": "property", "settings": { "label": "Pickup Option", "values": "Ship to me, Studio pickup" } }
+    ]
+  }
+}
+{% endschema %}
