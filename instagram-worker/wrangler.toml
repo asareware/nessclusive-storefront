@@ -1,0 +1,37 @@
+name = "nessclusive-instagram"
+main = "src/index.js"
+compatibility_date = "2025-01-01"
+
+# Hourly. The strip shows the five most recent posts; anything tighter costs
+# API calls for content that changes a few times a week at most.
+[triggers]
+crons = ["17 * * * *"]
+
+# State: the refreshed Instagram token and the map of mirrored posts.
+#
+# The token has to live here rather than in a secret because Worker secrets are
+# immutable at runtime — the Worker cannot rewrite its own secret after
+# refreshing the token, so a refreshed value would be lost on the next
+# invocation and the original would expire at 60 days.
+#
+# Create with:  npx wrangler kv namespace create NESS_IG
+# then paste the returned id below.
+[[kv_namespaces]]
+binding = "NESS_IG"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+[vars]
+SHOPIFY_SHOP = "nessclusive-llc.myshopify.com"
+# Shopify supports each API version for 12 months. Bump this yearly; the
+# mutations used here (stagedUploadsCreate, fileCreate, fileDelete,
+# metafieldsSet) have been stable across versions.
+SHOPIFY_API_VERSION = "2025-10"
+METAFIELD_NAMESPACE = "ness"
+METAFIELD_KEY = "instagram_feed"
+POST_LIMIT = "5"
+
+# Secrets — set with `npx wrangler secret put <NAME>`, never in this file:
+#   IG_TOKEN              long-lived Instagram token (seed value; refreshed into KV)
+#   SHOPIFY_ADMIN_TOKEN   Admin API access token, scopes: write_files, write_shop_metafields
+#   ALERT_WEBHOOK         optional; a URL that receives a POST when a run fails
+#   SYNC_SECRET           optional; bearer token guarding POST /sync

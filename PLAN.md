@@ -262,10 +262,21 @@ server-side:
 ```
 Cloudflare Worker (cron, hourly)
   → Instagram Graph API: /me/media?fields=id,media_type,media_url,thumbnail_url,permalink&limit=5
-  → download each image, upload to Shopify Files (Admin API)
-  → write [{src, permalink}] into a shop metafield
-Theme: sections/instagram-strip.liquid reads the metafield, renders normally
+  → for posts NOT already mirrored: download, upload to Shopify Files
+  → delete the Files belonging to posts that have dropped out of the top 5
+  → write [{id, src, permalink}] into a shop metafield
+Theme: sections/ness-instagram.liquid reads the metafield, renders normally
 ```
+
+⚠️ **Corrected during Phase 2b.** This originally said "download each image,
+upload to Shopify Files" on every run. That would upload five images an hour —
+roughly 44,000 files a year — with nothing ever deleting them, quietly filling
+Shopify Files until someone noticed.
+
+Keying on the Instagram post `id` fixes it: a post already mirrored is skipped,
+and files for posts that fall out of the top five are deleted. A typical hourly
+run therefore does zero uploads and zero deletes, and the stored file count
+stays at five. The post id is carried in the metafield to make this possible.
 
 Why this shape over a browser-side fetch:
 

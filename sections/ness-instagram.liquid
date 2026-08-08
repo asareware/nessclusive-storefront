@@ -92,6 +92,22 @@
               crops to 4:5 either way. Stating the rendered ratio is what
               reserves the right space before the photo arrives.
             {%- endcomment -%}
+            {%- comment -%}
+              onerror swaps in a bundled tile if the stored URL ever 404s.
+
+              It should not happen — the Worker mirrors images into Shopify
+              Files precisely so the URLs are permanent. But if a file is
+              deleted in admin, or the Worker fell back to a raw Instagram CDN
+              link after a failed upload and that link later expired, the
+              alternative is a broken-image icon sitting on the homepage until
+              someone notices. The handler removes itself first so a missing
+              fallback cannot loop.
+            {%- endcomment -%}
+            {%- assign tile_fallback = 'ness-ig-fallback-'
+              | append: tile_number
+              | append: '.jpg'
+              | asset_url
+            -%}
             <img
               class="ness-instagram__image"
               src="{{ post.src | escape }}"
@@ -100,6 +116,7 @@
               height="800"
               loading="lazy"
               decoding="async"
+              onerror="this.onerror=null;this.src='{{ tile_fallback }}';"
             >
           </a>
         {%- endif -%}
