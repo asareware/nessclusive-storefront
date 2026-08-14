@@ -26,3 +26,14 @@ node_modules/
 # tracked.
 assets/nav1.mp4
 assets/wedding.mp4
+
+# Original section photography — source material only.
+# Camera originals (2-22MB, up to 5852x8192). about2.JPG alone is 21.8MB,
+# past Shopify's 20MB asset ceiling. The web-sized copies the theme actually
+# serves are assets/ness-services-*.jpg and assets/ness-about-*.jpg, which
+# ARE tracked.
+assets/instlaation.jpg
+assets/sewing.jpg
+assets/natural.jpg
+assets/about1.JPG
+assets/about2.JPG

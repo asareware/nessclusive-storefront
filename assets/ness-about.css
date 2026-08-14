@@ -72,8 +72,20 @@
   aspect-ratio: 526 / 412;
 }
 
+/* 22% rather than a centred 50%.
+
+   This slot is a 526/412 landscape box and the photograph in it is a tall
+   portrait (1800x2519), so `cover` fills the width and crops 44% of the
+   height away. Centred, that crop opens below the hairline and takes the top
+   of her head off — the subject is framed high in the original, which is
+   normal for a portrait and exactly what a centred landscape crop punishes.
+   22% moves the window up to start just above the hair.
+
+   Tuned to the photograph the theme ships with. A merchant who picks their
+   own in the customizer gets this same framing, which suits an upright
+   portrait and is the common case for this slot. */
 .ness-about__media--2 img {
-  object-position: 50% 50%;
+  object-position: 50% 22%;
 }
 
 .ness-about__media--3 {

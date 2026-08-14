@@ -66,12 +66,35 @@
                   specifies; a fourth or fifth panel gets the grey placeholder,
                   which is the honest signal that it needs a picture.
                 {%- endcomment -%}
-                {%- capture fallback -%}ness-services-{{ forloop.index }}.jpg{%- endcapture -%}
+                {%- comment -%}
+                  Intrinsic dimensions are stated per panel rather than shared,
+                  because the three bundled photographs are not one shape: the
+                  first two are landscape studio frames and the third is a
+                  vertical phone shot. A single width/height pair would give
+                  the browser the wrong aspect for at least one of them before
+                  the stylesheet lands.
+                {%- endcomment -%}
+                {%- liquid
+                  case forloop.index
+                    when 1
+                      assign fallback = 'ness-services-1.jpg'
+                      assign fallback_w = 1600
+                      assign fallback_h = 900
+                    when 2
+                      assign fallback = 'ness-services-2.jpg'
+                      assign fallback_w = 1600
+                      assign fallback_h = 900
+                    else
+                      assign fallback = 'ness-services-3.jpg'
+                      assign fallback_w = 1167
+                      assign fallback_h = 2091
+                  endcase
+                -%}
                 <img
                   src="{{ fallback | asset_url }}"
                   alt=""
-                  width="900"
-                  height="600"
+                  width="{{ fallback_w }}"
+                  height="{{ fallback_h }}"
                   loading="lazy"
                 >
               {%- else -%}

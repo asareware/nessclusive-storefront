@@ -148,6 +148,19 @@
   object-position: center 22%;
 }
 
+/* The third panel's bundled photograph is a vertical phone shot, where the
+   first two are landscape studio frames. In a box this wide `cover` fills the
+   width and throws away roughly two thirds of the height, so the choice of
+   band actually decides what the panel is a picture of: at the shared 22% it
+   is mostly the studio signage above the model's head. 35% drops the window
+   onto the hair itself, which is what the panel is selling.
+
+   Scoped to the panel rather than changed globally — 22% is right for the two
+   landscape frames, which crop horizontally and barely move. */
+.ness-services__panel--3 .ness-services__media img {
+  object-position: center 35%;
+}
+
 .ness-services__copy {
   display: flex;
   flex-direction: column;

@@ -17,3 +17,12 @@ instagram-worker/*
 # The theme serves assets/ness-hero-style.mp4 / ness-hero-wedding.mp4.
 assets/nav1.mp4
 assets/wedding.mp4
+
+# Original section photography. Kept in the working tree for convenience but
+# never uploaded — about2.JPG is 21.8MB and would fail the push. The theme
+# serves the web-sized ness-services-*.jpg / ness-about-*.jpg copies.
+assets/instlaation.jpg
+assets/sewing.jpg
+assets/natural.jpg
+assets/about1.JPG
+assets/about2.JPG
