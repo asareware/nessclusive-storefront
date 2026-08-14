@@ -17,3 +17,12 @@ node_modules/
 
 # Claude Code — machine-local permission grants, not project config
 .claude/settings.local.json
+
+# Original hero footage — source material only.
+# These are the full-quality masters to upload to Shopify admin under
+# Content -> Files. They are 60MB and 7MB, far past Shopify's 20MB theme
+# asset ceiling, and are never served from the theme. The compressed copies
+# the hero actually falls back to are assets/ness-hero-*.mp4, which ARE
+# tracked.
+assets/nav1.mp4
+assets/wedding.mp4

@@ -46,117 +46,212 @@
 .ness-hero__layer {
   position: absolute;
   inset: 0;
-  /* 24s, linear, infinite — transcribed from the prototype. The layers are
-     staggered by negative delays below so they overlap instead of queueing. */
-  animation: ness-cine 24s linear infinite both;
+  /* 20s, linear, infinite. Linear is not a stylistic choice here: the two
+     layers are offset by exactly half the loop so that one's fade-out is the
+     other's fade-in, and their opacities only sum to 1 through the crossover
+     while both ramps are straight. Ease either one and the total dips, which
+     shows as the dark ground flashing between clips. */
+  animation: ness-hero-cine 20s linear infinite both;
 }
 
-.ness-hero__layer img {
+/* Carries aria-hidden for the Files-hosted branch, where video_tag builds the
+   element and cannot take the attribute itself. display:contents leaves no
+   box behind, so the video inside is laid out by .ness-hero__layer exactly as
+   the bundled one is and the rules below reach it unchanged. */
+.ness-hero__video-wrap {
+  display: contents;
+}
+
+.ness-hero__layer img,
+.ness-hero__layer video {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 28%;
+  /* The footage is vertical (1080x1920), so anything wider than portrait
+     crops it to a horizontal band. 42% puts that band on the subject rather
+     than the middle of the frame. */
+  object-position: center 42%;
 }
 
-.ness-hero__media > .ness-hero__layer:nth-child(2) img {
-  object-position: center 26%;
+.ness-hero__media > .ness-hero__layer:nth-child(2) img,
+.ness-hero__media > .ness-hero__layer:nth-child(2) video {
+  object-position: center 38%;
 }
 
-.ness-hero__media > .ness-hero__layer:nth-child(3) img {
-  object-position: center 30%;
-}
+/* Two layers, half a loop apart, tiling exactly:
 
-@keyframes ness-cine {
+     0–8%     layer 1 fades in    while layer 2 (at 50–58%) fades out
+     8–50%    layer 1 holds       layer 2 fully transparent
+     50–58%   layer 1 fades out   while layer 2 (at 0–8%) fades in
+     58–100%  layer 1 transparent layer 2 holds
+
+   Composited coverage is 1 at every point in the cycle, so the ground behind
+   is never visible. That is a deliberate change from the three-photograph
+   crossfade this replaces, whose fades did not tile and dipped to roughly
+   0.46 three times a loop, flashing the dark ground through. */
+@keyframes ness-hero-cine {
   0% {
     opacity: 0;
-    transform: scale(1.03);
   }
-  5% {
+  8%,
+  50% {
     opacity: 1;
   }
-  31% {
-    opacity: 1;
-  }
-  36% {
-    opacity: 0;
-  }
+  58%,
   100% {
     opacity: 0;
-    transform: scale(1.15);
   }
 }
 
-/* Three layers, 8s apart in a 24s loop, exactly as the design specifies.
-
-   All three are shifted back a further 5s from the design's 0 / -8s / -16s so
-   that LAYER ONE is inside its opaque plateau at t=0 rather than at opacity 0.
-   The relative spacing — and therefore the visual result — is identical; what
-   changes is which photograph is on screen at first paint. That matters
-   because layer one is the only one carrying fetchpriority="high", and with
-   the design's literal delays the image actually visible for the first second
-   was layer two, so the priority hint pointed at an invisible element and the
-   LCP candidate was decided by network ordering.
-
-   Coverage note: these keyframes do NOT tile the loop seamlessly. A layer
-   fades out over 31–36% while the next fades in over 33.3–38.3%, and the
-   crossover never sums to 1 — composited coverage dips to ~0.46 three times
-   per loop, briefly showing the dark ground through. That is the design's own
-   behaviour, transcribed faithfully, not a defect introduced here. */
-.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(1) {
-  animation-delay: -5s;
-}
-
-.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(2) {
-  animation-delay: -13s;
-}
-
-.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(3) {
-  animation-delay: -21s;
-}
-
-/* Fewer photographs cannot tile the loop — 36% of a cycle will not cover half
-   of one at any offset, so two layers both running ness-cine would leave the
-   hero on bare background for seconds at a time, twice a loop. Instead the
-   first photograph is held still as the ground and the second fades in and
-   out over it: both are seen, the crossfade still reads, and there is never a
-   frame with no photograph in it.
-
-   One photograph is the same rule with nothing on top: still, and no
-   animation at all — ness-cine would otherwise fade the only image the hero
-   has out for two thirds of every loop. */
-.ness-hero__media[data-cine-count='1'] > .ness-hero__layer,
-.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(1) {
-  animation: none;
+/* Half a loop of stagger, applied to the layer and to both parts of its
+   caption so the three stay locked together. Delay is not inherited, so each
+   animated element needs it stated. */
+.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(2),
+.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(2) .ness-hero__caption,
+.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(2) .ness-hero__caption::after {
+  animation-delay: -10s;
 }
 
 /* Paused by the visitor. Holding the animation keeps whatever is on screen on
-   screen rather than snapping to a fixed frame — and it is done with
-   :checked ~, so it works with no JavaScript at all. */
-.ness-hero__cine-input:checked ~ .ness-hero__media .ness-hero__layer {
+   screen rather than snapping to a fixed frame, and it is done with
+   :checked ~, so the crossfade halts with no JavaScript at all.
+
+   Playback of the clips themselves is the one part CSS cannot reach — only
+   the media API can pause a video — so ness-hero.js mirrors this same
+   checkbox onto them. */
+.ness-hero__cine-input:checked ~ .ness-hero__media .ness-hero__layer,
+.ness-hero__cine-input:checked ~ .ness-hero__media .ness-hero__caption,
+.ness-hero__cine-input:checked ~ .ness-hero__media .ness-hero__caption::after {
   animation-play-state: paused;
 }
 
+/* --- Caption ------------------------------------------------------------ */
+
+/* A positioning shell, so the caption itself is free to use transform for its
+   own animation. Sharing one element for both would mean baking the centring
+   offset into every keyframe. Tracks the same shell width and padding as the
+   headline, so caption and copy align to the same margins. */
+.ness-hero__caption-slot {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  width: 100%;
+  max-width: var(--ness-shell-max);
+  margin-inline: auto;
+  padding-inline: var(--ness-shell-pad);
+  pointer-events: none;
+}
+
+.ness-hero__caption {
+  margin: 0;
+  max-width: 8ch;
+  font-family: var(--ness-font-display);
+  font-weight: 600;
+  font-size: clamp(26px, 3.1vw, 50px);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-align: right;
+  text-wrap: balance;
+  color: var(--ness-hero-on-dark);
+  /* The wash already darkens the clip, but footage moves under this text and
+     a bright frame can pass behind it mid-loop. */
+  text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
+  animation: ness-hero-caption 20s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
+}
+
+/* A gold rule drawing in from the right beneath the words. scaleX on a
+   pseudo-element rather than an animated width, so it composites and never
+   triggers layout. */
+.ness-hero__caption::after {
+  content: '';
+  display: block;
+  width: clamp(56px, 6vw, 104px);
+  height: 2px;
+  margin-top: clamp(10px, 1.1vw, 18px);
+  margin-left: auto;
+  background: var(--ness-gold);
+  transform: scaleX(0);
+  transform-origin: right center;
+  animation: ness-hero-caption-rule 20s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
+}
+
+/* Deliberately out of step with the crossfade it sits inside. The clip is
+   fully opaque by 8% and the words are still arriving at 20%, so the caption
+   reads as settling onto footage that is already there rather than switching
+   on with it. It leaves early too — gone by 50%, as the crossfade is only
+   beginning — so the two captions are never on screen together mid-swap.
+   At 20s a loop the rise takes about 2.8s and the words hold for 4.4s. */
+@keyframes ness-hero-caption {
+  0%,
+  6% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  20%,
+  42% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  58%,
+  100% {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+}
+
+@keyframes ness-hero-caption-rule {
+  0%,
+  10% {
+    transform: scaleX(0);
+  }
+  30%,
+  42% {
+    transform: scaleX(1);
+  }
+  50%,
+  100% {
+    transform: scaleX(0);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  /* This has to be explicit. `animation: none` alone would leave all three
-     layers at their static opacity of 1, stacked — only the last would be
-     seen and the first two would be wasted paint. The blanket rule in
-     ness-base.css is no better: it clamps the duration to 0.01ms, which lands
-     ness-cine on its 100% frame, opacity 0, and the hero goes black.
-     So: no animation, all layers hidden, first one shown still. */
+  /* This has to be explicit. `animation: none` alone would leave both layers
+     at their static opacity of 1, stacked, so only the second would ever be
+     seen. The blanket rule in ness-base.css is no better: it clamps the
+     duration to 0.01ms, which lands ness-hero-cine on its 100% frame —
+     opacity 0 — and the hero goes black. So: no animation, both layers
+     hidden, the first shown still, and its caption held fully arrived rather
+     than frozen mid-fade.
+
+     The clips are stopped by ness-hero.js, which is not something CSS can do.
+     The pause control is deliberately NOT hidden here, unlike in the
+     photograph version: video may still be playing, so a control to stop it
+     has to remain reachable. */
   .ness-hero__layer {
     animation: none;
     opacity: 0;
-    transform: none;
   }
 
   .ness-hero__media > .ness-hero__layer:first-child {
     opacity: 1;
   }
 
-  /* Nothing is moving, so there is nothing to pause. */
-  .ness-hero__cine,
-  .ness-hero__cine-input {
-    display: none;
+  .ness-hero__caption {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .ness-hero__caption::after {
+    animation: none;
+    transform: scaleX(1);
   }
 }
 
@@ -364,5 +459,16 @@
     top: auto;
     bottom: clamp(20px, 4vw, 40px);
     right: clamp(20px, 4vw, 40px);
+  }
+
+  /* The quick-links panel goes single-column on phones — three 64px rows plus
+     gaps and padding, around 224px, sitting on top of the content's own
+     bottom padding. Centring the caption in the full height would drop it
+     straight onto that. Pinning it above the panel instead keeps it clear of
+     both the panel below and the sub-heading above, which is the only band of
+     free space left at this width. */
+  .ness-hero__caption-slot {
+    align-items: flex-end;
+    padding-bottom: clamp(268px, 34vh, 340px);
   }
 }

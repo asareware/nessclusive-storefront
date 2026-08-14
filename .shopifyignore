@@ -11,3 +11,9 @@ project/*
 .vscode/*
 .idea/*
 instagram-worker/*
+
+# Original hero footage. Kept in the working tree for convenience but never
+# uploaded: 60MB exceeds Shopify's per-asset limit and would fail the push.
+# The theme serves assets/ness-hero-style.mp4 / ness-hero-wedding.mp4.
+assets/nav1.mp4
+assets/wedding.mp4

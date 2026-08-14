@@ -1,14 +1,17 @@
 {{ 'ness-hero.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'ness-hero.js' | asset_url }}" defer="defer"></script>
 
 {%- liquid
   assign heading_id = 'ness-hero-heading-' | append: section.id
   assign cine_id = 'ness-hero-cine-' | append: section.id
   comment
-    Always three: each layer now falls back to a bundled photograph, so a
-    merchant cannot reduce the count by clearing an image. The CSS keys its
-    delays off this, and three is what the design's -8s spacing is built for.
+    Always two. The crossfade below is built so the pair tiles the loop
+    exactly — each clip's fade-out is the other's fade-in — which only works
+    for two layers. The count is fixed in code rather than derived from how
+    many settings the merchant filled in, so the hero cannot be reduced to a
+    single motionless layer by clearing a field.
   endcomment
-  assign layer_count = 3
+  assign layer_count = 2
 -%}
 
 <section
@@ -16,23 +19,51 @@
   {% if section.settings.heading != blank %}aria-labelledby="{{ heading_id }}"{% endif %}
 >
   {%- comment -%}
-    The photographs are decorative — the headline beside them carries the
-    meaning — so alt is empty and the layer is hidden from assistive tech.
-    The first is eager and fetchpriority high because it is the largest
-    contentful paint on the page; the others are eager (they are on screen
-    within seconds) but left at default priority so they do not compete with
-    it.
+    Two full-bleed clips on a slow crossfade, each captioned with the service
+    it shows.
 
-    Slots two and three have no bundled fallback on purpose: an unchosen slot
-    renders no layer at all rather than a placeholder, and data-cine-count
-    tells the stylesheet how many there are to cross-fade between. One
-    photograph gets no animation — see ness-hero.css.
+    Source order per layer is: a video chosen from Shopify Files, then a still
+    photograph, then the clip bundled with the theme. The bundled clip is last
+    so it is the out-of-the-box state and the first thing either setting
+    overrides — and it means the hero ships showing video without anyone
+    having to upload anything.
+
+    Files-hosted video is the better of the two paths and the one to prefer:
+    Shopify transcodes the upload, serves it as adaptive HLS, and picks a rung
+    to suit the visitor's connection. The bundled copies are necessarily small
+    — a theme asset is capped at 20MB and is served at one fixed size — so
+    they are softer on a large desktop display. See PLAN.md.
+
+    The video elements are decorative; the caption beside them carries the
+    meaning, so they are hidden from assistive technology and the captions are
+    not.
   {%- endcomment -%}
-  <div class="ness-hero__media" data-cine-count="{{ layer_count }}" aria-hidden="true">
+  <div class="ness-hero__media" data-cine-count="{{ layer_count }}">
     <div class="ness-hero__layer">
-      {%- if section.settings.image != blank -%}
+      {%- if section.settings.video_1 != blank -%}
+        {%- comment -%}
+          video_tag builds the element itself and cannot be handed an
+          aria-hidden attribute — a hyphenated parameter name is not valid
+          Liquid. The wrapper carries it instead, and display:contents keeps
+          that wrapper out of the layout entirely, so the video still fills
+          the layer exactly as the bundled one does.
+        {%- endcomment -%}
+        <div class="ness-hero__video-wrap" aria-hidden="true">
+          {{
+            section.settings.video_1
+            | video_tag:
+              image_size: '1400x',
+              autoplay: true,
+              loop: true,
+              muted: true,
+              controls: false,
+              playsinline: true,
+              class: 'ness-hero__video'
+          }}
+        </div>
+      {%- elsif section.settings.image_1 != blank -%}
         {{
-          section.settings.image
+          section.settings.image_1
           | image_url: width: 2400
           | image_tag:
             alt: '',
@@ -42,19 +73,54 @@
             fetchpriority: 'high'
         }}
       {%- else -%}
-        <img
-          src="{{ 'ness-hero-bg.jpg' | asset_url }}"
-          alt=""
-          width="1000"
-          height="667"
-          loading="eager"
-          fetchpriority="high"
+        {%- comment -%}
+          preload="auto" on the first clip only. It is what is on screen at
+          first paint, so it is worth the bandwidth; the second is metadata
+          only until the crossfade is nearly due, which keeps the two from
+          competing over the connection while the page is still painting.
+
+          poster is a real still pulled from the clip itself, so the frame
+          shown while the video buffers matches the first frame of playback
+          rather than cutting to it.
+        {%- endcomment -%}
+        <video
+          class="ness-hero__video"
+          poster="{{ 'ness-hero-style-poster.jpg' | asset_url }}"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="auto"
+          aria-hidden="true"
+          tabindex="-1"
         >
+          <source src="{{ 'ness-hero-style.mp4' | asset_url }}" type="video/mp4">
+        </video>
+      {%- endif -%}
+
+      {%- if section.settings.caption_1 != blank -%}
+        <div class="ness-hero__caption-slot">
+          <p class="ness-hero__caption">{{ section.settings.caption_1 | escape }}</p>
+        </div>
       {%- endif -%}
     </div>
 
     <div class="ness-hero__layer">
-      {%- if section.settings.image_2 != blank -%}
+      {%- if section.settings.video_2 != blank -%}
+        <div class="ness-hero__video-wrap" aria-hidden="true">
+          {{
+            section.settings.video_2
+            | video_tag:
+              image_size: '1400x',
+              autoplay: true,
+              loop: true,
+              muted: true,
+              controls: false,
+              playsinline: true,
+              class: 'ness-hero__video'
+          }}
+        </div>
+      {%- elsif section.settings.image_2 != blank -%}
         {{
           section.settings.image_2
           | image_url: width: 2400
@@ -66,58 +132,25 @@
             fetchpriority: 'low'
         }}
       {%- else -%}
-        {%- comment -%}
-          Bundled so the crossfade the design specifies actually happens on a
-          fresh install. Without a default here layer_count fell to 1, the hero
-          degraded to a single still, and the pause control never rendered
-          because there was nothing to pause.
-
-          fetchpriority low: all three layers are viewport-sized and in view, so
-          lazy would not defer them either, and without this they compete with
-          layer one — the LCP candidate and the only one visible at t=0.
-        {%- endcomment -%}
-        <img
-          src="{{ 'ness-hero-bg-2.jpg' | asset_url }}"
-          alt=""
-          width="1000"
-          height="659"
-          loading="eager"
-          fetchpriority="low"
+        <video
+          class="ness-hero__video"
+          poster="{{ 'ness-hero-wedding-poster.jpg' | asset_url }}"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          aria-hidden="true"
+          tabindex="-1"
         >
+          <source src="{{ 'ness-hero-wedding.mp4' | asset_url }}" type="video/mp4">
+        </video>
       {%- endif -%}
-    </div>
 
-    <div class="ness-hero__layer">
-      {%- if section.settings.image_3 != blank -%}
-        {{
-          section.settings.image_3
-          | image_url: width: 2400
-          | image_tag:
-            alt: '',
-            widths: '750, 1100, 1500, 1900, 2400',
-            sizes: '100vw',
-            loading: 'eager',
-            fetchpriority: 'low'
-        }}
-      {%- else -%}
-        {%- comment -%}
-          Bundled so the crossfade the design specifies actually happens on a
-          fresh install. Without a default here layer_count fell to 1, the hero
-          degraded to a single still, and the pause control never rendered
-          because there was nothing to pause.
-
-          fetchpriority low: all three layers are viewport-sized and in view, so
-          lazy would not defer them either, and without this they compete with
-          layer one — the LCP candidate and the only one visible at t=0.
-        {%- endcomment -%}
-        <img
-          src="{{ 'ness-hero-bg-3.jpg' | asset_url }}"
-          alt=""
-          width="667"
-          height="1000"
-          loading="eager"
-          fetchpriority="low"
-        >
+      {%- if section.settings.caption_2 != blank -%}
+        <div class="ness-hero__caption-slot">
+          <p class="ness-hero__caption">{{ section.settings.caption_2 | escape }}</p>
+        </div>
       {%- endif -%}
     </div>
   </div>
@@ -125,29 +158,30 @@
   <div class="ness-hero__wash" aria-hidden="true"></div>
 
   {%- comment -%}
-    Play/pause for the crossfade. Rendered only when there is more than one
-    photograph, because with one there is no animation to hold.
+    Play/pause for the hero.
+
+    A checkbox rather than a button, because WCAG 2.2.2 wants a pause for
+    anything moving beyond five seconds and this loop is infinite: `:checked ~`
+    halts the CSS crossfade with no JavaScript at all, so that half of the
+    guarantee holds even if scripting is blocked.
+
+    Video is the part CSS cannot stop — only the media API can pause playback
+    — so ness-hero.js mirrors this checkbox onto the video elements. With
+    JavaScript blocked the clips keep playing while the crossfade holds; the
+    control is still honoured, just partially.
+
+    role="switch" keeps the accessible name fixed at "Pause the slideshow"
+    with aria-checked carrying state, rather than a changing name plus
+    aria-pressed, which announces "Play, pressed" — the inverse of what is
+    true.
   {%- endcomment -%}
   {%- if layer_count > 1 -%}
-    {%- comment -%}
-      A checkbox, not a button, and no JavaScript.
-
-      WCAG 2.2.2 requires a pause control for anything that moves for more than
-      five seconds, and this loop is infinite. A scripted button fails that the
-      moment JavaScript is blocked — the CSS keeps animating and the control
-      never appears. `:checked ~` pauses a CSS animation with no script at all,
-      so the guarantee holds unconditionally.
-
-      role="switch" gives it the right semantics: the accessible name stays
-      "Pause the slideshow" and aria-checked carries the state, rather than a
-      changing name plus aria-pressed, which announces "Play, pressed" — the
-      exact inverse of what is true.
-    {%- endcomment -%}
     <input
       type="checkbox"
       id="{{ cine_id }}"
       class="ness-hero__cine-input"
       role="switch"
+      data-ness-hero-pause
     >
     <label class="ness-hero__cine" for="{{ cine_id }}">
       <svg class="ness-hero__cine-icon ness-hero__cine-icon--pause" width="12" height="14" viewBox="0 0 12 14" aria-hidden="true" focusable="false">
@@ -206,25 +240,57 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Full-height opening photographs with the headline over them. Add two or three and they cross-fade on a slow loop with a play/pause control; add one and it sits still. Type, colours, and the dark overlay are fixed by the design."
+      "content": "Two full-height clips that cross-fade on a slow loop, each labelled with the service it shows. The theme ships with a clip in both slots, so this works without you uploading anything. Type, colours, and the dark overlay are fixed by the design."
+    },
+    {
+      "type": "header",
+      "content": "First clip"
+    },
+    {
+      "type": "video",
+      "id": "video_1",
+      "label": "Video",
+      "info": "Upload under Content → Files first, then pick it here. This is the better route: Shopify re-encodes the file and serves the right size for each visitor's screen and connection, so it looks sharper than the copy bundled with the theme. Vertical phone footage works, but it is cropped to a wide band on desktop — footage shot landscape fills the screen best."
     },
     {
       "type": "image_picker",
-      "id": "image",
-      "label": "Background photograph 1",
-      "info": "Fills the screen and is cropped to fit, so nothing stretches. Use a wide landscape image of at least 2400px. Keep the subject away from the top-left, where the headline sits. Left empty, the photograph the theme ships with is used."
+      "id": "image_1",
+      "label": "Still photograph instead",
+      "info": "Optional. Use this to show a photograph in place of the video. If both are set the video wins."
+    },
+    {
+      "type": "text",
+      "id": "caption_1",
+      "label": "Caption",
+      "default": "Hair Style",
+      "info": "Fades in slowly over this clip. Keep it to two or three words — it names the service the footage shows. Leave empty for no caption."
+    },
+    {
+      "type": "header",
+      "content": "Second clip"
+    },
+    {
+      "type": "video",
+      "id": "video_2",
+      "label": "Video",
+      "info": "Same guidance as the first clip."
     },
     {
       "type": "image_picker",
       "id": "image_2",
-      "label": "Background photograph 2",
-      "info": "Optional. Same guidance as the first. Left empty, the hero simply shows fewer photographs — nothing is left blank."
+      "label": "Still photograph instead",
+      "info": "Optional. Same guidance as the first clip."
     },
     {
-      "type": "image_picker",
-      "id": "image_3",
-      "label": "Background photograph 3",
-      "info": "Optional. Three photographs is what the loop was drawn for and gives the smoothest result."
+      "type": "text",
+      "id": "caption_2",
+      "label": "Caption",
+      "default": "Wedding Styles",
+      "info": "Fades in slowly over the second clip."
+    },
+    {
+      "type": "header",
+      "content": "Wording"
     },
     { "type": "text", "id": "heading", "label": "Headline", "default": "Nessclusive Hair Company", "info": "Around 25 characters is what the design was drawn for — the headline is capped at 15ch and wraps beyond that." },
     { "type": "textarea", "id": "body", "label": "Sub-heading", "default": "Let your Wig do the talking with Nessclusive" }
