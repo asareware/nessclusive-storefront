@@ -14,3 +14,6 @@ node_modules/
 # Editor
 .vscode/
 .idea/
+
+# Claude Code — machine-local permission grants, not project config
+.claude/settings.local.json
