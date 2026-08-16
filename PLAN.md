@@ -656,11 +656,23 @@ always are:
    make the option picker look slightly different between products (see
    Phase 0e above).
 
-### Enable or disable the currency switcher
+### Currency and country
 
-1. Customize → **Header** → **Show currency selector** checkbox.
-2. It only actually appears on the storefront once more than one country is
-   enabled in **Settings → Markets** — the checkbox alone is not enough.
+There is no switcher to turn on or off any more, and no setting for it. The
+header pill was removed; a **Country/region** selector sits in the **footer**
+instead, and it appears by itself as soon as **Settings → Markets** has more
+than one country enabled. On a single-country store it renders nothing.
+
+Changing country there changes the currency **and converts every price on the
+site**, including the cart and checkout. That conversion is Shopify Markets,
+not the theme — the theme only offers the choice.
+
+**Automatic switching by the visitor's location is not theme work.** Install
+Shopify's own free **Geolocation** app; it detects the visitor's country and
+offers to switch them, which is the supported way to do this. Whether prices
+convert at all is governed by **Settings → Markets** — each country has to be
+active, with a currency assigned. Adding countries there is what makes the
+footer selector appear.
 
 ### Change the footer newsletter text or the copyright line
 

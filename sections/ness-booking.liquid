@@ -11,10 +11,12 @@
   agrees — it now ends on a pair of links rather than a form, so this page and
   the design finish in the same place.
 
-  The design's order, top to bottom: hero banner, "Plan your Perfect Style",
-  then the Studio Info / Booking Policy / Custom Wig cards, then the two
-  buttons. The standalone booking panel the earlier revision drew between the
-  steps and the cards is gone; its heading/body/note settings went with it.
+  Order, top to bottom: hero banner, the two buttons, "Plan your Perfect
+  Style", then the Studio Info / Booking Policy / Custom Wig cards. The design
+  closed on the buttons; they were moved up under the banner so a visitor who
+  has already decided is not scrolled past four policy cards to reach them.
+  The standalone booking panel the earlier revision drew between the steps and
+  the cards is gone; its heading/body/note settings went with it.
 
   No JavaScript: every control on this page is a link, so the page is complete
   the moment the HTML arrives, and nothing here needs scripting to be readable.
@@ -112,6 +114,49 @@
 
       <h1 class="ness-booking__hero-heading">{{ hero_heading | escape }}</h1>
     </div>
+  </div>
+
+  {%- comment -%}
+    The two buttons the page opens on, sitting directly under the banner.
+
+    They were at the foot of the page, which put the steps and four policy
+    cards between a visitor who had already decided and the button they came
+    for. The policy still has to be readable before booking, so it stays on
+    the page — it just no longer gates the action.
+
+    The Acuity link opens in a new tab and says so in its accessible name. A
+    forced tab that goes unannounced is the accessibility problem, not the tab
+    itself. Keeping this page open behind the scheduler also means a visitor
+    who backs out of booking still has the policy and studio details where
+    they left them.
+
+    "Ask question" goes through ness-nav-url like every other internal link,
+    so it cannot be pointed at a URL that does not exist, and it stays in this
+    tab because it is an ordinary page on this site.
+  {%- endcomment -%}
+  <div class="ness-booking__actions ness-booking__actions--top ness-shell">
+    {%- comment -%}
+      The booking button is not conditional: cta_label falls back above, so an
+      emptied field cannot leave this page without a way to book.
+    {%- endcomment -%}
+    <a
+      class="ness-booking__cta"
+      href="{{ booking_url | escape }}"
+      target="_blank"
+      rel="noopener"
+      aria-label="{{ cta_label | escape }}, opens in a new tab"
+    >
+      {{- cta_label | escape -}}
+    </a>
+
+    {%- if section.settings.secondary_label != blank -%}
+      {%- capture secondary_url -%}
+        {%- render 'ness-nav-url', destination: section.settings.secondary_destination -%}
+      {%- endcapture -%}
+      <a class="ness-booking__cta ness-booking__cta--secondary" href="{{ secondary_url }}">
+        {{- section.settings.secondary_label | escape -}}
+      </a>
+    {%- endif -%}
   </div>
 
   {%- comment -%}
@@ -496,35 +541,6 @@
     </section>
   {%- endif -%}
 
-  {%- comment -%}
-    The two buttons the design closes on.
-
-    The Acuity link is a plain same-tab navigation, matching
-    ness-booking-banner. The design draws target="_blank" here; it is not
-    carried over because a forced tab has to be announced to be accessible, and
-    because the site's other "Book a Session" control navigates in place — two
-    buttons to the same scheduler behaving differently is worse than either
-    behaviour on its own.
-
-    "Ask question" goes through ness-nav-url like every other internal link, so
-    it cannot be pointed at a URL that does not exist.
-  {%- endcomment -%}
-  <div class="ness-booking__actions ness-shell">
-    {%- comment -%}
-      The booking button is not conditional: cta_label falls back above, so an
-      emptied field cannot leave this page without a way to book.
-    {%- endcomment -%}
-    <a class="ness-booking__cta" href="{{ booking_url | escape }}">{{ cta_label | escape }}</a>
-
-    {%- if section.settings.secondary_label != blank -%}
-      {%- capture secondary_url -%}
-        {%- render 'ness-nav-url', destination: section.settings.secondary_destination -%}
-      {%- endcapture -%}
-      <a class="ness-booking__cta ness-booking__cta--secondary" href="{{ secondary_url }}">
-        {{- section.settings.secondary_label | escape -}}
-      </a>
-    {%- endif -%}
-  </div>
 </div>
 
 {% schema %}

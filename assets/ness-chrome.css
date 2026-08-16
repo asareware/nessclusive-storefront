@@ -192,12 +192,6 @@
   text-decoration: none;
 }
 
-.ness-pill--currency {
-  height: 46px;
-  border-radius: 42px;
-  padding: 0 17px;
-  gap: 10px;
-}
 
 .ness-pill--cart {
   border: none;
@@ -226,7 +220,6 @@
 
 @media (max-width: 1180px) {
   .ness-header__nav,
-  .ness-header__actions .ness-pill--currency,
   .ness-header__actions .ness-pill--account,
   .ness-header__search-label {
     display: none;
@@ -528,6 +521,70 @@ ness-drawer[hidden] {
   font-size: 15px;
   line-height: 22px;
   color: var(--ness-ink);
+}
+
+/* --- Country / region -------------------------------------------------- */
+
+/* Sits above the copyright rule, centred, so it reads as a site-wide control
+   rather than a footer link. Deliberately quiet: it is used once per visitor
+   at most, and the design has no slot for it — the header pill it replaces
+   was removed because it competed with the nav at every screen width. */
+.ness-footer__region {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+}
+
+.ness-footer__region-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.ness-footer__region-label {
+  font-size: 14px;
+  color: rgba(255, 253, 248, 0.72);
+}
+
+/* Height and radius follow the theme's own input tokens rather than the pill
+   the header used, since this one sits in a row of text, not a nav. */
+.ness-footer__region-select {
+  height: 44px;
+  padding: 0 14px;
+  border-radius: var(--ness-radius-input);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--ness-background);
+  font-family: var(--ness-font-text);
+  font-size: 15px;
+  cursor: pointer;
+  max-width: 100%;
+}
+
+/* The native menu is drawn by the OS, so its options inherit nothing from
+   here — without this they are cream on white in the popup on some
+   platforms. */
+.ness-footer__region-select option {
+  color: var(--ness-ink);
+  background: var(--ness-background);
+}
+
+.ness-footer__region-select:hover {
+  border-color: var(--ness-background);
+}
+
+.ness-footer__region-submit {
+  height: 44px;
+  padding: 0 18px;
+  border-radius: var(--ness-radius-input);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  background: transparent;
+  color: var(--ness-background);
+  font-family: var(--ness-font-text);
+  font-size: 15px;
+  cursor: pointer;
 }
 
 .ness-footer__bottom {

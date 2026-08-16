@@ -1,26 +1,29 @@
 /* Nessclusive — hero video.
 
    The crossfade itself is CSS and needs no script. This file exists for the
-   one thing CSS cannot do, which is stop a <video> from playing.
+   one thing CSS cannot do, which is start and stop a <video>.
 
    Three jobs:
-     * mirror the pause checkbox onto the clips
-     * honour prefers-reduced-motion, which the markup's autoplay ignores
+     * keep the clips playing, including where a browser refuses the first
+       autoplay attempt
+     * mirror the pause checkbox onto them, so the control stops the footage
+       as well as the crossfade
      * stop playback once the hero has scrolled out of view
 
-   With this file blocked the hero still works: the clips autoplay and
-   cross-fade, and the checkbox still halts the crossfade through `:checked ~`
-   in the stylesheet. What is lost is the ability to pause the footage itself.
-   That is unavoidable — pausing a video is a scripting-only capability — and
-   it is why the markup ships autoplay rather than starting playback here:
-   a script-started hero would show nothing at all to a visitor with
-   JavaScript disabled. */
+   With this file blocked the hero still works: the clips carry the autoplay
+   attribute and cross-fade on their own, and the checkbox still halts the
+   crossfade through `:checked ~` in the stylesheet. What is lost is the
+   ability to pause the footage itself, which is scripting-only by nature.
+
+   On reduced motion: the clips still play. The stylesheet freezes the
+   crossfade, so the layer-to-layer movement is gone, and the pause control is
+   left on screen so the footage can be stopped in one click. An earlier
+   version ticked that control automatically under reduced motion, which meant
+   some visitors met a hero that had to be started by hand — the opposite of
+   what a hero is for. */
 
 (function () {
   'use strict';
-
-  var reducedQuery =
-    window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)');
 
   function setup(root) {
     var heroes = (root || document).querySelectorAll('.ness-hero');
@@ -38,56 +41,61 @@
       var toggle = hero.querySelector('[data-ness-hero-pause]');
       var onScreen = true;
 
-      function reduced() {
-        return !!(reducedQuery && reducedQuery.matches);
+      function wanted() {
+        return onScreen && !(toggle && toggle.checked);
+      }
+
+      function start(video) {
+        var played = video.play();
+        /* A rejection here is normal, not an error: Safari in a Private
+           window, iOS low-power mode, and data-saver settings all refuse the
+           first programmatic play even for muted inline video. The poster is
+           a still from the clip's own opening frame, so the hero looks right
+           either way, and the listeners below get another attempt as soon as
+           the browser is willing. Swallowed rather than logged — there is
+           nothing here a visitor or a merchant can act on. */
+        if (played && played.catch) played.catch(function () {});
       }
 
       function apply() {
-        var shouldPlay = onScreen && !reduced() && !(toggle && toggle.checked);
-
+        var play = wanted();
         Array.prototype.forEach.call(videos, function (video) {
-          if (shouldPlay) {
-            var played = video.play();
-            /* Autoplay can still be refused — iOS low-power mode, a
-               data-saver setting, a browser that wants a gesture first. The
-               poster is a still from the clip's own opening frame, so a
-               refusal leaves the right picture on screen. Nothing to recover
-               from, and nothing worth logging. */
-            if (played && played.catch) {
-              played.catch(function () {});
-            }
+          if (play) {
+            start(video);
           } else if (!video.paused) {
             video.pause();
           }
         });
       }
 
-      if (toggle) {
-        toggle.addEventListener('change', apply);
-      }
+      if (toggle) toggle.addEventListener('change', apply);
 
-      /* Reduced motion resolves to a paused hero rather than a still one, so
-         the control stays on screen (see ness-hero.css) and the checkbox is
-         ticked to match. Without this the control would read "Pause" next to
-         footage that is already stopped — and unticking it would then be the
-         visitor's way to opt back in, which is the correct escape hatch. */
-      function syncReduced() {
-        if (reduced() && toggle && !toggle.checked) {
-          toggle.checked = true;
-        }
-        apply();
-      }
+      /* Retry as each clip becomes playable. The first attempt runs the
+         moment this script does, which for the later layers is usually before
+         they hold any data — preload is "metadata" on those, so their first
+         play() has nothing to play and resolves to nothing useful. */
+      Array.prototype.forEach.call(videos, function (video) {
+        video.addEventListener('canplay', function () {
+          if (wanted() && video.paused) start(video);
+        });
+      });
 
-      if (reducedQuery) {
-        if (reducedQuery.addEventListener) {
-          reducedQuery.addEventListener('change', syncReduced);
-        } else if (reducedQuery.addListener) {
-          /* Safari before 14. */
-          reducedQuery.addListener(syncReduced);
-        }
+      /* Last resort: a browser that refused autoplay outright will allow it
+         once the visitor has interacted with the page at all. These fire once
+         and remove themselves, and they only ever start playback the visitor
+         has not explicitly paused. */
+      var gestures = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
+      function onGesture() {
+        gestures.forEach(function (type) {
+          document.removeEventListener(type, onGesture);
+        });
+        if (wanted()) apply();
       }
+      gestures.forEach(function (type) {
+        document.addEventListener(type, onGesture, { passive: true, once: false });
+      });
 
-      /* Decoding two clips for a hero nobody is looking at costs battery on
+      /* Decoding three clips for a hero nobody is looking at costs battery on
          phones and buys nothing. Browsers do not stop offscreen video on
          their own. */
       if ('IntersectionObserver' in window) {
@@ -102,7 +110,7 @@
         ).observe(hero);
       }
 
-      syncReduced();
+      apply();
     });
   }
 

@@ -134,6 +134,62 @@
       {%- endif -%}
     </div>
 
+    {%- comment -%}
+      Country and region, which is the control that actually changes money on
+      this site. Shopify Markets converts every price on every page from the
+      selected country — products, cart, and checkout — so this is not a
+      display-only currency switch and there is no conversion of our own to
+      get wrong.
+
+      It replaces the currency pill that used to sit in the desktop header.
+      Country is the honest thing to ask for: currency follows from it, and so
+      do shipping and duties, whereas picking a bare currency implies a choice
+      that Markets does not actually offer independently.
+
+      Rendered only when Markets offers more than one country, so a
+      single-market store gets no dead control. The label carries the current
+      currency alongside the country name, so the effect of changing it is
+      legible before it is changed.
+
+      A native select inside the localization form, submitted on change:
+      keyboard- and screen-reader-accessible by default, and it still works
+      with scripting blocked because the form has its own submit button
+      underneath.
+    {%- endcomment -%}
+    {%- if localization.available_countries.size > 1 -%}
+      <div class="ness-footer__region">
+        {%- form 'localization', class: 'ness-footer__region-form' -%}
+          <label class="ness-footer__region-label" for="ness-footer-country">
+            {{ 'localization.country_label' | t | default: 'Country/region' }}
+          </label>
+          <select
+            id="ness-footer-country"
+            class="ness-footer__region-select"
+            name="country_code"
+            onchange="this.form.requestSubmit ? this.form.requestSubmit() : this.form.submit()"
+          >
+            {%- for country in localization.available_countries -%}
+              <option
+                value="{{ country.iso_code }}"
+                {% if country.iso_code == localization.country.iso_code %}selected{% endif %}
+              >
+                {{ country.name }} ({{ country.currency.iso_code }} {{ country.currency.symbol }})
+              </option>
+            {%- endfor -%}
+          </select>
+          {%- comment -%}
+            The no-JavaScript path. Hidden from everyone whose select already
+            submits itself, shown by ness-base.css only when scripting is off.
+          {%- endcomment -%}
+          <noscript>
+            <button class="ness-footer__region-submit" type="submit">
+              {{ 'localization.update_country' | t | default: 'Update' }}
+            </button>
+          </noscript>
+        {%- endform -%}
+      </div>
+    {%- endif -%}
+
     <div class="ness-footer__bottom">
       <span class="ness-footer__copy">
         &copy; {{ 'now' | date: '%Y' }} {{ section.settings.copyright | default: shop.name }}

@@ -74,38 +74,6 @@
 
     <div class="ness-header__actions">
       {%- comment -%}
-        Currency. Rendered only when Markets actually offers a choice, so the
-        pill does not appear on a single-currency store. A native select keeps
-        this keyboard- and screen-reader-accessible; the pill styling makes it
-        match the design.
-      {%- endcomment -%}
-      {%- if section.settings.show_currency
-          and localization.available_countries.size > 1
-      -%}
-        {%- form 'localization', class: 'ness-header__currency' -%}
-          <div class="ness-pill ness-pill--currency">
-            <label class="visually-hidden" for="ness-currency">
-              {{ 'localization.country_label' | t | default: 'Country/region' }}
-            </label>
-            <select
-              id="ness-currency"
-              name="country_code"
-              onchange="this.form.submit()"
-            >
-              {%- for country in localization.available_countries -%}
-                <option
-                  value="{{ country.iso_code }}"
-                  {% if country.iso_code == localization.country.iso_code %}selected{% endif %}
-                >
-                  {{ country.currency.iso_code }}
-                </option>
-              {%- endfor -%}
-            </select>
-          </div>
-        {%- endform -%}
-      {%- endif -%}
-
-      {%- comment -%}
         Search stays a link, not a button. ness-search.js intercepts a plain
         left-click and opens the overlay instead; a Cmd-click, a blocked
         script, or no script at all leaves an anchor that navigates to the real
@@ -177,9 +145,8 @@
     },
     { "type": "image_picker", "id": "logo", "label": "Logo", "info": "Shown at 102 × 65. Use at least 306 × 195 so it stays sharp on high-resolution screens. Falls back to the store name if empty." },
     { "type": "header", "content": "Currency" },
-    { "type": "checkbox", "id": "show_currency", "label": "Show currency selector", "default": true, "info": "Only appears if more than one country is enabled in Markets." },
     { "type": "header", "content": "Mobile menu" },
-    { "type": "text", "id": "drawer_cta_label", "label": "Button label", "default": "Book a Session" },
+    { "type": "text", "id": "drawer_cta_label", "label": "Button label", "default": "Booking" },
     {
       "type": "select",
       "id": "drawer_cta_destination",

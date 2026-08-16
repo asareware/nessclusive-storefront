@@ -505,6 +505,15 @@ svg.ness-booking__hero-image {
   gap: 14px;
 }
 
+/* The buttons now sit between the banner and the steps rather than closing
+   the page, so they need air on both sides instead of only above — otherwise
+   they read as attached to "Plan your Perfect Style" below them. The top gap
+   is tightened for the same reason: they belong to the banner. */
+.ness-booking__actions--top {
+  padding-top: clamp(28px, 3vw, 44px);
+  padding-bottom: clamp(8px, 1.5vw, 20px);
+}
+
 /* 60px, not the site-wide --ness-cta-height of 55px: the design draws this
    pair taller than the buttons in the page bands above. */
 .ness-booking__cta {
