@@ -1,9 +1,9 @@
 {{ 'ness-instagram.css' | asset_url | stylesheet_tag }}
 
 {%- comment -%}
-  Instagram strip — five tiles, live feed.
+  Instagram strip — seven tiles, live feed.
 
-  The photos are not settings. A Cloudflare Worker pulls the five most recent
+  The photos are not settings. A Cloudflare Worker pulls the most recent
   posts on a cron, re-hosts each image to Shopify Files, and writes
   [{ src, permalink }] into the shop metafield ness.instagram_feed
   (PLAN.md, Decision #10). This section reads that metafield and renders it
@@ -13,9 +13,9 @@
   Two tiers, so the strip is never a hole in the homepage:
   1. The metafield, whenever it holds at least one usable entry. Each tile
      links to its own post.
-  2. The five bundled photos otherwise — before the first cron run, and if the
-     Worker ever stops. Those tiles link to the profile instead, since there
-     is no per-post URL to send anyone to.
+  2. The seven bundled studio photos otherwise — which, with the Worker not
+     deployed, is what actually renders today. Those tiles link to the profile
+     instead, since there is no per-post URL to send anyone to.
 
   Entries with no `src` are skipped rather than drawn as a broken tile, and
   the live count is taken *after* that filter — so a metafield holding only
@@ -26,11 +26,16 @@
   assign feed = shop.metafields.ness.instagram_feed.value
 
   comment
-    Five is the design, not the data: the strip is drawn for five tiles, so
-    the loops are capped here rather than trusting the Worker to send exactly
-    that many. Both loops share the cap so the "N of M" labels always agree.
+    Seven, up from the five the original design drew. The cap lives here
+    rather than in either loop so both the live feed and the bundled photos
+    stay the same length and the "N of M" labels can never disagree.
+
+    The strip already scrolls horizontally and each tile holds a fixed 4:5
+    frame, so the count is free to change without touching the layout — the
+    row simply runs longer. It is still a cap, not a target: a metafield
+    holding fewer entries renders fewer tiles.
   endcomment
-  assign max_tiles = 5
+  assign max_tiles = 7
 
   assign live_count = 0
   for post in feed limit: max_tiles
