@@ -374,11 +374,24 @@ svg.ness-booking__hero-image {
   color: var(--ness-ink);
 }
 
+/* This note now stands alone — the street address above it is deliberately
+   empty, because the studio address is only released in the reminder email.
+   So it is no longer a footnote under an address; it IS the location answer,
+   and it carries the weight of one.
+
+   Uppercasing is done here rather than by typing the setting in capitals.
+   The merchant sees and edits an ordinary sentence, screen readers get
+   ordinary words rather than something they may spell out letter by letter,
+   and the presentation stays where the editability policy keeps it. Letter
+   spacing is opened up because caps set at normal tracking close up. */
 .ness-booking__location-note {
   margin: 0;
-  font-size: 15px;
-  line-height: 23px;
-  color: var(--ness-muted);
+  font-size: 14px;
+  line-height: 21px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ness-ink);
 }
 
 /* --- Booking Policy ------------------------------------------------------ */

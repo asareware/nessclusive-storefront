@@ -46,12 +46,13 @@
 .ness-hero__layer {
   position: absolute;
   inset: 0;
-  /* 20s, linear, infinite. Linear is not a stylistic choice here: the two
-     layers are offset by exactly half the loop so that one's fade-out is the
-     other's fade-in, and their opacities only sum to 1 through the crossover
-     while both ramps are straight. Ease either one and the total dips, which
-     shows as the dark ground flashing between clips. */
-  animation: ness-hero-cine 20s linear infinite both;
+  /* 24s, linear, infinite — three clips at 8s apiece. Linear is not a
+     stylistic choice here: each layer is offset by exactly a third of the
+     loop so that one's fade-out is the next one's fade-in, and their
+     opacities only sum to 1 through the crossover while both ramps are
+     straight. Ease either one and the total dips, which shows as the dark
+     ground flashing between clips. */
+  animation: ness-hero-cine 24s linear infinite both;
 }
 
 /* Carries aria-hidden for the Files-hosted branch, where video_tag builds the
@@ -79,38 +80,69 @@
   object-position: center 38%;
 }
 
-/* Two layers, half a loop apart, tiling exactly:
+/* The salon clip frames the stylist and client across the middle of a tall
+   4K portrait; 48% puts that band in the window rather than the ceiling. */
+.ness-hero__media > .ness-hero__layer:nth-child(3) img,
+.ness-hero__media > .ness-hero__layer:nth-child(3) video {
+  object-position: center 48%;
+}
 
-     0–8%     layer 1 fades in    while layer 2 (at 50–58%) fades out
-     8–50%    layer 1 holds       layer 2 fully transparent
-     50–58%   layer 1 fades out   while layer 2 (at 0–8%) fades in
-     58–100%  layer 1 transparent layer 2 holds
+/* Three layers, each offset a third of the loop, tiling exactly. Reading one
+   layer's own cycle:
 
-   Composited coverage is 1 at every point in the cycle, so the ground behind
-   is never visible. That is a deliberate change from the three-photograph
-   crossfade this replaces, whose fades did not tile and dipped to roughly
-   0.46 three times a loop, flashing the dark ground through. */
+     0–8%       fades in     while the previous layer fades out
+     8–33.33%   holds        the other two are fully transparent
+     33.33–41.33% fades out  while the next layer fades in
+     41.33–100% transparent  the other two take their turns
+
+   The fade window (8%) is the same length in both directions and the two
+   ramps that overlap are always one in and one out, so composited coverage
+   is 1 at every point in the cycle and the ground behind is never visible.
+
+   Extending this to a fourth clip is not a matter of adding a delay: the
+   33.33% hold boundary is 100/N and would have to be recut, along with every
+   delay below. */
 @keyframes ness-hero-cine {
   0% {
     opacity: 0;
   }
   8%,
-  50% {
+  33.333% {
     opacity: 1;
   }
-  58%,
+  41.333%,
   100% {
     opacity: 0;
   }
 }
 
-/* Half a loop of stagger, applied to the layer and to both parts of its
-   caption so the three stay locked together. Delay is not inherited, so each
-   animated element needs it stated. */
-.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(2),
-.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(2) .ness-hero__caption,
-.ness-hero__media[data-cine-count='2'] > .ness-hero__layer:nth-child(2) .ness-hero__caption::after {
-  animation-delay: -10s;
+/* A third of the loop of stagger between layers — 8s of 24 — applied to the
+   layer and to both parts of its caption so the three stay locked together.
+   Delay is not inherited, so each animated element needs it stated.
+
+   All three are then shifted back a further 4.8s (20% of the cycle) so that
+   LAYER ONE is inside its opaque hold at t=0 rather than at the start of its
+   fade-in. Relative spacing is untouched, so the loop looks identical; what
+   changes is which clip is on screen at first paint. That matters because
+   layer one is the only one carrying preload="auto" — without the shift the
+   clip actually visible for the first second would be layer three, and the
+   preload hint would point at footage nobody is looking at. */
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(1),
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(1) .ness-hero__caption,
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(1) .ness-hero__caption::after {
+  animation-delay: -4.8s;
+}
+
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(2),
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(2) .ness-hero__caption,
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(2) .ness-hero__caption::after {
+  animation-delay: -12.8s;
+}
+
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(3),
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(3) .ness-hero__caption,
+.ness-hero__media[data-cine-count='3'] > .ness-hero__layer:nth-child(3) .ness-hero__caption::after {
+  animation-delay: -20.8s;
 }
 
 /* Paused by the visitor. Holding the animation keeps whatever is on screen on
@@ -159,7 +191,7 @@
   /* The wash already darkens the clip, but footage moves under this text and
      a bright frame can pass behind it mid-loop. */
   text-shadow: 0 2px 24px rgba(0, 0, 0, 0.5);
-  animation: ness-hero-caption 20s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
+  animation: ness-hero-caption 24s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
 }
 
 /* A gold rule drawing in from the right beneath the words. scaleX on a
@@ -175,31 +207,34 @@
   background: var(--ness-gold);
   transform: scaleX(0);
   transform-origin: right center;
-  animation: ness-hero-caption-rule 20s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
+  animation: ness-hero-caption-rule 24s cubic-bezier(0.22, 0.61, 0.36, 1) infinite both;
 }
 
 /* Deliberately out of step with the crossfade it sits inside. The clip is
-   fully opaque by 8% and the words are still arriving at 20%, so the caption
+   fully opaque by 8% and the words are still arriving at 18%, so the caption
    reads as settling onto footage that is already there rather than switching
-   on with it. It leaves early too — gone by 50%, as the crossfade is only
-   beginning — so the two captions are never on screen together mid-swap.
-   At 20s a loop the rise takes about 2.8s and the words hold for 4.4s. */
+   on with it. It leaves early too — gone by 33%, exactly as the clip begins
+   its own fade-out — so no two captions are ever on screen together mid-swap,
+   which with three layers is the failure that would look worst.
+
+   At 24s a loop the rise takes 2.4s and the words hold for 2.4s, inside the
+   8s the clip is up. */
 @keyframes ness-hero-caption {
   0%,
-  6% {
+  8% {
     opacity: 0;
     transform: translateY(26px);
   }
-  20%,
-  42% {
+  18%,
+  28% {
     opacity: 1;
     transform: translateY(0);
   }
-  50% {
+  33% {
     opacity: 0;
     transform: translateY(-14px);
   }
-  58%,
+  40%,
   100% {
     opacity: 0;
     transform: translateY(26px);
@@ -211,11 +246,11 @@
   10% {
     transform: scaleX(0);
   }
-  30%,
-  42% {
+  24%,
+  28% {
     transform: scaleX(1);
   }
-  50%,
+  33%,
   100% {
     transform: scaleX(0);
   }

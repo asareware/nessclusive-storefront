@@ -5,13 +5,13 @@
   assign heading_id = 'ness-hero-heading-' | append: section.id
   assign cine_id = 'ness-hero-cine-' | append: section.id
   comment
-    Always two. The crossfade below is built so the pair tiles the loop
-    exactly — each clip's fade-out is the other's fade-in — which only works
-    for two layers. The count is fixed in code rather than derived from how
-    many settings the merchant filled in, so the hero cannot be reduced to a
-    single motionless layer by clearing a field.
+    Always three. The crossfade tiles the loop exactly — each clip's fade-out
+    is the next one's fade-in — and the stylesheet's delays are cut for this
+    count specifically. The count is fixed in code rather than derived from
+    how many settings the merchant filled in, so the hero cannot be reduced to
+    a single motionless layer by clearing a field.
   endcomment
-  assign layer_count = 2
+  assign layer_count = 3
 -%}
 
 <section
@@ -153,6 +153,55 @@
         </div>
       {%- endif -%}
     </div>
+
+    <div class="ness-hero__layer">
+      {%- if section.settings.video_3 != blank -%}
+        <div class="ness-hero__video-wrap" aria-hidden="true">
+          {{
+            section.settings.video_3
+            | video_tag:
+              image_size: '1400x',
+              autoplay: true,
+              loop: true,
+              muted: true,
+              controls: false,
+              playsinline: true,
+              class: 'ness-hero__video'
+          }}
+        </div>
+      {%- elsif section.settings.image_3 != blank -%}
+        {{
+          section.settings.image_3
+          | image_url: width: 2400
+          | image_tag:
+            alt: '',
+            widths: '750, 1100, 1500, 1900, 2400',
+            sizes: '100vw',
+            loading: 'eager',
+            fetchpriority: 'low'
+        }}
+      {%- else -%}
+        <video
+          class="ness-hero__video"
+          poster="{{ 'ness-hero-luxury-poster.jpg' | asset_url }}"
+          autoplay
+          loop
+          muted
+          playsinline
+          preload="metadata"
+          aria-hidden="true"
+          tabindex="-1"
+        >
+          <source src="{{ 'ness-hero-luxury.mp4' | asset_url }}" type="video/mp4">
+        </video>
+      {%- endif -%}
+
+      {%- if section.settings.caption_3 != blank -%}
+        <div class="ness-hero__caption-slot">
+          <p class="ness-hero__caption">{{ section.settings.caption_3 | escape }}</p>
+        </div>
+      {%- endif -%}
+    </div>
   </div>
 
   <div class="ness-hero__wash" aria-hidden="true"></div>
@@ -240,7 +289,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Two full-height clips that cross-fade on a slow loop, each labelled with the service it shows. The theme ships with a clip in both slots, so this works without you uploading anything. Type, colours, and the dark overlay are fixed by the design."
+      "content": "Three full-height clips that cross-fade on a slow loop, each labelled with the service it shows. The theme ships with a clip in all three slots, so this works without you uploading anything. Type, colours, and the dark overlay are fixed by the design."
     },
     {
       "type": "header",
@@ -262,7 +311,7 @@
       "type": "text",
       "id": "caption_1",
       "label": "Caption",
-      "default": "Hair Style",
+      "default": "Hair Styles",
       "info": "Fades in slowly over this clip. Keep it to two or three words — it names the service the footage shows. Leave empty for no caption."
     },
     {
@@ -285,8 +334,31 @@
       "type": "text",
       "id": "caption_2",
       "label": "Caption",
-      "default": "Wedding Styles",
+      "default": "Bridal Styles",
       "info": "Fades in slowly over the second clip."
+    },
+    {
+      "type": "header",
+      "content": "Third clip"
+    },
+    {
+      "type": "video",
+      "id": "video_3",
+      "label": "Video",
+      "info": "Same guidance as the first clip."
+    },
+    {
+      "type": "image_picker",
+      "id": "image_3",
+      "label": "Still photograph instead",
+      "info": "Optional. Same guidance as the first clip."
+    },
+    {
+      "type": "text",
+      "id": "caption_3",
+      "label": "Caption",
+      "default": "Luxury Styles",
+      "info": "Fades in slowly over the third clip."
     },
     {
       "type": "header",

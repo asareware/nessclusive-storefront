@@ -608,15 +608,15 @@
     {
       "type": "text",
       "id": "address",
-      "label": "Address",
-      "default": "E 169 St, Bronx, NY 10456"
+      "label": "Street address",
+      "info": "Intentionally has no default — the studio address goes out in the reminder email instead, and the note below says so. Fill this in only if you want the address published on the page. (Shopify rejects a schema whose default is an empty string, so the key is omitted rather than blanked.)"
     },
     {
       "type": "textarea",
       "id": "address_note",
-      "label": "Note under the address",
+      "label": "Location note",
       "default": "Exact address is sent in a reminder email 24 hours before your appointment.",
-      "info": "Leave empty to hide it."
+      "info": "Shown in bold capitals — type it as a normal sentence and the design does the rest. Leave empty to hide it."
     },
     { "type": "header", "content": "Booking policy" },
     { "type": "text", "id": "policy_heading", "label": "Heading", "default": "Booking Policy" },
